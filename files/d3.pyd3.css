@@ -1,3 +1,7 @@
+.chart-title {
+ font: 12px sans-serif;
+}
+
 .line { 
     stroke: steelblue;
     stroke-width: 1.5;
