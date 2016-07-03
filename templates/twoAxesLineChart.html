@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<head>
+<link rel="stylesheet" href="../files/d3.pyd3.css">
+</head>
+
+<div id="chart1"></div>
+
+<body>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="../files/d3.pyd3.js"></script>
+
+<script "text=javascript">
+
+d3.csv("data.csv", function(error, data) {
+  if(error) { console.log(error); }
+  twoAxesLineChart(data);
+});
+
+</script>
