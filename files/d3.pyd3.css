@@ -1,0 +1,64 @@
+.line { 
+    stroke: steelblue;
+    stroke-width: 1.5;
+    fill: none;
+ }
+
+.line2 { 
+    stroke: orange;
+    stroke-width: 1.5;
+    fill: none
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
+.focus2 circle {
+  fill: none;
+  stroke: orange;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.axis {
+ font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.y.axis path {
+ display: none;
+}
+.x.axis path {
+ display: none;
+}
+
+.grid .tick {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+.grid path {
+          stroke-width: 0;
+}
+
+
+.bar {
+  fill: steelblue;
+  opacity: 0.8;
+}
+
+.bar:hover {
+  fill: orange;
+  opacity: 0.8;
+}
