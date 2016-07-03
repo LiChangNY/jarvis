@@ -8,20 +8,10 @@
     fill: none;
  }
 
-.line2 { 
-    stroke: orange;
-    stroke-width: 1.5;
-    fill: none
-}
 
 .focus circle {
   fill: none;
-  stroke: steelblue;
-}
 
-.focus2 circle {
-  fill: none;
-  stroke: orange;
 }
 
 .overlay {
