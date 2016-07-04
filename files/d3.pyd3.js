@@ -1,6 +1,7 @@
 (function() {
 
  twoAxesLineChart = function(data) {
+
     var margin = {top: 20, right: 65, bottom: 40, left: 80};
     var width = 960 - margin.left - margin.right;
     var height = 400 - margin.top - margin.bottom;
@@ -18,7 +19,8 @@
   var parseDate = d3.time.format('%Y-%m-%d').parse,
       bisectDate = d3.bisector(function(d) { return d.Date; }).left,
       formatDate = d3.time.format("%m-%d");;  
-      
+
+
     data.forEach(function(d) {
       d['Date'] = parseDate(d['Date']);
       d['Series 1'] = +d['Series 1'];
