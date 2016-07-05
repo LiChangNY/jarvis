@@ -10,8 +10,11 @@
 
 <script "text=javascript">
 
-  var data = {{ data|safe }};
+    var data = {{ data|safe }},
+        x_serie = {{ x_serie|safe  }}
+        y_series = {{ y_series|safe }};
 
-  twoAxesLineChart(data);
+    twoAxesLineChart(data, x_serie, y_series);
+
 
 </script>

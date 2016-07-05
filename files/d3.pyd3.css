@@ -2,8 +2,7 @@
  font: 12px sans-serif;
 }
 
-.line { 
-    stroke: steelblue;
+.line {
     stroke-width: 1.5;
     fill: none;
  }

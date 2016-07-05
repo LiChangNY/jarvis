@@ -23,7 +23,15 @@ class twoAxesLineChart(object):
     def __init__(self, dataframe, **kwargs):
         self.TEMPLATE_FILE = "twoAxesLineChart.html"
         self.df_json = dataframe.to_json(orient='records')
-        self.templates_var = {'data': self.df_json}
+        self.series_count = len(dataframe.columns)
+        dataframe_columns = list(dataframe.columns.values)
+
+        # A list of accepted kwargs:
+        self.x_serie = kwargs.get('x_serie', dataframe_columns[0].split())
+        self.y_series = kwargs.get('y_series', dataframe_columns[1:self.series_count])
+        self.templates_var = {'data': self.df_json,
+                              'x_serie': self.x_serie,
+                              'y_series': self.y_series}
 
     def show(self, **kwargs):
 
@@ -31,3 +39,4 @@ class twoAxesLineChart(object):
         html_content = template.render(self.templates_var)
 
         display(HTML(html_content))
+
