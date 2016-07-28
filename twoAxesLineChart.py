@@ -43,6 +43,7 @@ class twoAxesLineChart(object):
         self.canvas_height = kwargs.get("canvas_height", 400)
         self.width = kwargs.get('width', self.canvas_width - self.margin_left - self.margin_right)
         self.height = kwargs.get('height', self.canvas_height - self.margin_top - self.margin_bottom)
+        self.legendTick = kwargs.get("legendTick", 'bar')
 
         # Accepted kwargs for shape element
         self.interpolation_method = kwargs.get("interpolation_method",  'cardinal')

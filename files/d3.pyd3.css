@@ -42,25 +42,21 @@
     shape-rendering: crispEdges;
 }
 .grid path {
-          stroke-width: 0;
+    stroke-width: 0;
 }
+
 
 
 .bar {
-  fill: steelblue;
-  opacity: 0.8;
+  cursor: pointer
 }
 
-.bar:hover {
-  fill: orange;
-  opacity: 0.8;
+.bar: hover {
+  opacity: 0.8
 }
 
 
-
-.legend circle {
-  stroke: none;
-}
 .legend text {
   font: 11px sans-serif;
+  cursor: pointer
 }

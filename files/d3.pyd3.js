@@ -10,6 +10,7 @@ drawChart = function(data, options) {
     , second_y_axis_title = options.second_y_axis_title || ""
     , x_serie =  options.x_serie
     , y_series = options.y_series
+    , legendTick = options.legend_tick || "bar"
 
     var canvas_width = options.canvas_width || 960
     , canvas_height = options.canvas_height || 400
@@ -257,7 +258,6 @@ drawChart = function(data, options) {
     legend_x = width
     legend_y = margin.top
     circleRadius= 5
-
     legend = svg.append("g")
                 .attr("class","legend")
                 .attr("transform", "translate(" + legend_x + "," + legend_y + ")")
@@ -265,17 +265,32 @@ drawChart = function(data, options) {
                 .data(d3.range(y_series.length))
                 .enter().append("g");
 
+    if (legendTick == 'circle') {
+        legend.append("circle")
+                .attr("cy", function (d) { return d*(height/y_series.length);  })
+                .attr("cx", function(d) {return margin.right/4 ;})
+                .attr("r", function (d) { return circleRadius; })
+                .attr("fill", function (d) {return c10(d % 10); })
+    } else {
 
-    legend.append("circle")
-            .attr("cy", function (d) { return d*(height/y_series.length);  })
-            .attr("cx", function(d) {return margin.right/4 ;})
-            .attr("r", function (d) { return circleRadius; })
-            .attr("fill", function (d) {return c10(d); })
-            .attr('opacity', 0.8);
+        legend.append("rect")
+            .attr("class", ".legend bar")
+            .attr('x', margin.right/5)
+            .attr('y', function(d) {return Math.floor(d*(height)/y_series.length); })
+            .attr("width", 10)
+            .attr("height", Math.floor(height/y_series.length) )
+            .attr("fill", function(d) {return c10(d % 10);})
+            .attr("id", function(d) {return "legend-bar-" + d; })
+            .on("click", function(d) {
+                toggleId('line_'+d);
+                toggleId('focus_'+d)
+            })
+
+    }
 
     legend.append('text')
-            .attr("y", function (d) { return d*(height/y_series.length) + circleRadius; })
-            .attr("x", function (d) { return  margin.right/4 + circleRadius*2;})
+            .attr("y", function (d) { return (d+0.5)*(height/y_series.length); })
+            .attr("x", function (d) { return  margin.right/3;})
             .attr("fill", function (d) {return c10(d); })
             .attr("text-anchor", "start")
             .on("click", function(d) {
@@ -292,8 +307,8 @@ drawChart = function(data, options) {
 		// Hide or show the elements
 		d3.select("#"+shape_id).style("opacity", newOpacity);
 
-		$("#"+shape_id)[0].active = active;
 		// Update whether or not the elements are active
+		$("#"+shape_id)[0].active = active;
 		//console.log($("#"+shape_id)[0].active);
 
     }
