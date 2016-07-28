@@ -2,14 +2,15 @@
 
 drawChart = function(data, options) {
 
-    //*** Set up canvas *** //
-    var chart_title = options.chart_title || ""
+    //*** Init attributes *** //
+    var x_serie =  options.x_serie
+    , y_series = options.y_series
+    , filterSeries = options.filter_series
+    , chart_title = options.chart_title || ""
     , x_axis_title = options.x_axis_title || ""
     , y_axis_title = options.y_axis_title || ""
     , second_y_axis = options.second_y_axis || false
     , second_y_axis_title = options.second_y_axis_title || ""
-    , x_serie =  options.x_serie
-    , y_series = options.y_series
     , legendTick = options.legend_tick || "bar"
     , legendStyle = options.legend_style || "expand"
 
@@ -94,7 +95,7 @@ drawChart = function(data, options) {
             .style("text-anchor", "middle")
             .text(x_axis_title);
 
-    //draw the left y axis
+    //Draw the left y axis
      svg.append("g")
         .attr("class", "y axis")
         .style('fill', 'steelblue')
@@ -107,38 +108,6 @@ drawChart = function(data, options) {
         .style("text-anchor", "middle")
         .text(y_axis_title);
 
-
-    if (second_y_axis){
-        var yScale2 = d3.scale.linear()
-                        .range([height, margin.top])
-                        .domain([0, y_series_max]);
-
-        var yAxis2 = d3.svg.axis()
-                        .scale(yScale2)
-                        .orient("right")
-                        //coerce the tick values
-                        .tickValues(
-                            tickerBase
-                            //tickerBase.map(function(x) {
-                            //    return x * Math.ceil(y2Max/y1Max)*y1Max/5
-                            //}
-                        );
-
-
-        //draw the right y axis
-        svg.append("g")
-          .attr("class", "y axis")
-          .style('fill','orange')
-          .attr("transform", "translate(" + width + " ,0)")
-          .call(yAxis2)
-         .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", margin.bottom*1.25)
-            .attr("x", -width/4)
-            .attr("dy", ".71em")
-            .style("text-anchor", "middle")
-            .text(second_y_axis_title);
-    }
 
     //Draw y axis
     drawYAxis =  function() {
