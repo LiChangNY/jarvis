@@ -11,6 +11,7 @@ drawChart = function(data, options) {
     , x_serie =  options.x_serie
     , y_series = options.y_series
     , legendTick = options.legend_tick || "bar"
+    , legendStyle = options.legend_style || "expand"
 
     var canvas_width = options.canvas_width || 960
     , canvas_height = options.canvas_height || 400
@@ -169,7 +170,7 @@ drawChart = function(data, options) {
 
     // Draw line element
     drawLine = function(serieName, serieNo) {
-        window['line_'+serieNo] = d3.svg.line().interpolate('cardinal')
+        window['line-'+serieNo] = d3.svg.line().interpolate('cardinal')
             .x(function(d) {
                 return xScale(d[x_serie]) ; })
             .y(function(d) {
@@ -179,8 +180,8 @@ drawChart = function(data, options) {
             .datum(data)
             .attr("class", "line")
             .attr('stroke', c10(serieNo % 10)) //Take remainder
-            .attr("d", window['line_'+serieNo])
-            .attr("id", 'line_'+serieNo);
+            .attr("d", window['line-'+serieNo])
+            .attr("id", 'line-'+serieNo);
 
     };
 
@@ -197,7 +198,7 @@ drawChart = function(data, options) {
             .attr("class", "focus")
             .style('stroke', c10(serieNo % 10))
             .style("display", "none")
-            .attr('id', 'focus_'+serieNo)
+            .attr('id', 'focus-'+serieNo)
 
          focus.append("circle")
             .attr("r", 4.5)
@@ -206,13 +207,13 @@ drawChart = function(data, options) {
             .attr("x", 9)
             .attr("dy", ".35em");
 
-        window['focus_' + serieNo] = focus;
+        window['focus-' + serieNo] = focus;
 
     };
 
     changeFocusCircleState = function(state) {
        y_series.forEach( function(serieName, serieNo) {
-            window['focus_'+serieNo].style("display", state);
+            window['focus-'+serieNo].style("display", state);
        })
     };
 
@@ -227,9 +228,9 @@ drawChart = function(data, options) {
 
 
         y_series.forEach( function(serieName, serieNo){
-            window['focus_'+serieNo].attr("transform", "translate(" + xScale(d[x_serie])  + ","
+            window['focus-'+serieNo].attr("transform", "translate(" + xScale(d[x_serie])  + ","
                    + yScale(d[serieName]) + ")");
-            window['focus_'+serieNo].select("text")
+            window['focus-'+serieNo].select("text")
                 .text(formatDate(d[x_serie]) + ": "+ d[serieName])
                 .style('fill', c10(serieNo % 10))
                 .style('font-size', '10px');
@@ -258,6 +259,15 @@ drawChart = function(data, options) {
     legend_x = width
     legend_y = margin.top
     circleRadius= 5
+
+    if (legendStyle == "collapse") {
+
+
+
+
+    }
+
+
     legend = svg.append("g")
                 .attr("class","legend")
                 .attr("transform", "translate(" + legend_x + "," + legend_y + ")")
@@ -265,28 +275,34 @@ drawChart = function(data, options) {
                 .data(d3.range(y_series.length))
                 .enter().append("g");
 
+
+
     if (legendTick == 'circle') {
         legend.append("circle")
+                .attr("class", "legend tick")
                 .attr("cy", function (d) { return d*(height/y_series.length);  })
                 .attr("cx", function(d) {return margin.right/4 ;})
                 .attr("r", function (d) { return circleRadius; })
-                .attr("fill", function (d) {return c10(d % 10); })
     } else {
-
         legend.append("rect")
-            .attr("class", ".legend bar")
+            .attr("class", "legend tick")
             .attr('x', margin.right/5)
             .attr('y', function(d) {return Math.floor(d*(height)/y_series.length); })
             .attr("width", 10)
             .attr("height", Math.floor(height/y_series.length) )
-            .attr("fill", function(d) {return c10(d % 10);})
-            .attr("id", function(d) {return "legend-bar-" + d; })
-            .on("click", function(d) {
-                toggleId('line_'+d);
-                toggleId('focus_'+d)
-            })
-
     }
+
+
+    legend.selectAll('.legend.tick')
+           .attr("id", function(d) {return "legend-tick-" + d; })
+           .style("fill", function(d) {return c10(d % 10);})
+           .style('stroke', function(d) {return c10(d % 10);})
+           .style('stroke-opacity',0.3)
+            .on("click", function(d) {
+                toggleId('line-'+d);
+                toggleId('focus-'+d)
+                toggleId('legend-tick-'+d)
+            })
 
     legend.append('text')
             .attr("y", function (d) { return (d+0.5)*(height/y_series.length); })
@@ -294,8 +310,9 @@ drawChart = function(data, options) {
             .attr("fill", function (d) {return c10(d); })
             .attr("text-anchor", "start")
             .on("click", function(d) {
-                toggleId('line_'+d);
-                toggleId('focus_'+d)
+                toggleId('line-'+d);
+                toggleId('focus-'+d)
+                toggleId('legend-tick-'+d)
             })
             .text(function(d) {return y_series[d]})
 
