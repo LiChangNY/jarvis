@@ -8,13 +8,9 @@
 
 <body>
 
-<script "text=javascript">
 
-    var data = {{ data|safe }},
-        x_serie = {{ x_serie|safe  }}
-        y_series = {{ y_series|safe }};
+<script type="text/javascript">
 
-    twoAxesLineChart(data, x_serie, y_series);
-
+   drawChart({{ chart.data|safe }}, {{ chart.options|safe }});
 
 </script>
