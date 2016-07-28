@@ -4,13 +4,33 @@
 
 </head>
 
-<div id="chart1"></div>
-
 <body>
 
+{% if chart.filters|length > 0 %}
+    {% for f,vs in chart.filters.iteritems() %}
+
+        <select name="filter-{{f|lower}}" multiple="multiple" id="filter-{{f|lower}}">
+            {# get a list of unique values #}
+            {% for v in vs %}
+                <option value="{{v}}">{{v}}</option>
+            {% endfor %}
+        </select>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#filter-{{f|lower}}").multiselect()
+        });
+    </script>
+
+    {% endfor %}
+{% endif %}
+
+
+<div id="chart1"></div>
 
 <script type="text/javascript">
-
    drawChart({{ chart.data|safe }}, {{ chart.options|safe }});
-
 </script>
+
+</body>
