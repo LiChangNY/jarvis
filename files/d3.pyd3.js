@@ -224,18 +224,11 @@ drawChart = function(data, options) {
         .on("mousemove", mouseMoveFocusCircle);
 
 
+
     //Draw legend
     legend_x = width
     legend_y = margin.top
     circleRadius= 5
-
-    if (legendStyle == "collapse") {
-
-
-
-
-    }
-
 
     legend = svg.append("g")
                 .attr("class","legend")
