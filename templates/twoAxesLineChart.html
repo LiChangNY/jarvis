@@ -15,20 +15,6 @@
         {% endfor %}
     </select>
 
-    <script type="text/javascript">
-
-        $(document).ready(function() {
-             $("#filter-{{f|lower}}").multiselect({
-                    enableCaseInsensitiveFiltering: true,
-                    includeSelectAllOption: true,
-                    onChange: function() {
-                        selectedValues = $('#filter-{{f|lower}}').val();
-                        console.log(selectedValues);
-                    }
-             })
-
-        });
-     </script>
 {% endfor %}
 {% endif %}
 

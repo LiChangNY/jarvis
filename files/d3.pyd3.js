@@ -2,6 +2,29 @@
 
 drawChart = function(data, options) {
 
+
+     $("#filter-date").multiselect({
+            enableCaseInsensitiveFiltering: true,
+            includeSelectAllOption: true,
+            onChange: function() {
+                selectedValues = $('#filter-date').val();
+                console.log(selectedValues);
+                //filter data based on selection
+                filterData = data.filter(function(d) {
+                    return selectedValues.indexOf(formatDate(d['Date'])) > -1;
+                });
+
+                var t = svg.transition().duration(350);
+
+                t.select(".x.axis").call(xAxis);
+                y_series.forEach(function( serieName, serieNo) {
+                    window['line-'+serieNo] = line(filterData, serieName, serieNo);
+                    t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's binding to data.
+                });
+
+            }
+     })
+
     //*** Init attributes *** //
     var x_serie =  options.x_serie
     , y_series = options.y_series
@@ -41,8 +64,8 @@ drawChart = function(data, options) {
 
     data.forEach(function(d) {
 
-      d[x_serie] = parseDate(d[x_serie])
-      y_series.forEach(function(item, index){
+     d[x_serie] = parseDate(d[x_serie])
+     y_series.forEach(function(item, index){
         d[item] = +d[item];
       })
 
@@ -54,34 +77,15 @@ drawChart = function(data, options) {
       return a.x_serie - b.x_serie;
     })
 
-    var xScale = d3.time.scale()
-       .range([0, width]) //- margin.right/2
-       .domain([data[0][x_serie], data[data.length - 1][x_serie]]) ;
-
-    // find the max of all series on the same axis.
-    var y_series_max =  d3.max(data, function(d){return d[y_series[0]];})
-
-    y_series.forEach(function(item, index){
-        var y_serie_max = d3.max(data, function(d){return d[item];});
-        y_series_max = (y_series_max > y_serie_max)? y_series_max: y_serie_max;
-
-    })
 
     //define axis
+    var xScale = d3.time.scale()
+       .range([0, width- margin.right/2])
+       .domain([data[0][x_serie], data[data.length - 1][x_serie]])
+
     var xAxis = d3.svg.axis()
         .scale(xScale)
         .orient("bottom")
-
-    var tickerBase = d3.range(0, data.length);
-
-    var yScale = d3.scale.linear()
-        .range([height, margin.top])
-        .domain([0, y_series_max]);
-
-    var yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient("left")
-        .ticks(data.length)
 
     //draw the x axis
      svg.append("g")
@@ -94,6 +98,25 @@ drawChart = function(data, options) {
                   "translate(" + (width/2) + " ," + margin.bottom/2 + ")")
             .style("text-anchor", "middle")
             .text(x_axis_title);
+
+
+    // find the max of all series on the same axis.
+    var y_series_max =  d3.max(data, function(d){return d[y_series[0]];})
+
+    y_series.forEach(function(item, index){
+        var y_serie_max = d3.max(data, function(d){return d[item];});
+        y_series_max = (y_series_max > y_serie_max)? y_series_max: y_serie_max;
+
+    })
+
+    var yScale = d3.scale.linear()
+        .range([height, margin.top])
+        .domain([0, y_series_max]);
+
+    var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left")
+        .ticks(data.length)
 
     //Draw the left y axis
      svg.append("g")
@@ -138,25 +161,33 @@ drawChart = function(data, options) {
     var c10 = d3.scale.category10();
 
     // Draw line element
-    drawLine = function(serieName, serieNo) {
+    line = function(data, serieName, serieNo) {
+        xScale.domain([data[0][x_serie], data[data.length - 1][x_serie]]) ;
+
         window['line-'+serieNo] = d3.svg.line().interpolate('cardinal')
             .x(function(d) {
                 return xScale(d[x_serie]) ; })
             .y(function(d) {
                 return yScale(d[serieName]);});
 
-        svg.append("path")
+        //TODO: This is kinda hacky way of updating chart. See if I can replace transition.
+        //All I need here is to update data without further drawing new path element.
+        $('#line-'+serieNo).remove();
+
+        svg.append('path')
             .datum(data)
             .attr("class", "line")
             .attr('stroke', c10(serieNo % 10)) //Take remainder
             .attr("d", window['line-'+serieNo])
             .attr("id", 'line-'+serieNo);
 
+        return window['line-'+serieNo];
+
     };
 
 
     y_series.forEach(function(serieName, serieNo) {
-            drawLine(serieName, serieNo);
+        window['line-'+serieNo] = line(data, serieName, serieNo);
     });
 
 
@@ -209,6 +240,7 @@ drawChart = function(data, options) {
     };
 
 
+    /*
     y_series.forEach(function(serieName, serieNo) {
             drawFocusCircle(serieName,serieNo);
     });
@@ -222,7 +254,7 @@ drawChart = function(data, options) {
         .on("mouseover", function() {changeFocusCircleState(null);})
         .on("mouseout", function() {changeFocusCircleState('none');})
         .on("mousemove", mouseMoveFocusCircle);
-
+    */
 
 
     //Draw legend
@@ -262,7 +294,7 @@ drawChart = function(data, options) {
            .style('stroke-opacity',0.3)
             .on("click", function(d) {
                 toggleId('line-'+d);
-                toggleId('focus-'+d)
+                //toggleId('focus-'+d)
                 toggleId('legend-tick-'+d)
             })
 
@@ -273,7 +305,7 @@ drawChart = function(data, options) {
             .attr("text-anchor", "start")
             .on("click", function(d) {
                 toggleId('line-'+d);
-                toggleId('focus-'+d)
+                //toggleId('focus-'+d)
                 toggleId('legend-tick-'+d)
             })
             .text(function(d) {return y_series[d]})
