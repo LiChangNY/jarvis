@@ -1,29 +1,54 @@
 (function() {
 
-drawChart = function(data, options) {
+drawChart = function(data, options, filters) {
+    //dictionary of current filters; store filtered values
+    filterDict = {};
 
+     for (f in filters) {
 
-     $("#filter-date").multiselect({
+        f_slugify = f.replace(' ', '-').toLowerCase();
+        console.log(f_slugify);
+
+        $("#filter-"+f_slugify).multiselect({
             enableCaseInsensitiveFiltering: true,
             includeSelectAllOption: true,
-            onChange: function() {
-                selectedValues = $('#filter-date').val();
-                console.log(selectedValues);
-                //filter data based on selection
-                filterData = data.filter(function(d) {
-                    return selectedValues.indexOf(formatDate(d['Date'])) > -1;
-                });
+            onChange: function(eventData) {
+                //Need to find the parent() and name attribute of eventData due to scoping.
+                //Otherwise it will get overwritten by the last f.
+                var select = eventData.parent()
+                var name = select.attr("name")
 
-                var t = svg.transition().duration(350);
+                filterDict[name] = function(d) {
+                    var value = d[name]
 
-                t.select(".x.axis").call(xAxis);
-                y_series.forEach(function( serieName, serieNo) {
-                    window['line-'+serieNo] = line(filterData, serieName, serieNo);
-                    t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's binding to data.
-                });
+                    if (value instanceof Date) { value=formatDate(value)} //convert date object to be same as the filter format
+
+                    return select.val().indexOf(value.toString()) > -1;
+                };
+
+                updateData();
 
             }
-     })
+        })
+
+     }
+
+
+    //filter data method to loop though all filters and check values.
+    updateData = function() {
+        filterData = data;
+        for (f in filterDict) {
+            filterData = filterData.filter(filterDict[f]);
+        }
+        var t = svg.transition().duration(350);
+        t.select(".x.axis").call(xAxis);
+        y_series.forEach(function( serieName, serieNo) {
+            window['line-'+serieNo] = line(filterData, serieName, serieNo);
+            t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's binding to data.
+        });
+
+     }
+
 
     //*** Init attributes *** //
     var x_serie =  options.x_serie
@@ -240,7 +265,7 @@ drawChart = function(data, options) {
     };
 
 
-    /*
+/*
     y_series.forEach(function(serieName, serieNo) {
             drawFocusCircle(serieName,serieNo);
     });
@@ -254,7 +279,7 @@ drawChart = function(data, options) {
         .on("mouseover", function() {changeFocusCircleState(null);})
         .on("mouseout", function() {changeFocusCircleState('none');})
         .on("mousemove", mouseMoveFocusCircle);
-    */
+*/
 
 
     //Draw legend

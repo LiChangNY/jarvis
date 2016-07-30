@@ -49,6 +49,7 @@ class twoAxesLineChart(object):
             for f in self.filter_series:
                self.filter_values[f] = list(dataframe[f].unique())
 
+        print self.filter_values
 
         # Accepted kwargs for DOM element
         self.x_axis_title = kwargs.get("x_axis_title", "")
