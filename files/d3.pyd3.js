@@ -1,45 +1,50 @@
 (function() {
 
 drawChart = function(data, options, filters) {
-    //dictionary of current filters; store filtered values
+
+
+
+
     filterDict = {};
 
-     for (f in filters) {
+    for (var f in filters) {
 
-        f_slugify = f.replace(' ', '-').toLowerCase();
+        var f_slugify = f.replace(' ', '-').toLowerCase();
         console.log(f_slugify);
 
         $("#filter-"+f_slugify).multiselect({
             enableCaseInsensitiveFiltering: true,
             includeSelectAllOption: true,
-            onChange: function(eventData) {
-                //Need to find the parent() and name attribute of eventData due to scoping.
-                //Otherwise it will get overwritten by the last f.
-                var select = eventData.parent()
-                var name = select.attr("name")
-
-                filterDict[name] = function(d) {
-                    var value = d[name]
-
-                    if (value instanceof Date) { value=formatDate(value)} //convert date object to be same as the filter format
-
-                    return select.val().indexOf(value.toString()) > -1;
-                };
-
-                updateData();
-
-            }
+            //Bootstrap thing. Have to define update functions for all three events.
+            onChange: function(option, checked) { updateData(this.$select);},
+            onSelectAll: function(checked) { updateData(this.$select); },
+            onDeselectAll:  function(checked) { updateData(this.$select); }
         })
 
-     }
+    }
 
 
-    //filter data method to loop though all filters and check values.
-    updateData = function() {
+    //Loop though all filters and check data against filters. Once done, update svg.
+    updateData = function(select) {
+
+        //jQuery thing to return name and values.
+        var name = select.attr("name")
+        , valueSelected = select.val()
+
+        filterDict[name] = function(d) {
+            var value = d[name]
+
+            if (value instanceof Date) { value=formatDate(value)} //convert date object to be same as the filter format
+
+            return valueSelected.indexOf(value.toString()) > -1;
+        };
+
         filterData = data;
         for (f in filterDict) {
             filterData = filterData.filter(filterDict[f]);
         }
+
+
         var t = svg.transition().duration(350);
         t.select(".x.axis").call(xAxis);
         y_series.forEach(function( serieName, serieNo) {
@@ -47,7 +52,7 @@ drawChart = function(data, options, filters) {
             t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's binding to data.
         });
 
-     }
+    }
 
 
     //*** Init attributes *** //
@@ -187,7 +192,11 @@ drawChart = function(data, options, filters) {
 
     // Draw line element
     line = function(data, serieName, serieNo) {
-        xScale.domain([data[0][x_serie], data[data.length - 1][x_serie]]) ;
+
+        //If data has value, re-scale xScale; otherwise, use the default scale.
+        if (data && data.length > 0) {
+            xScale.domain([data[0][x_serie], data[data.length - 1][x_serie]]) ;
+        }
 
         window['line-'+serieNo] = d3.svg.line().interpolate('cardinal')
             .x(function(d) {
