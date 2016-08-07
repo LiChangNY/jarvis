@@ -276,14 +276,15 @@ drawChart = function(data, options, filters) {
 
 
     updateFocusCircle = function(data) {
-        //TODO: FIX when data is undefined or 0 length, there will be one circle drawn.
+
         y_series.forEach(function(serieName, serieNo) {
 
             drawFocusCircle(serieName,serieNo);
 
         });
 
-        svg.append("rect")
+        if (data && data.length > 0) {
+          svg.append("rect")
             .attr("class", "overlay")
             .attr("width", width)
             .attr("height", height)
@@ -291,6 +292,15 @@ drawChart = function(data, options, filters) {
             .on("mouseover", function() {changeFocusCircleState(null);})
             .on("mouseout", function() {changeFocusCircleState('none');})
             .on("mousemove", function() {mouseMoveFocusCircle(data, this)})
+
+        } else {
+
+            y_series.forEach(function(serieName, serieNo) {
+                window['focus-'+serieNo].remove();
+            });
+
+        }
+
 
     };
 
