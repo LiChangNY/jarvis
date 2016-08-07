@@ -10,7 +10,6 @@ drawChart = function(data, options, filters) {
     for (var f in filters) {
 
         var f_slugify = f.replace(' ', '-').toLowerCase();
-        console.log(f_slugify);
 
         $("#filter-"+f_slugify).multiselect({
             enableCaseInsensitiveFiltering: true,
@@ -49,10 +48,12 @@ drawChart = function(data, options, filters) {
         t.select(".x.axis").call(xAxis);
         y_series.forEach(function( serieName, serieNo) {
             window['line-'+serieNo] = line(filterData, serieName, serieNo);
-            t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's binding to data.
+            t.select('#line-'+serieNo).attr("d", window['line-'+serieNo]); //Ideal way of doing update. But it's bound to data.
         });
 
-    }
+        updateFocusCircle(filterData);
+
+    };
 
 
     //*** Init attributes *** //
@@ -252,9 +253,9 @@ drawChart = function(data, options, filters) {
     };
 
 
-    mouseMoveFocusCircle = function() {
+    mouseMoveFocusCircle = function(data, element) {
 
-        var x0 = xScale.invert(d3.mouse(this)[0]),
+        var x0 = xScale.invert(d3.mouse(element)[0]),
             i = bisectDate(data, x0, 1),
             d0 = data[i - 1],
             d1 = data[i],
@@ -274,21 +275,26 @@ drawChart = function(data, options, filters) {
     };
 
 
-/*
-    y_series.forEach(function(serieName, serieNo) {
+    updateFocusCircle = function(data) {
+        //TODO: FIX when data is undefined or 0 length, there will be one circle drawn.
+        y_series.forEach(function(serieName, serieNo) {
+
             drawFocusCircle(serieName,serieNo);
-    });
 
+        });
 
-    svg.append("rect")
-        .attr("class", "overlay")
-        .attr("width", width)
-        .attr("height", height)
-        //Why can't we just call changeFocusCircleState(state) but function()
-        .on("mouseover", function() {changeFocusCircleState(null);})
-        .on("mouseout", function() {changeFocusCircleState('none');})
-        .on("mousemove", mouseMoveFocusCircle);
-*/
+        svg.append("rect")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height)
+            //Why can't we just call changeFocusCircleState(state) but function()
+            .on("mouseover", function() {changeFocusCircleState(null);})
+            .on("mouseout", function() {changeFocusCircleState('none');})
+            .on("mousemove", function() {mouseMoveFocusCircle(data, this)})
+
+    };
+
+    updateFocusCircle(data);
 
 
     //Draw legend
