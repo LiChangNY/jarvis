@@ -1,9 +1,151 @@
-(function() {
+var pyd3 = pyd3 || {};
 
-drawChart = function(data, options, filters) {
+pyd3.drawChart = (function() {
+
+var chartBuilder = {}
+
+chartBuilder.drawCanvas = function(id, width, height, position) {
+    return d3
+        .select(id)
+            .append("svg")
+            .style("max-width", "960px")
+            .attr("width", width)
+            .attr("height", height)
+        .append("g")
+            .attr("transform", "translate(" + position.x + "," + position.y + ")");
+}
+
+chartBuilder.drawTitle = function(svg, x, y, title) {
+    return svg
+        .append("text")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("text-anchor", "middle")
+            .attr("class", 'chart-title')
+            .text(title);
+}
+
+chartBuilder.drawXAxis = function(svg, xAxis, axisPosition, titlePosition, title) {
+    return svg
+        .append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(" + axisPosition.x + ", " + axisPosition.y + ")")
+            .call(xAxis)
+        .append("text")
+            .attr("transform", "translate(" + titlePosition.x + " ," + titlePosition.y + ")")
+            .style("text-anchor", "middle")
+            .text(title);
+}
+
+
+chartBuilder.drawYAxis = function(svg, yAxis, titlePosition, title ) {
+    return svg.append("g")
+        .attr("class", "y axis")
+        .style('fill', 'steelblue')
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", titlePosition.x)
+        .attr("y", titlePosition.y)
+        .attr("dy", ".71em")
+        .style("text-anchor", "middle")
+        .text(title);
+}
+
+var legendBuilder = {};
+
+legendBuilder.drawLegend = function(svg, position, value) {
+    var legend = svg.append("g")
+        .attr("class","legend")
+        .attr("transform", "translate(" + position.x + "," + position.y + ")")
+        .selectAll("g")
+        .data(value)
+        .enter().append("g");
+
+    return legend;
+}
+
+legendBuilder.drawCircleTicks = function(legend, cx, cy, r){
+    return legend.append("circle")
+            .attr("class", "legend tick")
+            .attr("cx", function(d) {return cx;})
+            .attr("cy", function(d) {return cy; })
+            .attr("r", function (d) { return r; })
+
+}
+
+legendBuilder.drawRectTicks = function(legend, x, y, w, h){
+
+    return legend.append("rect")
+            .attr("class", "legend tick")
+            .attr('x', function(d) { return x; })
+            .attr('y', function(d) {return y; })
+            .attr("width", w)
+            .attr("height", h )
+
+}
+
+legendBuilder.colorTicks = function(legend, colorSet) {
+    return legend.selectAll('.legend.tick')
+           .attr("id", function(d) {return "legend-tick-" + d; })
+           .style("fill", function(d) {return colorSet(d % colorSet.length);})
+           .style('stroke', function(d) {return colorSet(d % colorSet.length);})
+           .style('stroke-opacity',0.3)
+            .on("click", function(d) {
+                toggleId('line-'+d);
+                toggleId('focus-'+d)
+                toggleId('legend-tick-'+d)
+            })
+}
+
+
+legendBuilder.drawLabel = function(legend, x, y, colorSet, labels){
+
+    return legend.append('text')
+            .attr("y", function (d) { return y; })
+            .attr("x", function (d) { return  x;})
+            .attr("fill", function (d) {return c10(d); })
+            .attr("text-anchor", "start")
+            .on("click", function(d) {
+                toggleId('line-'+d);
+                toggleId('focus-'+d)
+                toggleId('legend-tick-'+d)
+            })
+            .text(function(d) {return labels[d]})
+
+}
+
+
+var scaleBuilder = {}
+
+scaleBuilder.timeScale = function(range, domain) {
+    return d3.time.scale()
+        .range(range)
+        .domain(domain);
+}
+
+scaleBuilder.linearScale = function(range, domain) {
+    return d3.scale.linear()
+        .range(range)
+        .domain(domain);
+
+}
+
+var axisBuilder = {}
+
+axisBuilder.make = function(scale, orientation, ticks) {
+    var axis = d3.svg.axis()
+        .scale(scale)
+        .orient(orientation);
+
+    if (ticks) axis.ticks(ticks);
+
+    return axis;
+}
 
 
 
+var drawChart = function(data, options, filters) {
 
     filterDict = {};
 
@@ -17,7 +159,7 @@ drawChart = function(data, options, filters) {
             //Bootstrap thing. Have to define update functions for all three events.
             onChange: function(option, checked) { updateData(this.$select);},
             onSelectAll: function(checked) { updateData(this.$select); },
-            onDeselectAll:  function(checked) { updateData(this.$select); }
+            onDeselectAll: function(checked) { updateData(this.$select); }
         })
 
     }
@@ -65,8 +207,11 @@ drawChart = function(data, options, filters) {
     , y_axis_title = options.y_axis_title || ""
     , second_y_axis = options.second_y_axis || false
     , second_y_axis_title = options.second_y_axis_title || ""
-    , legendTick = options.legend_tick || "bar"
+    , legendTick = options.legend_tick || "rect"
     , legendStyle = options.legend_style || "expand"
+    , legend_x = options.legend_x || width
+    , legend_y = options.legend_y || margin.top
+    , circleRadius= options.circleRadius || 5
 
     var canvas_width = options.canvas_width || 960
     , canvas_height = options.canvas_height || 400
@@ -79,15 +224,7 @@ drawChart = function(data, options, filters) {
     var width = options.width || canvas_width - margin.left - margin.right
     , height = options.height || canvas_height - margin.top - margin.bottom
 
-    var svg = d3.select("#chart1")
-              .append("svg")
-                  .style("max-width", "960px")
-                  .attr("width", canvas_width)
-                  .attr("height", canvas_height)
-              .append("g")
-                  .attr("transform",
-                        "translate(" + margin.left+ "," + margin.top + ")");
-
+    var svg = chartBuilder.drawCanvas('#chart1', canvas_width, canvas_height, {x: margin.left , y: margin.top} )
 
     var parseDate = d3.time.format('%Y-%m-%d').parse,
       bisectDate = d3.bisector(function(d) { return d[x_serie]; }).left,
@@ -108,85 +245,45 @@ drawChart = function(data, options, filters) {
       return a.x_serie - b.x_serie;
     })
 
+    updateChart = function(data) {}
 
     //define axis
-    var xScale = d3.time.scale()
-       .range([0, width- margin.right/2])
-       .domain([data[0][x_serie], data[data.length - 1][x_serie]])
+    var xScale = scaleBuilder.timeScale([0, width - margin.right / 2], d3.extent(data, function(d) { return d.Date; }));
 
-    var xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient("bottom")
+    var xAxis = axisBuilder.make(xScale, "bottom");
 
-    //draw the x axis
-     svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform",
-                  "translate(0," + height+ ")")
-            .call(xAxis)
-        .append("text")
-            .attr("transform",
-                  "translate(" + (width/2) + " ," + margin.bottom/2 + ")")
-            .style("text-anchor", "middle")
-            .text(x_axis_title);
+    chartBuilder.drawXAxis(svg, xAxis, axisPosition={x: 0, y: height},
+                            titlePosition={x: width/2, y: margin.bottom/2}, x_axis_title);
 
+    chartBuilder.drawTitle(svg, width / 2, margin.top / 2, chart_title);
 
     // find the max of all series on the same axis.
     var y_series_max =  d3.max(data, function(d){return d[y_series[0]];})
+    , y_series_min = d3.min(data, function(d){return d[y_series[0]];})
 
-    y_series.forEach(function(item, index){
-        var y_serie_max = d3.max(data, function(d){return d[item];});
+    y_series.forEach(function(e, i){
+        var y_serie_max = d3.max(data, function(d){return d[e];});
         y_series_max = (y_series_max > y_serie_max)? y_series_max: y_serie_max;
+
+        var y_serie_min = d3.min(data, function(d){return d[e];});
+        y_series_min = (y_series_min < y_serie_min)? y_series_min: y_serie_min;
 
     })
 
-    var yScale = d3.scale.linear()
-        .range([height, margin.top])
-        .domain([0, y_series_max]);
 
-    var yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient("left")
-        .ticks(data.length)
+    var yScale = scaleBuilder.linearScale([height, margin.top],[0, y_series_max] );
 
-    //Draw the left y axis
-     svg.append("g")
-        .attr("class", "y axis")
-        .style('fill', 'steelblue')
-        .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -margin.left/2)
-        .attr("x", -height/2)
-        .attr("dy", ".71em")
-        .style("text-anchor", "middle")
-        .text(y_axis_title);
+    var yAxis = axisBuilder.make(yScale, "left", data.length);
 
-
-    //Draw y axis
-    drawYAxis =  function() {
-        return d3.svg.axis()
-            .scale(yScale)
-            .orient("left")
-            .ticks(5)
-    };
-
+    chartBuilder.drawYAxis(svg, yAxis, {x:-height/2, y:-margin.left/2}, y_axis_title);
 
     // Draw the left y Grid lines
     svg.append("g")
       .attr("class", "grid")
-      .call(drawYAxis()
+      .call(axisBuilder.make(yScale, "left", 5)
               .tickSize(-width, 0, 0)
               .tickFormat("")
            )
-
-    // Add  title
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", margin.top/2)
-      .attr("text-anchor", "middle")
-      .attr("class", 'chart-title')
-      .text(chart_title);
 
     //*** Set up shapes *** //
     var c10 = d3.scale.category10();
@@ -196,7 +293,7 @@ drawChart = function(data, options, filters) {
 
         //If data has value, re-scale xScale; otherwise, use the default scale.
         if (data && data.length > 0) {
-            xScale.domain([data[0][x_serie], data[data.length - 1][x_serie]]) ;
+            xScale.domain(d3.extent(data, function(d) { return d.Date; })) ;
         }
 
         window['line-'+serieNo] = d3.svg.line().interpolate('cardinal')
@@ -209,6 +306,7 @@ drawChart = function(data, options, filters) {
         //All I need here is to update data without further drawing new path element.
         $('#line-'+serieNo).remove();
 
+        //TODO: Replace datum() with Enter, Update, Exit
         svg.append('path')
             .datum(data)
             .attr("class", "line")
@@ -220,7 +318,7 @@ drawChart = function(data, options, filters) {
 
     };
 
-
+    console.log(data);
     y_series.forEach(function(serieName, serieNo) {
         window['line-'+serieNo] = line(data, serieName, serieNo);
     });
@@ -296,6 +394,7 @@ drawChart = function(data, options, filters) {
         } else {
 
             y_series.forEach(function(serieName, serieNo) {
+
                 window['focus-'+serieNo].remove();
             });
 
@@ -306,59 +405,19 @@ drawChart = function(data, options, filters) {
 
     updateFocusCircle(data);
 
-
-    //Draw legend
-    legend_x = width
-    legend_y = margin.top
-    circleRadius= 5
-
-    legend = svg.append("g")
-                .attr("class","legend")
-                .attr("transform", "translate(" + legend_x + "," + legend_y + ")")
-                .selectAll("g")
-                .data(d3.range(y_series.length))
-                .enter().append("g");
-
-
-
+    legend = chartBuilder.drawLegend(svg, {x: legend_x, y: legend_y}, d3.range(y_series.length))
     if (legendTick == 'circle') {
-        legend.append("circle")
-                .attr("class", "legend tick")
-                .attr("cy", function (d) { return d*(height/y_series.length);  })
-                .attr("cx", function(d) {return margin.right/4 ;})
-                .attr("r", function (d) { return circleRadius; })
+        legendBuilder.drawCircleTicks(legend,
+                                       margin.right/4 ,
+                                       d*(height/y_series.length),
+                                       circleRadius)
     } else {
-        legend.append("rect")
-            .attr("class", "legend tick")
-            .attr('x', margin.right/5)
-            .attr('y', function(d) {return Math.floor(d*(height)/y_series.length); })
-            .attr("width", 10)
-            .attr("height", Math.floor(height/y_series.length) )
-    }
+        legendBuilder.drawRectTicks(legend, margin.right/5, Math.floor(d*(height)/y_series.length),
+                                10, Math.floor(height/y_series.length))
+    };
 
-
-    legend.selectAll('.legend.tick')
-           .attr("id", function(d) {return "legend-tick-" + d; })
-           .style("fill", function(d) {return c10(d % 10);})
-           .style('stroke', function(d) {return c10(d % 10);})
-           .style('stroke-opacity',0.3)
-            .on("click", function(d) {
-                toggleId('line-'+d);
-                //toggleId('focus-'+d)
-                toggleId('legend-tick-'+d)
-            })
-
-    legend.append('text')
-            .attr("y", function (d) { return (d+0.5)*(height/y_series.length); })
-            .attr("x", function (d) { return  margin.right/3;})
-            .attr("fill", function (d) {return c10(d); })
-            .attr("text-anchor", "start")
-            .on("click", function(d) {
-                toggleId('line-'+d);
-                //toggleId('focus-'+d)
-                toggleId('legend-tick-'+d)
-            })
-            .text(function(d) {return y_series[d]})
+    legendBuilder.colorTicks(legend, c10);
+    legendBuilder.drawLabel(legend, margin.right/3, (d+0.5)*(height/y_series.length), c10, y_series)
 
     toggleId = function(shape_id) {
         //Need to add [0] to access the attributes
@@ -377,7 +436,6 @@ drawChart = function(data, options, filters) {
 
 }
 
-
-
+return drawChart;
 
 })();
