@@ -1,6 +1,5 @@
 *.csv
 **/archive
-index.html
 .DS_Store
 
 .idea
