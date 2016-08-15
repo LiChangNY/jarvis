@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<head>
+
+<link media="all" href="files/d3.pyd3.css" type="text/css" rel="stylesheet">
+<script src='files/d3.v3.min.js'></script>
+<script src='files/d3.pyd3.js'></script>
+
+<link rel="stylesheet" href="files/bootstrap.min.css" type="text/css">
+<script type="text/javascript" src="files/jquery.min.js"></script>
+<script type="text/javascript" src="files/bootstrap.min.js"></script>
+<script type="text/javascript" src="files/bootstrap-multiselect.js"></script>
+<link rel="stylesheet" href="files/bootstrap-multiselect.css" type="text/css">
+
+</head>
+
+<body>
+
+   <select name="Date" multiple="multiple" id="filter-date">
+      
+            <option value="2015-01-01" selected="">2015-01-01</option>
+
+            <option value="2015-01-15" selected="">2015-01-15</option>
+
+            <option value="2015-02-01" selected="">2015-02-01</option>
+
+            <option value="2015-02-15" selected="">2015-02-15</option>
+
+            <option value="2015-03-01" selected="">2015-03-01</option>
+
+    </select>
+    <select name="Series 1" multiple="multiple" id="filter-series-1">
+
+
+            <option value="100" selected="">100</option>
+
+            <option value="20" selected="">20</option>
+
+            <option value="200" selected="">200</option>
+
+            <option value="40" selected="">40</option>
+
+            <option value="300" selected="">300</option>
+
+    </select>
+
+<div id="chart1"></div>
+
+<script type="text/javascript">
+pyd3.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
+          {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
+          {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
+          {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
+          {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
+          {"df_json": [{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
+                        {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
+                        {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
+                        {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
+                        {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
+          "legend_tick": "bar", "height": 300, "x_serie": "Date", "interpolation_method": "cardinal",
+          "canvas_width": 960, "margin_right": 100, "width": 600, "x_axis_title": "x axis title goes here",
+          "second_y_axis_title": "", "y_series": ["Series 1", "Series 2", "Series 3"],
+          "TEMPLATE_FILE": "twoAxesLineChart.html", "legend_style": "expand",
+          "filter_values": {"Date": ["2015-01-01", "2015-01-15", "2015-02-01", "2015-02-15", "2015-03-01"],
+                            "Series 1": [100, 20, 200, 40, 300]}, "canvas_height": 400,
+          "chart_title": "Chart Title Goes Here",
+          "filter_series": ["Date", "Series 1"],
+          "y_axis_title": "y axis title goes here", "margin_top": 40,
+          "margin_left": 80, "margin_bottom": 60, "series_count": 4},
+          {'Date': ['2015-01-01', '2015-01-15', '2015-02-01', '2015-02-15', '2015-03-01'],
+          'Series 1': [100, 20, 200, 40, 300]});
+
+</script>
+</body>
