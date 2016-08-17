@@ -2,30 +2,50 @@ var pyd3 = pyd3 || {};
 
 pyd3.LineChart = (function() {
 
-LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale, yScale, colorSet = d3.scale.category10()) {
+LineChartBuilder = function(id, canvas_width, canvas_height, width, height, margin, x_serie, y_series,
+                            data, colorSet = d3.scale.category10()) {
     var seriesCount = y_series.length;
     var formatDate = d3.time.format("%Y-%m-%d");
+    var parseDate = d3.time.format('%Y-%m-%d').parse;
+
+    data.forEach(function(d) {
+
+         d[x_serie] = parseDate(d[x_serie])
+         y_series.forEach(function(item, index){
+            d[item] = +d[item];
+          })
+
+    });
+
+    //sort data by date
+    data.sort(function(a, b) {
+      return a.x_serie - b.x_serie;
+    })
+
+    var nestData = function(data) {
+        return y_series.map(function(e) {
+            return data.map(function(d) {
+                var value = {};
+                value['id'] = e;
+                value[x_serie] = d[x_serie];
+                value[e] = +d[e];
+                return value;
+            })
+
+        })
+    }
+
+    var dataGrouped = nestData(data);
 
     var drawCanvas = function() {
         return d3
             .select(id)
             .append("svg")
-                .style("max-width", "960px")
-                .attr("width", width)
-                .attr("height", height)
+                //.style("max-width", "960px")
+                .attr("width", canvas_width)
+                .attr("height", canvas_height)
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    }
-
-    this.drawGridLine = function() {
-        // Draw the left y Grid lines
-        svg.append("g")
-          .attr("class", "grid")
-          .call(axisBuilder.make(yScale, "left", 5)
-                  .tickSize(-width, 0, 0)
-                  .tickFormat("")
-               )
-         return this;
     }
 
     this.drawTitle = function(x, y, title) {
@@ -40,7 +60,55 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
         return this;
     }
 
-    this.drawXAxis = function(xAxis, axisPosition, titlePosition, title) {
+   var timeScale = function(range, domain) {
+        return d3.time.scale()
+            .range(range)
+            .domain(domain);
+    }
+
+    var linearScale = function(range, domain) {
+        return d3.scale.linear()
+            .range(range)
+            .domain(domain);
+
+    }
+
+
+    //TODO: Replace d.Date with xAxis
+    //var xScale = timeScale([0, width - margin.right / 2], d3.extent(data, function(d) { return d.Date; }));
+
+    var xScaleBuilder = function(data) {
+        var xScaleMin = d3.min(data, function(d) { return d3.min(d, function (v) { return v[x_serie] })})
+        , xScaleMax = d3.max(data, function(d) { return d3.max(d, function (v) { return v[x_serie] }) });
+
+        console.log(xScaleMin, xScaleMax);
+
+        return timeScale([0, width - margin.right / 2],[xScaleMin, xScaleMax])
+    }
+
+    var xScale = xScaleBuilder(dataGrouped)
+
+    // Find min and max of y series.
+    var yAxisMax = d3.max(dataGrouped, function(c) {
+        return d3.max(c, function(v) {return v[v.id]; })
+    } );
+
+    var yScale = linearScale([height, margin.top],[0, yAxisMax] );
+
+    var defineAxis = function(scale, orientation, ticks) {
+        var axis = d3.svg.axis()
+            .scale(scale)
+            .orient(orientation);
+
+        if (ticks) axis.ticks(ticks);
+
+        return axis;
+    }
+
+    var xAxis = defineAxis(xScale, "bottom");
+    var yAxis = defineAxis(yScale, "left");
+
+    this.drawXAxis = function(axisPosition, titlePosition, title) {
         svg
             .append("g")
                 .attr("class", "x axis")
@@ -54,8 +122,18 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
         return this;
     }
 
+    this.drawGridLine = function() {
+        // Draw the left y Grid lines
+        svg.append("g")
+          .attr("class", "grid")
+          .call(yAxis
+                  .tickSize(-width, 0, 0)
+                  .tickFormat("")
+               )
+         return this;
+    }
 
-    this.drawYAxis = function(yAxis, titlePosition, title ) {
+    this.drawYAxis = function(titlePosition, title ) {
         svg.append("g")
             .attr("class", "y axis")
             .style('fill', 'steelblue')
@@ -72,7 +150,10 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
     }
 
 
-    this.drawLine = function(dataGrouped) {
+    this.drawLine = function(data) {
+
+        if (!data) data = dataGrouped;
+
         var line = d3.svg.line()
             .interpolate('cardinal')
             .x(function(d) { return xScale(d[x_serie]); })
@@ -81,7 +162,7 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
         //Update svg
         var multiLines = svg
             .selectAll(".line-g")
-            .data(dataGrouped)
+            .data(data)
 
         //Enter new data.
         multiLines
@@ -103,43 +184,6 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
 
         return this;
     }
-
-    //Loop though all filters and check data against filters. Once done, update svg.
-    this.updateData = function(select, filterDict, nestData, data, xAxis) {
-
-        //jQuery thing to return name and values.
-        var name = select.attr("name")
-        , valueSelected = select.val()
-
-        filterDict[name] = function(d) {
-
-            var value = d[name];
-
-            if (!value) return true;
-
-            if (value instanceof Date) value=formatDate(value);
-
-            return valueSelected.indexOf(value.toString()) > -1;
-        };
-
-
-        filterData = nestData(data) ;
-
-        for (f in filterDict) {
-
-            filterData = filterData.map(function(c) {
-                return c.filter(filterDict[f]);
-            })
-
-        }
-
-        var t = svg.transition().duration(350);
-        t.select(".x.axis").call(xAxis);
-        drawLine(filterData);
-
-        //updateFocusCircle(filterData);
-        return this;
-    };
 
     this.drawLegend = function(height, position, legendTick, circleRadius) {
         this.legendHeight = height;
@@ -271,7 +315,7 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
     };
 
 
-    this.updateFocusCircle = function(data, width, height) {
+    this.updateFocusCircle = function(width, height) {
         drawFocusCircle();
         svg.append("rect")
             .attr("class", "overlay")
@@ -284,38 +328,70 @@ LineChartBuilder = function(id, width, height, margin, x_serie, y_series, xScale
         return this;
     };
 
+
+    this.setFilters = function(filters) {
+
+        filterDict = {};
+
+        for (var f in filters) {
+
+            var f_slugify = f.replace(' ', '-').toLowerCase();
+
+            $("#filter-"+f_slugify).multiselect({
+                enableCaseInsensitiveFiltering: true,
+                includeSelectAllOption: true,
+                //Bootstrap thing. Have to define update functions for all three events.
+                onChange: function(option, checked) { updateData(this.$select, filterDict);},
+                onSelectAll: function(checked) { updateData(this.$select, filterDict); },
+                onDeselectAll: function(checked) { updateData(this.$select, filterDict); }
+            })
+        }
+
+    }
+
+    //Loop though all filters and check data against filters. Once done, update svg.
+    var updateData = function(select, filterDict) {
+
+        //jQuery thing to return name and values.
+        var name = select.attr("name")
+        , valueSelected = select.val()
+
+        filterDict[name] = function(d) {
+
+            var value = d[name];
+
+            if (!value) return true;
+
+            if (value instanceof Date) value=formatDate(value);
+
+            return valueSelected.indexOf(value.toString()) > -1;
+        };
+
+
+        filterData = nestData(data);
+
+        for (f in filterDict) {
+
+            filterData = filterData.map(function(c) {
+                return c.filter(filterDict[f]);
+            })
+
+        }
+
+        //TODO: Clean up manual reset.
+        xScale = xScaleBuilder(filterData);
+        xAxis = defineAxis(xScale, "bottom");
+
+        var t = svg.transition().duration(350);
+        t.select(".x.axis").call(xAxis);
+        drawLine(filterData);
+
+        return this;
+    };
+
     this.svg = drawCanvas();
 
     return this;
-}
-
-
-
-var scaleBuilder = {}
-
-scaleBuilder.timeScale = function(range, domain) {
-    return d3.time.scale()
-        .range(range)
-        .domain(domain);
-}
-
-scaleBuilder.linearScale = function(range, domain) {
-    return d3.scale.linear()
-        .range(range)
-        .domain(domain);
-
-}
-
-var axisBuilder = {}
-
-axisBuilder.make = function(scale, orientation, ticks) {
-    var axis = d3.svg.axis()
-        .scale(scale)
-        .orient(orientation);
-
-    if (ticks) axis.ticks(ticks);
-
-    return axis;
 }
 
 
@@ -349,79 +425,17 @@ var drawChart = function(data, options, filters) {
     , circleRadius= options.circleRadius || 5
 
 
-    var parseDate = d3.time.format('%Y-%m-%d').parse;
-
-    data.forEach(function(d) {
-
-         d[x_serie] = parseDate(d[x_serie])
-         y_series.forEach(function(item, index){
-            d[item] = +d[item];
-          })
-
-    });
-
-    //sort data by date
-    data.sort(function(a, b) {
-      return a.x_serie - b.x_serie;
-    })
-
-    filterDict = {};
-
-    for (var f in filters) {
-
-        var f_slugify = f.replace(' ', '-').toLowerCase();
-
-        $("#filter-"+f_slugify).multiselect({
-            enableCaseInsensitiveFiltering: true,
-            includeSelectAllOption: true,
-            //Bootstrap thing. Have to define update functions for all three events.
-            onChange: function(option, checked) { chart.updateData(this.$select, filterDict, nestData, data, xAxis);},
-            onSelectAll: function(checked) { chart.updateData(this.$select, filterDict, nestData, data, xAxis); },
-            onDeselectAll: function(checked) { cart.updateData(this.$select, filterDict, nestData, data, xAxis); }
-        })
-
-    }
-
-
-    //define axis
-    var xScale = scaleBuilder.timeScale([0, width - margin.right / 2], d3.extent(data, function(d) { return d.Date; }));
-
-    var xAxis = axisBuilder.make(xScale, "bottom");
-
-    var nestData = function(data) {
-        return y_series.map(function(e) {
-            return data.map(function(d) {
-                var value = {};
-                value['id'] = e;
-                value[x_serie] = d[x_serie];
-                value[e] = +d[e];
-                return value;
-            })
-
-        })
-    }
-
-    var dataGrouped = nestData(data);
-
-    // Find min and max of y series.
-    var yAxisMax = d3.max(dataGrouped, function(c) {
-        return d3.max(c, function(v) {return v[v.id]; })
-        //same as return d3.max(c.values.map(function(d) {return d.value;} ));
-    } );
-
-    var yScale = scaleBuilder.linearScale([height, margin.top],[0, yAxisMax] );
-
-    var yAxis = axisBuilder.make(yScale, "left", data.length);
-
-    var chart = LineChartBuilder('#chart1', canvas_width, canvas_height, margin, x_serie, y_series, xScale, yScale)
+    var chart = LineChartBuilder('#chart1', canvas_width, canvas_height, width, height, margin, x_serie, y_series, data)
         .drawTitle(width / 2, margin.top / 2, chart_title)
-        .drawXAxis(xAxis, axisPosition={x: 0, y: height},
+        .drawXAxis(axisPosition={x: 0, y: height},
                     titlePosition={x: width/2, y: margin.bottom/2}, x_axis_title)
-        .drawYAxis(yAxis, {x:-height/2, y:-margin.left/2}, y_axis_title)
-        .drawLine(dataGrouped)
+        .drawYAxis({x:-height/2, y:-margin.left/2}, y_axis_title)
+        .drawLine()
         .drawLegend(height, {x: legend_x, y: legend_y}, legendTick, circleRadius)
         .drawGridLine()
-        .updateFocusCircle(data, width, height);
+        .updateFocusCircle(width, height)
+        .setFilters(filters)
+
 }
 
 return drawChart;
