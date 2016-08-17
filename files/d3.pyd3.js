@@ -2,16 +2,16 @@ var pyd3 = pyd3 || {};
 
 pyd3.LineChart = (function() {
 
-LineChartBuilder = function(id, canvas_width, canvas_height, width, height, margin, x_serie, y_series,
+LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries,
                             data, colorSet = d3.scale.category10()) {
-    var seriesCount = y_series.length;
+    var seriesCount = ySeries.length;
     var formatDate = d3.time.format("%Y-%m-%d");
     var parseDate = d3.time.format('%Y-%m-%d').parse;
 
     data.forEach(function(d) {
 
-         d[x_serie] = parseDate(d[x_serie])
-         y_series.forEach(function(item, index){
+         d[xSerie] = parseDate(d[xSerie])
+         ySeries.forEach(function(item, index){
             d[item] = +d[item];
           })
 
@@ -19,15 +19,15 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
 
     //sort data by date
     data.sort(function(a, b) {
-      return a.x_serie - b.x_serie;
+      return a.xSerie - b.xSerie;
     })
 
     var nestData = function(data) {
-        return y_series.map(function(e) {
+        return ySeries.map(function(e) {
             return data.map(function(d) {
                 var value = {};
                 value['id'] = e;
-                value[x_serie] = d[x_serie];
+                value[xSerie] = d[xSerie];
                 value[e] = +d[e];
                 return value;
             })
@@ -42,8 +42,8 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
             .select(id)
             .append("svg")
                 //.style("max-width", "960px")
-                .attr("width", canvas_width)
-                .attr("height", canvas_height)
+                .attr("width", canvasWidth)
+                .attr("height", canvasHeight)
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     }
@@ -78,8 +78,8 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
     //var xScale = timeScale([0, width - margin.right / 2], d3.extent(data, function(d) { return d.Date; }));
 
     var xScaleBuilder = function(data) {
-        var xScaleMin = d3.min(data, function(d) { return d3.min(d, function (v) { return v[x_serie] })})
-        , xScaleMax = d3.max(data, function(d) { return d3.max(d, function (v) { return v[x_serie] }) });
+        var xScaleMin = d3.min(data, function(d) { return d3.min(d, function (v) { return v[xSerie] })})
+        , xScaleMax = d3.max(data, function(d) { return d3.max(d, function (v) { return v[xSerie] }) });
 
         console.log(xScaleMin, xScaleMax);
 
@@ -156,7 +156,7 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
 
         var line = d3.svg.line()
             .interpolate('cardinal')
-            .x(function(d) { return xScale(d[x_serie]); })
+            .x(function(d) { return xScale(d[xSerie]); })
             .y(function(d) { return yScale(d[d.id]); });
 
         //Update svg
@@ -253,7 +253,7 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
                     toggleId('focus-'+d)
                     toggleId('legend-tick-'+d)
                 })
-                .text(function(d) {return y_series[d]})
+                .text(function(d) {return ySeries[d]})
 
     }
 
@@ -297,19 +297,19 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
 
 
     var mouseMoveFocusCircle = function(data, element){
-        var bisectDate = d3.bisector(function(d) { return d[x_serie]; }).left;
+        var bisectDate = d3.bisector(function(d) { return d[xSerie]; }).left;
 
         var x0 = xScale.invert(d3.mouse(element)[0]),
             i = bisectDate(data, x0, 1),
             d0 = data[i - 1],
             d1 = data[i],
-            d = x0 - d0[x_serie] > d1[x_serie] - x0 ? d1 : d0;
+            d = x0 - d0[xSerie] > d1[xSerie] - x0 ? d1 : d0;
 
         svg.selectAll(".focus")
-            .attr("transform", function(i) { return "translate(" + xScale(d[x_serie])  + ","
+            .attr("transform", function(i) { return "translate(" + xScale(d[xSerie])  + ","
                    + yScale(d['Series ' + (i + 1)]) + ")";})
             .select("text")
-                .text(function(i) { return formatDate(d[x_serie]) + ": "+ d['Series ' + (i + 1)]; })
+                .text(function(i) { return formatDate(d[xSerie]) + ": "+ d['Series ' + (i + 1)]; })
                 .style('fill', function(i) { return colorSet(i % 10); })
                 .style('font-size', '10px');
     };
@@ -399,39 +399,37 @@ LineChartBuilder = function(id, canvas_width, canvas_height, width, height, marg
 var drawChart = function(data, options, filters) {
 
     //*** Init attributes *** //
-    var x_serie =  options.x_serie
-    , y_series = options.y_series
+    var xSerie =  options.x_serie
+    , ySeries = options.y_series
     , filterSeries = options.filter_series
-    , chart_title = options.chart_title || ""
-    , x_axis_title = options.x_axis_title || ""
-    , y_axis_title = options.y_axis_title || ""
-    , second_y_axis = options.second_y_axis || false
-    , second_y_axis_title = options.second_y_axis_title || ""
+    , chartTitle = options.chart_title || ""
+    , xAxisTitle = options.x_axis_title || ""
+    , yAxisTitle = options.y_axis_title || ""
 
-    var canvas_width = options.canvas_width || 960
-    , canvas_height = options.canvas_height || 400
+    var canvasWidth = options.canvas_width || 960
+    , canvasHeight = options.canvas_height || 400
     , margin = {}
     margin.left = options.margin_left || 80
     margin.right = options.margin_right || 65
     margin.top = options.margin_top ||40
     margin.bottom = options.margin_bottom || 60
 
-    var width = options.width || canvas_width - margin.left - margin.right
-    , height = options.height || canvas_height - margin.top - margin.bottom
+    var width = options.width || canvasWidth - margin.left - margin.right
+    , height = options.height || canvasHeight - margin.top - margin.bottom
     , legendTick = options.legend_tick || "rect"
     , legendStyle = options.legend_style || "expand"
-    , legend_x = options.legend_x || width
-    , legend_y = options.legend_y || margin.top
+    , legendX = options.legend_x || width
+    , legendY = options.legend_y || margin.top
     , circleRadius= options.circleRadius || 5
 
 
-    var chart = LineChartBuilder('#chart1', canvas_width, canvas_height, width, height, margin, x_serie, y_series, data)
-        .drawTitle(width / 2, margin.top / 2, chart_title)
+    var chart = LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data)
+        .drawTitle(width / 2, margin.top / 2, chartTitle)
         .drawXAxis(axisPosition={x: 0, y: height},
-                    titlePosition={x: width/2, y: margin.bottom/2}, x_axis_title)
-        .drawYAxis({x:-height/2, y:-margin.left/2}, y_axis_title)
+                    titlePosition={x: width/2, y: margin.bottom/2}, xAxisTitle)
+        .drawYAxis({x:-height/2, y:-margin.left/2}, yAxisTitle)
         .drawLine()
-        .drawLegend(height, {x: legend_x, y: legend_y}, legendTick, circleRadius)
+        .drawLegend(height, {x: legendX, y: legendY}, legendTick, circleRadius)
         .drawGridLine()
         .updateFocusCircle(width, height)
         .setFilters(filters)
