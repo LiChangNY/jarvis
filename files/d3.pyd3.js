@@ -1,9 +1,28 @@
-var pyd3 = pyd3 || {};
+var pyd3 = (function() {
 
-pyd3.LineChart = (function() {
+// This is the ChartBuilder constructor
+// It gets called whenever you new up a class that inherits from ChartBuilder or whenever
+// you new up a ChartBuilder itself
+ChartBuilder = function(id) {
+    console.log("ChartBuilder constructor called");
 
+    this._id = id;
+}
+
+ChartBuilder.prototype.test2 = function() { console.log(this._id); }
+
+// This is the LineChartBuilder constructor
+// It gets called whenever you new up a LineChartBuilder
 LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries,
                             data, colorSet = d3.scale.category10()) {
+
+    console.log("LineChartBuilder constructor called");
+
+    // Call parent constructor with arguments
+    ChartBuilder.call(this, arguments);
+
+    this.test2();
+
     var seriesCount = ySeries.length;
     var formatDate = d3.time.format("%Y-%m-%d");
     var parseDate = d3.time.format('%Y-%m-%d').parse;
@@ -49,7 +68,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     }
 
     this.drawTitle = function(x, y, title) {
-        svg
+        this.svg
             .append("text")
                 .attr("x", x)
                 .attr("y", y)
@@ -109,7 +128,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     var yAxis = defineAxis(yScale, "left");
 
     this.drawXAxis = function(axisPosition, titlePosition, title) {
-        svg
+        this.svg
             .append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(" + axisPosition.x + ", " + axisPosition.y + ")")
@@ -124,7 +143,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
     this.drawGridLine = function() {
         // Draw the left y Grid lines
-        svg.append("g")
+        this.svg.append("g")
           .attr("class", "grid")
           .call(yAxis
                   .tickSize(-width, 0, 0)
@@ -134,7 +153,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     }
 
     this.drawYAxis = function(titlePosition, title ) {
-        svg.append("g")
+        this.svg.append("g")
             .attr("class", "y axis")
             .style('fill', 'steelblue')
             .call(yAxis)
@@ -160,7 +179,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             .y(function(d) { return yScale(d[d.id]); });
 
         //Update svg
-        var multiLines = svg
+        var multiLines = this.svg
             .selectAll(".line-g")
             .data(data)
 
@@ -188,7 +207,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     this.drawLegend = function(height, position, legendTick, circleRadius) {
         this.legendHeight = height;
 
-        this.legend = svg.append("g")
+        this.legend = this.svg.append("g")
             .attr("class","legend")
             .attr("transform", "translate(" + position.x + "," + position.y + ")")
             .selectAll("g")
@@ -196,39 +215,40 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             .enter().append("g");
 
         if (legendTick == 'circle') {
-            drawCircleTicks();
+            this.drawCircleTicks();
         } else {
-            drawRectTicks();
+            this.drawRectTicks();
         };
 
-        colorTicks();
-        drawLabel();
+        this.colorTicks();
+        this.drawLabel();
 
         return this;
     }
 
-    var drawCircleTicks = function() {
-        return legend.append("circle")
+    this.drawCircleTicks = function() {
+        var self = this;
+        return self.legend.append("circle")
                 .attr("class", "legend tick")
                 .attr("cx", function(d) { return margin.right / 4;})
-                .attr("cy", function(d) { return d*(legendHeight/seriesCount); })
+                .attr("cy", function(d) { return d*(self.legendHeight/seriesCount); })
                 .attr("r", function (d) { return circleRadius; })
 
     }
 
-    var drawRectTicks = function(){
-
-        return legend.append("rect")
+    this.drawRectTicks = function(){
+        var self = this;
+        return self.legend.append("rect")
                 .attr("class", "legend tick")
                 .attr('x', function(d) { return margin.right/5; })
-                .attr('y', function(d) { return Math.floor(d*legendHeight/seriesCount); })
+                .attr('y', function(d) { return Math.floor(d*self.legendHeight/seriesCount); })
                 .attr("width", 10)
-                .attr("height", Math.floor(legendHeight/seriesCount) )
+                .attr("height", Math.floor(self.legendHeight/seriesCount) )
 
     }
 
-    var colorTicks = function() {
-        return legend.selectAll('.legend.tick')
+    this.colorTicks = function() {
+        return this.legend.selectAll('.legend.tick')
                .attr("id", function(d) {return "legend-tick-" + d; })
                .style("fill", function(d) {return colorSet(d);})
                .style('stroke', function(d) {return colorSet(d);})
@@ -241,10 +261,12 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     }
 
 
-    var drawLabel = function(){
+    this.drawLabel = function(){
 
-        return legend.append('text')
-                .attr("y", function (d) { return (d+0.5)*(legendHeight/seriesCount); })
+        var self = this;
+
+        return self.legend.append('text')
+                .attr("y", function (d) { return (d+0.5)*(self.legendHeight/seriesCount); })
                 .attr("x", function (d) { return  margin.right/3;})
                 .attr("fill", function (d) {return colorSet(d); })
                 .attr("text-anchor", "start")
@@ -273,8 +295,8 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
 
     //Draw focus circle
-    var drawFocusCircle = function() {
-        var focus = svg.selectAll(".focus")
+    this.drawFocusCircle = function() {
+        var focus = this.svg.selectAll(".focus")
             .data(d3.range(seriesCount))
             .enter()
             .append("g")
@@ -290,13 +312,13 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             .attr("dy", ".35em");
     };
 
-    var changeFocusCircleState = function(state) {
-        svg.selectAll(".focus")
+    this.changeFocusCircleState = function(state) {
+        this.svg.selectAll(".focus")
            .style("display", state);
     };
 
 
-    var mouseMoveFocusCircle = function(data, element){
+    this.mouseMoveFocusCircle = function(data, element){
         var bisectDate = d3.bisector(function(d) { return d[xSerie]; }).left;
 
         var x0 = xScale.invert(d3.mouse(element)[0]),
@@ -305,7 +327,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             d1 = data[i],
             d = x0 - d0[xSerie] > d1[xSerie] - x0 ? d1 : d0;
 
-        svg.selectAll(".focus")
+        this.svg.selectAll(".focus")
             .attr("transform", function(i) { return "translate(" + xScale(d[xSerie])  + ","
                    + yScale(d['Series ' + (i + 1)]) + ")";})
             .select("text")
@@ -316,16 +338,17 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
 
     this.updateFocusCircle = function(width, height) {
-        drawFocusCircle();
-        svg.append("rect")
+        var self = this;
+        self.drawFocusCircle();
+        self.svg.append("rect")
             .attr("class", "overlay")
             .attr("width", width)
             .attr("height", height)
-            .on("mouseover", function() {changeFocusCircleState(null);})
-            .on("mouseout", function() {changeFocusCircleState('none');})
-            .on("mousemove", function() {mouseMoveFocusCircle(data, this)})
+            .on("mouseover", function() {self.changeFocusCircleState(null);})
+            .on("mouseout", function() {self.changeFocusCircleState('none');})
+            .on("mousemove", function() {self.mouseMoveFocusCircle(data, this)})
 
-        return this;
+        return self;
     };
 
 
@@ -347,7 +370,10 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             })
         }
 
+        return this;
+
     }
+
 
     //Loop though all filters and check data against filters. Once done, update svg.
     var updateData = function(select, filterDict) {
@@ -394,9 +420,11 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     return this;
 }
 
+LineChartBuilder.prototype = new ChartBuilder();
+LineChartBuilder.prototype.constructor = LineChartBuilder;
+LineChartBuilder.prototype.parent = ChartBuilder.prototype;
 
-
-var drawChart = function(data, options, filters) {
+var drawLineChart = function(data, options, filters) {
 
     //*** Init attributes *** //
     var xSerie =  options.x_serie
@@ -423,7 +451,7 @@ var drawChart = function(data, options, filters) {
     , circleRadius= options.circleRadius || 5
 
 
-    var chart = LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data)
+    var chart = new LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data)
         .drawTitle(width / 2, margin.top / 2, chartTitle)
         .drawXAxis(axisPosition={x: 0, y: height},
                     titlePosition={x: width/2, y: margin.bottom/2}, xAxisTitle)
@@ -436,6 +464,19 @@ var drawChart = function(data, options, filters) {
 
 }
 
-return drawChart;
+MapBuilder = function() {
+}
+
+MapBuilder.prototype = new ChartBuilder();
+MapBuilder.prototype.constructor = MapBuilder;
+MapBuilder.prototype.parent = ChartBuilder.prototype;
+
+function drawMap() {
+}
+
+return {
+    LineChart: drawLineChart,
+    Map: drawMap
+};
 
 })();
