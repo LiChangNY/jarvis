@@ -464,11 +464,25 @@ var drawLineChart = function(data, options, filters) {
 
 }
 
-MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400, width, height, margin) {
+MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
+                      width, height, margin, geoUnitColumn, geoValueColumn) {
+
+   //TODO: Add color palettes
+   var dataByUnits = d3.map();
+
+   var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
+    , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
+
+   var colorScale = d3.scale.linear()
+                  .domain([valueMin, valueMax])
+                  .range(['#F0F8FF', '#003300']);
+
+   data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
 
     //TODO: Give options to load users' own map
     var mapType = {
-        flatWorld: "files/maps/world-110m2.json"
+        mercator: {base: "files/maps/world-110m2.json", mapKey: 'countries'},
+        usStates: {base: "files/maps/us-states.json", mapKey: "units"}
     }
 
     //TODO: This a method duplicated in LineChartBuilder
@@ -483,23 +497,29 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400, wid
     }
 
     this.drawMap = function(data, center = [0,0], scale = 150, rotate = [0,0], pathStyle = 'map-path') {
-        var projection = d3.geo.mercator()
-            .center(center)
-            .scale(scale)
-            //.rotate([-180,0]);
 
         var path = d3.geo.path()
-            .projection(projection);
+
+        if (type == 'mercator') {
+
+            var projection = d3.geo.mercator()
+                .center(center)
+                .scale(scale)
+                //.rotate([-180,0]);
+
+            path.projection(projection);
+        }
 
         var g = this.svg.append("g");
 
-        d3.json( mapType[type], function(error, topology) {
+        d3.json( mapType[type].base, function(error, topology) {
             g.selectAll("path")
-              .data(topojson.feature(topology, topology.objects.countries).features)
+              .data(topojson.feature(topology, topology.objects[mapType[type].mapKey]).features)
             .enter()
               .append("path")
               .attr('class', pathStyle)
               .attr("d", path)
+              .style("fill", function(d) { return colorScale(dataByUnits.get(d.properties.name))})
 
             return this;
         })
@@ -523,14 +543,15 @@ function drawMapChart(data, options) {
     margin.top = options.margin_top ||40
     margin.bottom = options.margin_bottom || 60
 
-    console.log(margin)
-
     var width = options.width || canvasWidth - margin.left - margin.right
     , height = options.height || canvasHeight- margin.top - margin.bottom
 
-    var mapType = options.type || "flatWorld"
+    var mapType = options.type || "mercator"
+    var geoUnitColumn = options.geo_unit_column
+    var geoValueColumn = options.geo_value_column
 
-    var chart = new MapBuilder("#chart2", data = null, mapType ,canvasWidth, canvasHeight, width, height, margin)
+    var chart = new MapBuilder("#chart2", data, mapType ,canvasWidth, canvasHeight,
+                                width, height, margin, geoUnitColumn, geoValueColumn)
         .drawMap()
 
 }
