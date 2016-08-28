@@ -420,7 +420,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     return this;
 }
 
-LineChartBuilder.prototype = new ChartBuilder();
+LineChartBuilder.prototype = Object.create(ChartBuilder.prototype)
 LineChartBuilder.prototype.constructor = LineChartBuilder;
 LineChartBuilder.prototype.parent = ChartBuilder.prototype;
 
@@ -464,19 +464,80 @@ var drawLineChart = function(data, options, filters) {
 
 }
 
-MapBuilder = function() {
+MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400, width, height, margin) {
+
+    //TODO: Give options to load users' own map
+    var mapType = {
+        flatWorld: "files/maps/world-110m2.json"
+    }
+
+    //TODO: This a method duplicated in LineChartBuilder
+    var drawCanvas = function() {
+        return d3
+            .select(id)
+            .append("svg")
+                .attr("width", canvasWidth)
+                .attr("height", canvasHeight)
+            .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    }
+
+    this.drawMap = function(data, center = [0,0], scale = 150, rotate = [0,0], pathStyle = 'map-path') {
+        var projection = d3.geo.mercator()
+            .center(center)
+            .scale(scale)
+            //.rotate([-180,0]);
+
+        var path = d3.geo.path()
+            .projection(projection);
+
+        var g = this.svg.append("g");
+
+        d3.json( mapType[type], function(error, topology) {
+            g.selectAll("path")
+              .data(topojson.feature(topology, topology.objects.countries).features)
+            .enter()
+              .append("path")
+              .attr('class', pathStyle)
+              .attr("d", path)
+
+            return this;
+        })
+    }
+
+    this.svg = drawCanvas();
+    return this;
 }
 
-MapBuilder.prototype = new ChartBuilder();
+MapBuilder.prototype = Object.create(ChartBuilder.prototype);
 MapBuilder.prototype.constructor = MapBuilder;
 MapBuilder.prototype.parent = ChartBuilder.prototype;
 
-function drawMap() {
+function drawMapChart(data, options) {
+
+    var canvasWidth = options.canvas_width || 1000
+    , canvasHeight = options.canvas_height || 560
+    , margin = {}
+    margin.left = options.margin_left || 80
+    margin.right = options.margin_right || 65
+    margin.top = options.margin_top ||40
+    margin.bottom = options.margin_bottom || 60
+
+    console.log(margin)
+
+    var width = options.width || canvasWidth - margin.left - margin.right
+    , height = options.height || canvasHeight- margin.top - margin.bottom
+
+    var mapType = options.type || "flatWorld"
+
+    var chart = new MapBuilder("#chart2", data = null, mapType ,canvasWidth, canvasHeight, width, height, margin)
+        .drawMap()
+
 }
 
 return {
     LineChart: drawLineChart,
-    Map: drawMap
+    MapChart: drawMapChart
 };
 
 })();
