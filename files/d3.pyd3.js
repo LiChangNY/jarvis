@@ -100,8 +100,6 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
         var xScaleMin = d3.min(data, function(d) { return d3.min(d, function (v) { return v[xSerie] })})
         , xScaleMax = d3.max(data, function(d) { return d3.max(d, function (v) { return v[xSerie] }) });
 
-        console.log(xScaleMin, xScaleMax);
-
         return timeScale([0, width - margin.right / 2],[xScaleMin, xScaleMax])
     }
 
@@ -473,8 +471,10 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
    var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
     , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
 
+   var colorDomain = [valueMin, valueMax];
+
    var colorScale = d3.scale.linear()
-                  .domain([valueMin, valueMax])
+                  .domain(colorDomain)
                   .range(['#F0F8FF', '#003300']);
 
    data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
@@ -512,21 +512,101 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
 
         var g = this.svg.append("g");
 
-        d3.json( mapType[type].base, function(error, topology) {
-            g.selectAll("path")
+        var self = this;
+
+        // Perform an synchronous request to load JSON
+        $.ajax({
+          url: mapType[type].base,
+          async: false,
+          dataType: 'json',
+          success: function (topology) {
+
+            self.paths = g.selectAll("path")
               .data(topojson.feature(topology, topology.objects[mapType[type].mapKey]).features)
             .enter()
               .append("path")
               .attr('class', pathStyle)
               .attr("d", path)
-              .style("fill", function(d) { return colorScale(dataByUnits.get(d.properties.name))})
 
-            return this;
-        })
+          }
+        });
+
+        return this;
     }
+
+    this.addColor = function(){
+          //TODO: Add series for coloring
+          this.paths.style("fill", function(d) { return colorScale(dataByUnits.get(d.properties.name))})
+
+          return this;
+    }
+
+
+    this.addTooltip = function() {
+          var tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          this.paths
+            .on("mouseover", function(d){
+
+                tooltip
+                    .transition()
+                    .duration(50)
+                    .style("opacity", 1)
+
+                //TODO: Customized tooltip
+                tooltip
+                    .text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
+                    .style("left", (d3.event.pageX) + "px"  )
+                    .style("top", (d3.event.pageY -30) + "px");
+            })
+            .on("mouseout", function() {
+                tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0);
+            })
+          return this;
+
+    }
+
+    this.drawLegend = function(height, position) {
+
+        //TODO: Make legend more progressive. Now it only has lowest and highest value.
+
+        this.legend = this.svg.append("g")
+            .attr("class","legend")
+            .attr("transform", "translate(" + position.x + "," + position.y + ")")
+            .selectAll("g")
+            .data(colorDomain)
+            .enter().append("g");
+
+        var ls_w = 20, ls_h = 20;
+
+
+        this.legend.append("rect")
+          .attr("x", 20)
+          .attr("y", function(d, i){ return height - (i*ls_h) - 2*ls_h;})
+          .attr("width", ls_w)
+          .attr("height", ls_h)
+          .style("fill", function(d, i) { return colorScale(d); })
+          .style("opacity", 0.8);
+
+        this.legend.append("text")
+          .attr("x", 50)
+          .attr("y", function(d, i){ return height - (i*ls_h) - ls_h - 4;})
+          .text(function(d, i){ return colorDomain[i]; });
+
+        return this;
+    }
+
+    this.addLayer = function(type = "circle") {}
+
 
     this.svg = drawCanvas();
     return this;
+
 }
 
 MapBuilder.prototype = Object.create(ChartBuilder.prototype);
@@ -550,10 +630,18 @@ function drawMapChart(data, options) {
     var geoUnitColumn = options.geo_unit_column
     var geoValueColumn = options.geo_value_column
 
+    var legendX = options.legend_x || 0
+    , legendY = options.legend_y || margin.top
+    , legendHeight = options.legend_height || 70
+
+    console.log(legendX, legendY, legendHeight)
+
     var chart = new MapBuilder("#chart2", data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
         .drawMap()
-
+        .addColor()
+        .addTooltip()
+        .drawLegend(legendHeight, {x: legendX, y:legendY})
 }
 
 return {
