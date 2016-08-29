@@ -57,7 +57,7 @@
 
 
 .legend text {
-  font: 11px sans-serif;
+  font: 14px sans-serif;
   cursor: pointer
 }
 
@@ -78,4 +78,20 @@
 
 .map-path:hover {
   opacity: 0.7
+}
+
+
+.tooltip {
+ text-align: middle;
+ padding: 2px;
+ background: white;
+ border-radius: 3px;
+}
+
+.circle{
+    stroke: white;
+    stroke-width: 2;
+}
+.circle:hover{
+    fill:orange;
 }

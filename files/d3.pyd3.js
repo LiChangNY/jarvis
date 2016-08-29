@@ -466,22 +466,25 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
                       width, height, margin, geoUnitColumn, geoValueColumn) {
 
    //TODO: Add color palettes
-   var dataByUnits = d3.map();
+   if (data != null) {
+       var dataByUnits = d3.map();
 
-   var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
-    , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
+       var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
+        , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
 
-   var colorDomain = [valueMin, valueMax];
+       var colorDomain = [valueMin, valueMax];
 
-   var colorScale = d3.scale.linear()
-                  .domain(colorDomain)
-                  .range(['#F0F8FF', '#003300']);
+       var colorScale = d3.scale.linear()
+                      .domain(colorDomain)
+                      .range(['#F0F8FF', '#003300']);
 
-   data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
+       // TODO: geoValueColumn can be multiple.
+       data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
+    }
 
     //TODO: Give options to load users' own map
     var mapType = {
-        mercator: {base: "files/maps/world-110m2.json", mapKey: 'countries'},
+        world: {base: "files/maps/countries.json", mapKey: 'units'},
         usStates: {base: "files/maps/us-states.json", mapKey: "units"}
     }
 
@@ -500,7 +503,7 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
 
         var path = d3.geo.path()
 
-        if (type == 'mercator') {
+        if (type == 'world') {
 
             var projection = d3.geo.mercator()
                 .center(center)
@@ -559,7 +562,9 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
                 tooltip
                     .text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
                     .style("left", (d3.event.pageX) + "px"  )
-                    .style("top", (d3.event.pageY -30) + "px");
+                    .style("top", (d3.event.pageY -30) + "px")
+                    .attr('class', 'tooltip text')
+                    .style('font-size', '20px');
             })
             .on("mouseout", function() {
                 tooltip
@@ -584,7 +589,6 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
 
         var ls_w = 20, ls_h = 20;
 
-
         this.legend.append("rect")
           .attr("x", 20)
           .attr("y", function(d, i){ return height - (i*ls_h) - 2*ls_h;})
@@ -596,12 +600,28 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
         this.legend.append("text")
           .attr("x", 50)
           .attr("y", function(d, i){ return height - (i*ls_h) - ls_h - 4;})
-          .text(function(d, i){ return colorDomain[i]; });
+          .text(function(d, i){ return colorDomain[i]; })
+
 
         return this;
     }
 
-    this.addLayer = function(type = "circle") {}
+    this.addLayer = function(type = "circle", data) {
+
+         circles = this.svg.selectAll("circle")
+            .data(dataByUnits).enter()
+            .append("circle")
+            .attr("class","circle")
+            .attr("id", function (d) { return d.origin;})
+            .attr("cx", function (d) { return projection([d.long, d.lat])[0]; })
+            .attr("cy", function (d) { return projection([d.long, d.lat])[1]; })
+            .attr("r", function (d) {  return Math.log(d.flightCounts); })
+            .attr("fill", "#1f77b4")
+            .attr('opacity', opacityCircle)
+        return this
+    }
+
+
 
 
     this.svg = drawCanvas();
@@ -626,7 +646,7 @@ function drawMapChart(data, options) {
     var width = options.width || canvasWidth - margin.left - margin.right
     , height = options.height || canvasHeight- margin.top - margin.bottom
 
-    var mapType = options.type || "mercator"
+    var mapType = options.type || "world"
     var geoUnitColumn = options.geo_unit_column
     var geoValueColumn = options.geo_value_column
 
@@ -639,9 +659,15 @@ function drawMapChart(data, options) {
     var chart = new MapBuilder("#chart2", data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
         .drawMap()
-        .addColor()
-        .addTooltip()
-        .drawLegend(legendHeight, {x: legendX, y:legendY})
+
+
+    if (data != null) {
+        chart
+            .addColor()
+            .addTooltip()
+            .drawLegend(legendHeight, {x: legendX, y:legendY})
+
+    }
 }
 
 return {
