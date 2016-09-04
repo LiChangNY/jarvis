@@ -14,7 +14,7 @@ ChartBuilder.prototype.test2 = function() { console.log(this._id); }
 // This is the LineChartBuilder constructor
 // It gets called whenever you new up a LineChartBuilder
 LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries,
-                            data, colorSet = d3.scale.category10()) {
+                            data, colorSet) {
 
     console.log("LineChartBuilder constructor called");
 
@@ -449,7 +449,7 @@ var drawLineChart = function(data, options, filters) {
     , circleRadius= options.circleRadius || 5
 
 
-    var chart = new LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data)
+    var chart = new LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data, d3.scale.category10())
         .drawTitle(width / 2, margin.top / 2, chartTitle)
         .drawXAxis(axisPosition={x: 0, y: height},
                     titlePosition={x: width/2, y: margin.bottom/2}, xAxisTitle)
@@ -462,7 +462,7 @@ var drawLineChart = function(data, options, filters) {
 
 }
 
-MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
+MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                       width, height, margin, geoUnitColumn, geoValueColumn) {
 
    //TODO: Add color palettes
@@ -499,7 +499,7 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     }
 
-    this.drawMap = function(data, center = [0,0], scale = 150, rotate = [0,0], pathStyle = 'map-path') {
+    this.drawMap = function(data, center, scale, rotate, pathStyle) {
 
         var path = d3.geo.path()
 
@@ -606,7 +606,7 @@ MapBuilder = function(id, data, type, canvasWidth = 960, canvasHeight = 400,
         return this;
     }
 
-    this.addLayer = function(type = "circle", data) {
+    this.addLayer = function(type, data) {
 
          circles = this.svg.selectAll("circle")
             .data(dataByUnits).enter()
@@ -635,18 +635,20 @@ MapBuilder.prototype.parent = ChartBuilder.prototype;
 
 function drawMapChart(data, options) {
 
-    var canvasWidth = options.canvas_width || 1000
-    , canvasHeight = options.canvas_height || 560
+    var canvasWidth = options.canvas_width || 960
+    , canvasHeight = options.canvas_height || 400
     , margin = {}
     margin.left = options.margin_left || 80
     margin.right = options.margin_right || 65
     margin.top = options.margin_top ||40
     margin.bottom = options.margin_bottom || 60
 
+    var chartId = "#" + options._id
+
     var width = options.width || canvasWidth - margin.left - margin.right
     , height = options.height || canvasHeight- margin.top - margin.bottom
 
-    var mapType = options.type || "world"
+    var mapType = options.map_type || "world"
     var geoUnitColumn = options.geo_unit_column
     var geoValueColumn = options.geo_value_column
 
@@ -654,11 +656,10 @@ function drawMapChart(data, options) {
     , legendY = options.legend_y || margin.top
     , legendHeight = options.legend_height || 70
 
-    console.log(legendX, legendY, legendHeight)
 
-    var chart = new MapBuilder("#chart2", data, mapType ,canvasWidth, canvasHeight,
+    var chart = new MapBuilder(chartId, data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
-        .drawMap()
+        .drawMap(data, [0,0], 150, [0,0], 'map-path')
 
 
     if (data != null) {
