@@ -1,3 +1,10 @@
+body {
+   font-size: 1em;
+   color: #000;
+   font-family: sans-serif;
+}
+
+
 .chart-title {
  font: 12px sans-serif;
 }

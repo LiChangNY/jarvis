@@ -51,6 +51,7 @@ class Jarvis(object):
     display(HTML("""<link media="all" href="%s" type="text/css"
                   rel="stylesheet"/>""" % (css_url)))
     display(HTML("""<link rel="stylesheet" href="files/jquery-ui.min.css" type="text/css"/>"""))
+    display(HTML("""<link rel="stylesheet" href="files/bootstrap.min.css" type="text/css"/>"""))
 
     def __init__(self, dataframe, **kwargs):
 

@@ -3,25 +3,30 @@ var pyd3 = (function() {
 // This is the ChartBuilder constructor
 // It gets called whenever you new up a class that inherits from ChartBuilder or whenever
 // you new up a ChartBuilder itself
-ChartBuilder = function(id) {
-    console.log("ChartBuilder constructor called");
-
+ChartBuilder = function(id, canvasWidth, canvasHeight, margin) {
     this._id = id;
+    this._canvasWidth = canvasWidth;
+    this._canvasHeight = canvasHeight;
+    this._margin = margin;
 }
 
-ChartBuilder.prototype.test2 = function() { console.log(this._id); }
+ChartBuilder.prototype.drawCanvas = function() {
+    return d3
+        .select(this._id)
+        .append("svg")
+            .attr("width", this._canvasWidth)
+            .attr("height", this._canvasHeight)
+        .append("g")
+            .attr("transform", "translate(" + this._margin.left + "," + this._margin.top + ")");
+}
 
 // This is the LineChartBuilder constructor
 // It gets called whenever you new up a LineChartBuilder
 LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries,
                             data, colorSet) {
 
-    console.log("LineChartBuilder constructor called");
-
     // Call parent constructor with arguments
-    ChartBuilder.call(this, arguments);
-
-    this.test2();
+    ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
     var seriesCount = ySeries.length;
     var formatDate = d3.time.format("%Y-%m-%d");
@@ -55,17 +60,6 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     }
 
     var dataGrouped = nestData(data);
-
-    var drawCanvas = function() {
-        return d3
-            .select(id)
-            .append("svg")
-                //.style("max-width", "960px")
-                .attr("width", canvasWidth)
-                .attr("height", canvasHeight)
-            .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    }
 
     this.drawTitle = function(x, y, title) {
         this.svg
@@ -413,7 +407,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
         return this;
     };
 
-    this.svg = drawCanvas();
+    this.svg = this.drawCanvas();
 
     return this;
 }
@@ -465,6 +459,9 @@ var drawLineChart = function(data, options, filters) {
 MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                       width, height, margin, geoUnitColumn, geoValueColumn) {
 
+    // Call parent constructor with arguments
+    ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
+
    //TODO: Add color palettes
    if (data != null) {
        var dataByUnits = d3.map();
@@ -488,16 +485,6 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
         usStates: {base: "files/maps/us-states.json", mapKey: "units"}
     }
 
-    //TODO: This a method duplicated in LineChartBuilder
-    var drawCanvas = function() {
-        return d3
-            .select(id)
-            .append("svg")
-                .attr("width", canvasWidth)
-                .attr("height", canvasHeight)
-            .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    }
 
     this.drawMap = function(data, center, scale, rotate, pathStyle) {
 
@@ -509,6 +496,17 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                 .center(center)
                 .scale(scale)
                 //.rotate([-180,0]);
+
+            path.projection(projection);
+
+        } else if (type == 'globe') {
+
+            var projection = d3.geo.orthographic()
+                .translate([width / 2, height / 2])
+                .scale(250)
+                .clipAngle(90)
+                .precision(0.1)
+                .rotate([0, -30]);
 
             path.projection(projection);
         }
@@ -564,7 +562,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                     .style("left", (d3.event.pageX) + "px"  )
                     .style("top", (d3.event.pageY -30) + "px")
                     .attr('class', 'tooltip text')
-                    .style('font-size', '20px');
+                    .style('font-size', '14px');
             })
             .on("mouseout", function() {
                 tooltip
@@ -624,7 +622,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
 
 
-    this.svg = drawCanvas();
+    this.svg = this.drawCanvas();
     return this;
 
 }
