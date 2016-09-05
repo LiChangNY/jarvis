@@ -102,3 +102,22 @@ body {
 .circle:hover{
     fill:orange;
 }
+
+
+.background {
+  fill: white;
+  stroke-width: .8px;
+  stroke: black;
+}
+
+.graticule {
+    stroke: rgba(0,0,0, .2);
+    stroke-width: .5px;
+}
+
+.land {
+    fill: #DCDCDC;
+    stroke: white;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+}

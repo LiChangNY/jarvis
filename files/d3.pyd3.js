@@ -482,13 +482,15 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
     //TODO: Give options to load users' own map
     var mapType = {
         world: {base: "files/maps/countries.json", mapKey: 'units'},
-        usStates: {base: "files/maps/us-states.json", mapKey: "units"}
+        usStates: {base: "files/maps/us-states.json", mapKey: "units"},
+        orthographic: {base: "files/maps/countries.json", mapKey: "units"}
     }
 
 
     this.drawMap = function(data, center, scale, rotate, pathStyle) {
 
         var path = d3.geo.path()
+        , graticule = d3.geo.graticule();
 
         if (type == 'world') {
 
@@ -499,11 +501,11 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
             path.projection(projection);
 
-        } else if (type == 'globe') {
+        } else if (type == 'orthographic') {
 
             var projection = d3.geo.orthographic()
                 .translate([width / 2, height / 2])
-                .scale(250)
+                .scale(scale)
                 .clipAngle(90)
                 .precision(0.1)
                 .rotate([0, -30]);
@@ -513,7 +515,30 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
         var g = this.svg.append("g");
 
+
+        if (type == 'orthographic') {
+            g.append('path')
+                .datum({type: 'Sphere'})
+                .attr('class', 'background')
+                .attr('d', path);
+
+            g.append('path')
+              .datum(graticule)
+              .attr('class', 'graticule')
+              .attr('d', path);
+        }
+
         var self = this;
+
+        zoom = d3.geo.zoom()
+          .projection(projection)
+          .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
+          .on('zoom.redraw', function(){
+
+            d3.event.sourceEvent.preventDefault();
+            self.svg.selectAll('path').attr('d',path);
+          });
+
 
         // Perform an synchronous request to load JSON
         $.ajax({
@@ -524,13 +549,21 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
             self.paths = g.selectAll("path")
               .data(topojson.feature(topology, topology.objects[mapType[type].mapKey]).features)
-            .enter()
+              .enter()
+             .append('g')
               .append("path")
-              .attr('class', pathStyle)
+              .attr('class', 'land')
+              .attr('data-name', function(d) {
+                return d.properties.name;
+              })
+              .attr('data-id', function(d) {
+                return d.id;
+              })
               .attr("d", path)
-
           }
         });
+
+        this.svg.selectAll('path').call(zoom);
 
         return this;
     }
@@ -604,6 +637,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
         return this;
     }
 
+    //TODO: Not using it at the moment.
     this.addLayer = function(type, data) {
 
          circles = this.svg.selectAll("circle")
@@ -623,6 +657,11 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
 
     this.svg = this.drawCanvas();
+
+    if (type == "orthographic") {
+       this.svg.attr('viewBox', '0, 0, ' + width + ', ' + height)
+    }
+
     return this;
 
 }
@@ -654,10 +693,10 @@ function drawMapChart(data, options) {
     , legendY = options.legend_y || margin.top
     , legendHeight = options.legend_height || 70
 
-
+    console.log(mapType)
     var chart = new MapBuilder(chartId, data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
-        .drawMap(data, [0,0], 150, [0,0], 'map-path')
+        .drawMap(data, [0,0], 150, [0,0], 'land')
 
 
     if (data != null) {
