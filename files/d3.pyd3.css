@@ -1,0 +1,125 @@
+body {
+   font-size: 1em;
+   color: #000;
+   font-family: sans-serif;
+}
+
+
+.chart-title {
+ font: 12px sans-serif;
+}
+
+.line {
+    stroke-width: 1.5;
+    fill: none;
+ }
+
+
+.focus circle {
+  fill: none;
+
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.axis {
+ font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.y.axis path {
+ display: none;
+}
+.x.axis path {
+ display: none;
+}
+
+.grid .tick {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+.grid path {
+    stroke-width: 0;
+}
+
+
+
+.bar {
+  cursor: pointer
+}
+
+.bar: hover {
+  opacity: 0.8
+}
+
+
+.legend text {
+  font: 14px sans-serif;
+  cursor: pointer
+}
+
+.legend rect {
+  cursor: pointer
+}
+
+.legend tick {
+  cursor: pointer
+}
+
+.tooltip {
+ text-align: middle;
+ padding: 2px;
+ background: white;
+ border-radius: 3px;
+}
+
+.tooltip text {
+ font-size: 20 px;
+}
+
+
+.circle{
+    stroke: white;
+    stroke-width: 2;
+}
+.circle:hover{
+    fill:orange;
+}
+
+
+path {
+    fill: none;
+    stroke: black
+}
+
+.background {
+  fill: white;
+  stroke-width: .8px;
+  stroke: black;
+}
+
+.graticule {
+    stroke: rgba(0,0,0, .2);
+    stroke-width: .5px;
+}
+
+.country .land, .state .land {
+    fill: #DCDCDC;
+    stroke: white;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+}
+
+.land:hover {
+  opacity: 0.7
+}

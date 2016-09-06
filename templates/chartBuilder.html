@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+
+<div id="{{ chart._id }}"></div>
+
+<script type="text/javascript">
+
+
+pyd3.MapChart(data = {{ chart.data|safe }}, {{ chart.options|safe }})
+
+</script>
+
+</body>
+</html>
