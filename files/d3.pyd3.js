@@ -481,20 +481,22 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
     //TODO: Give options to load users' own map
     var mapType = {
-        world: {base: "files/maps/countries.json", mapKey: 'units'},
-        usStates: {base: "files/maps/us-states.json", mapKey: "units"},
-        orthographic: {base: "files/maps/countries.json", mapKey: "units"}
+        world: {base: "files/maps/countries.json", mapKey: 'units', unit: "country"},
+        usStates: {base: "files/maps/us-states.json", mapKey: "units", unit: "state"},
+        orthographic: {base: "files/maps/countries.json", mapKey: "units", unit:"country"}
     }
 
 
-    this.drawMap = function(data, center, scale, rotate, pathStyle) {
+    this.drawMap = function(data, center, scale, rotate) {
 
-        var path = d3.geo.path()
+        var path, projection;
+
+        path = d3.geo.path()
         , graticule = d3.geo.graticule();
 
         if (type == 'world') {
 
-            var projection = d3.geo.mercator()
+            projection = d3.geo.mercator()
                 .center(center)
                 .scale(scale)
                 //.rotate([-180,0]);
@@ -503,7 +505,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
         } else if (type == 'orthographic') {
 
-            var projection = d3.geo.orthographic()
+            projection = d3.geo.orthographic()
                 .translate([width / 2, height / 2])
                 .scale(scale)
                 .clipAngle(90)
@@ -517,6 +519,8 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
 
         if (type == 'orthographic') {
+
+            //TODO: Fix graticule and background
             g.append('path')
                 .datum({type: 'Sphere'})
                 .attr('class', 'background')
@@ -530,15 +534,6 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
         var self = this;
 
-        zoom = d3.geo.zoom()
-          .projection(projection)
-          .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
-          .on('zoom.redraw', function(){
-
-            d3.event.sourceEvent.preventDefault();
-            self.svg.selectAll('path').attr('d',path);
-          });
-
 
         // Perform an synchronous request to load JSON
         $.ajax({
@@ -547,23 +542,26 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
           dataType: 'json',
           success: function (topology) {
 
-            self.paths = g.selectAll("path")
+            self.paths = g.selectAll(mapType[type].unit)
               .data(topojson.feature(topology, topology.objects[mapType[type].mapKey]).features)
               .enter()
              .append('g')
-              .append("path")
-              .attr('class', 'land')
+              .attr("class", mapType[type].unit)
               .attr('data-name', function(d) {
                 return d.properties.name;
               })
               .attr('data-id', function(d) {
                 return d.id;
               })
+             .append("path")
+              .attr('class', 'land')
+              .style("stroke", "white")
               .attr("d", path)
           }
         });
 
-        this.svg.selectAll('path').call(zoom);
+        this.path = path;
+        this.projection = projection;
 
         return this;
     }
@@ -577,7 +575,8 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
 
     this.addTooltip = function() {
-          var tooltip = d3.select("body").append("div")
+
+        var tooltip = d3.select(id).append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
@@ -589,12 +588,12 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                     .duration(50)
                     .style("opacity", 1)
 
-                //TODO: Customized tooltip
+                //TODO: Allow customized tooltip
                 tooltip
                     .text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
+                    .style("position", "absolute")
                     .style("left", (d3.event.pageX) + "px"  )
                     .style("top", (d3.event.pageY -30) + "px")
-                    .attr('class', 'tooltip text')
                     .style('font-size', '14px');
             })
             .on("mouseout", function() {
@@ -605,6 +604,59 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
             })
           return this;
 
+    }
+
+
+   this.zoom = function() {
+       var svg = this.svg
+       , projection = this.projection
+       , path = this.path;
+
+      return d3.geo.zoom()
+          .projection(projection)
+          .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
+          .on('zoom.redraw', function(){
+            console.log(this);
+            d3.event.sourceEvent.preventDefault();
+            svg.selectAll('path').attr('d',path);
+          });
+
+   }
+
+   this.enableZoom = function() {
+        this.svg.selectAll('path').call(this.zoom());
+   };
+
+
+   this.clickToCenter = function(x) {
+
+        var coords = d3.geo.centroid(x);
+        coords[0] = -coords[0];
+        coords[1] = -coords[1];
+
+       var svg = this.svg
+       , projection = this.projection
+       , path = this.path;
+
+        d3.transition()
+        .duration(1250)
+        .tween('rotate', function() {
+            var r = d3.interpolate(projection.rotate(), coords);
+            return function(t) {
+               projection.rotate(r(t));
+               svg.selectAll('path').attr('d', path);
+            };
+        })
+        .transition();
+
+   }
+
+   this.enableRotateToCenter = function () {
+        var self = this;
+        this.paths
+            .on("click", function(x) {
+                self.clickToCenter(x);
+            })
     }
 
     this.drawLegend = function(height, position) {
@@ -692,20 +744,26 @@ function drawMapChart(data, options) {
     var legendX = options.legend_x || 0
     , legendY = options.legend_y || margin.top
     , legendHeight = options.legend_height || 70
+    , showLegend = options.legend || null
 
-    console.log(mapType)
+    var enableZoom = options.enable_zoom || false
+    , enableClickToCenter = options.enable_click_to_center || false
+
     var chart = new MapBuilder(chartId, data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
-        .drawMap(data, [0,0], 150, [0,0], 'land')
+                    .drawMap(data, [0,0], 150, [0,0])
 
+    if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
 
     if (data != null) {
         chart
             .addColor()
             .addTooltip()
-            .drawLegend(legendHeight, {x: legendX, y:legendY})
-
     }
+
+    if (enableZoom) { chart.enableZoom();}
+    if (enableClickToCenter) {chart.enableRotateToCenter();}
+
 }
 
 return {
