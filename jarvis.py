@@ -69,6 +69,9 @@ class Jarvis(object):
         self.series_count = len(dataframe.columns)
         dataframe_columns = list(dataframe.columns.values)
 
+        self.enable_zoom = kwargs.get('enable_zoom', False)
+        self.enable_click_to_center = kwargs.get("enable_click_to_center", False)
+
         self.filters = kwargs.get("filters", None)
 
         # Another way of id
