@@ -346,20 +346,18 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
     this.setFilters = function(filters) {
 
+        var that = this;
+
         filterDict = {};
 
         for (var f in filters) {
 
             var f_slugify = f.replace(' ', '-').toLowerCase();
 
-            $("#filter-"+f_slugify).multiselect({
-                enableCaseInsensitiveFiltering: true,
-                includeSelectAllOption: true,
-                //Bootstrap thing. Have to define update functions for all three events.
-                onChange: function(option, checked) { updateData(this.$select, filterDict);},
-                onSelectAll: function(checked) { updateData(this.$select, filterDict); },
-                onDeselectAll: function(checked) { updateData(this.$select, filterDict); }
-            })
+            $("#filter-"+f_slugify).SumoSelect({ selectAll: true, okCancelInMulti: false });
+            $("#filter-"+f_slugify).change(function() {
+                that.updateData($(this), filterDict);
+            });
         }
 
         return this;
@@ -368,7 +366,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
 
     //Loop though all filters and check data against filters. Once done, update svg.
-    var updateData = function(select, filterDict) {
+    this.updateData = function(select, filterDict) {
 
         //jQuery thing to return name and values.
         var name = select.attr("name")
@@ -400,9 +398,9 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
         xScale = xScaleBuilder(filterData);
         xAxis = defineAxis(xScale, "bottom");
 
-        var t = svg.transition().duration(350);
+        var t = this.svg.transition().duration(350);
         t.select(".x.axis").call(xAxis);
-        drawLine(filterData);
+        this.drawLine(filterData);
 
         return this;
     };
@@ -442,8 +440,10 @@ var drawLineChart = function(data, options, filters) {
     , legendY = options.legend_y || margin.top
     , circleRadius= options.circleRadius || 5
 
+    var chartId = "#" + options._id
 
-    var chart = new LineChartBuilder('#chart1', canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data, d3.scale.category10())
+
+    var chart = new LineChartBuilder(chartId, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries, data, d3.scale.category10())
         .drawTitle(width / 2, margin.top / 2, chartTitle)
         .drawXAxis(axisPosition={x: 0, y: height},
                     titlePosition={x: width/2, y: margin.bottom/2}, xAxisTitle)
@@ -616,7 +616,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
           .projection(projection)
           .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
           .on('zoom.redraw', function(){
-            console.log(this);
+
             d3.event.sourceEvent.preventDefault();
             svg.selectAll('path').attr('d',path);
           });

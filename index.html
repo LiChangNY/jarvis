@@ -12,17 +12,9 @@
 
 <script type="text/javascript" src="files/jquery.min.js"></script>
 <script type="text/javascript" src="files/jquery-ui.min.js"></script>
+<script type="text/javascript" src="files/jquery.sumoselect.min.js"></script>
 <link rel="stylesheet" href="files/jquery-ui.min.css" type="text/css">
-
-<style>
-
-label {
-  display: block;
-  margin: 30px 0 0 0;
-}
-
-</style>
-
+<link rel="stylesheet" href="files/sumoselect.css" type="text/css">
 
 </head>
 
@@ -43,17 +35,28 @@ label {
 
 <div id="chart3">US state map: Basic interactivity.</div>
 
+<label for="date">Date</label>
+<select name="Date" multiple="multiple" id="filter-date">
+   <option value="2015-01-01" selected="">2015-01-01</option>
+   <option value="2015-01-15" selected="">2015-01-15</option>
+   <option value="2015-02-01" selected="">2015-02-01</option>
+   <option value="2015-02-15" selected="">2015-02-15</option>
+   <option value="2015-03-01" selected="">2015-03-01</option>
+</select>
+
+<label for="Serie 1">Serie 1</label>
+<select name="Series 1" multiple="multiple" id="filter-series-1">
+   <option value="100" selected="">100</option>
+   <option value="20" selected="">20</option>
+   <option value="200" selected="">200</option>
+   <option value="40" selected="">40</option>
+   <option value="300" selected="">300</option>
+</select>
+
+<div id="chart4">Line Chart</div>
+
 <script type="text/javascript">
 
-  $( function() {
-    $( "#filter-date" ).selectmenu({
-        select: function(event, ui) {console.log(event); console.log(ui); console.log(this)}
-
-    });
-    $( "#filter-series-1" ).selectmenu();
-  } );
-
-/*
 pyd3.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
           {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
           {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
@@ -73,10 +76,11 @@ pyd3.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":40
           "chart_title": "Chart Title Goes Here",
           "filter_series": ["Date", "Series 1"],
           "y_axis_title": "y axis title goes here", "margin_top": 40,
-          "margin_left": 80, "margin_bottom": 60, "series_count": 4},
+          "margin_left": 80, "margin_bottom": 60, "series_count": 4,
+          "_id": "chart4"},
           {'Date': ['2015-01-01', '2015-01-15', '2015-02-01', '2015-02-15', '2015-03-01'],
           'Series 1': [100, 20, 200, 40, 300]});
-*/
+
 
 pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'searches': 729, 'state': 'Minnesota'},
@@ -579,40 +583,6 @@ pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  canvas_width: 600,
  enable_zoom: true,
  enable_click_to_center: true})
-
-
-/*
-    <label for="date">Date</label>
-   <select name="Date" multiple="multiple" id="filter-date">
-
-            <option value="2015-01-01" selected="">2015-01-01</option>
-
-            <option value="2015-01-15" selected="">2015-01-15</option>
-
-            <option value="2015-02-01" selected="">2015-02-01</option>
-
-            <option value="2015-02-15" selected="">2015-02-15</option>
-
-            <option value="2015-03-01" selected="">2015-03-01</option>
-
-    </select>
-
-    <label for="Serie 1">Serie 1</label>
-    <select name="Series 1" multiple="multiple" id="filter-series-1">
-
-
-            <option value="100" selected="">100</option>
-
-            <option value="20" selected="">20</option>
-
-            <option value="200" selected="">200</option>
-
-            <option value="40" selected="">40</option>
-
-            <option value="300" selected="">300</option>
-
-    </select>
-*/
 
 </script>
 </body>
