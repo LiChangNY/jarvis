@@ -44,14 +44,15 @@ class Jarvis(object):
     # template_environment = Environment(lstrip_blocks=True, trim_blocks=True,
     #                                   loader=pl)
 
-
+    ## TODO: Use a global js_global to prevent loading js again.
     pyd3_js_url = "pyd3.min.js"
     display(HTML("<script src='%s'></script>" % (pyd3_js_url)))
     css_url = "files/d3.pyd3.css"
     display(HTML("""<link media="all" href="%s" type="text/css"
                   rel="stylesheet"/>""" % (css_url)))
     display(HTML("""<link rel="stylesheet" href="files/jquery-ui.min.css" type="text/css"/>"""))
-    display(HTML("""<link rel="stylesheet" href="files/bootstrap.min.css" type="text/css"/>"""))
+    display(HTML("""<link rel="stylesheet" href="files/sumoselect.css" type="text/css"/>"""))
+    display(HTML("""<script>console.log("Loaded libraries.")</script>"""))
 
     def __init__(self, dataframe, **kwargs):
 
