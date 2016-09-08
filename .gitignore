@@ -1,4 +1,4 @@
-*.csv
+#*.csv
 **/archive
 .DS_Store
 
