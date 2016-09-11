@@ -481,9 +481,9 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
     //TODO: Give options to load users' own map
     var mapType = {
-        world: {base: "files/maps/countries.json", mapKey: 'units', unit: "country"},
-        usStates: {base: "files/maps/us-states.json", mapKey: "units", unit: "state"},
-        orthographic: {base: "files/maps/countries.json", mapKey: "units", unit:"country"}
+        world: {base: "jarvis/files/maps/countries.json", mapKey: 'units', unit: "country"},
+        usStates: {base: "jarvis/files/maps/us-states.json", mapKey: "units", unit: "state"},
+        orthographic: {base: "jarvis/files/maps/countries.json", mapKey: "units", unit:"country"}
     }
 
 
