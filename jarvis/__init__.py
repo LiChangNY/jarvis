@@ -1,1 +1,1 @@
-import jarvis
+from .jarvis import Jarvis
