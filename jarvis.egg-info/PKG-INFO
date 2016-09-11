@@ -2,7 +2,7 @@ Metadata-Version: 1.0
 Name: jarvis
 Version: 0.1
 Summary: Python - Just another visualization library built on top of d3.js
-Home-page: https://github.com/LiChangNY/jarvis
+Home-page: https://github.com/LiChangNY/jarvis.git
 Author: Lily Chang
 Author-email: changliemail@gmail.com
 License: UNKNOWN
