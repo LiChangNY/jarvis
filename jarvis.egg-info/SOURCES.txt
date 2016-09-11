@@ -1,4 +1,3 @@
-jarvis.py
 setup.py
 jarvis.egg-info/PKG-INFO
 jarvis.egg-info/SOURCES.txt
