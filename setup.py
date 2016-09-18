@@ -12,5 +12,6 @@ setup(name='jarvis',
       author='Lily Chang',
       author_email='changliemail@gmail.com',
       url='https://github.com/LiChangNY/jarvis.git',
-      packages=['jarvis']
+      packages=['jarvis'],
+      include_package_data=True
       )

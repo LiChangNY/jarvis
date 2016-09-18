@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 from jinja2 import Environment, PackageLoader
-from IPython.display import display, HTML
+from IPython.display import display, HTML, Javascript
 import os
 import jinja2
+from pkg_resources import resource_string
 
 
 try:
@@ -10,11 +11,21 @@ try:
 except ImportError:
     import json
 
+_JS_INITIALIZED = False
+
 jinja_environment = jinja2.Environment(autoescape=True,
                                        loader=jinja2.FileSystemLoader(
-                                           os.path.join(os.path.dirname(__file__),
-                                                        'templates')))
+                                           os.path.join(os.path.dirname(__file__),'templates')
+                                       ))
 
+def _get_file(file):
+
+    global _JS_INITIALIZED
+
+    if not _JS_INITIALIZED:
+        js_string = resource_string('jarvis', file).decode('utf-8')
+
+        return js_string
 
 # CONTENT_FILENAME = "./content.html"
 # PAGE_FILENAME = "./page.html"
@@ -26,10 +37,6 @@ jinja_environment = jinja2.Environment(autoescape=True,
 # template_content = jinja2_env.get_template(CONTENT_FILENAME)
 # template_page = jinja2_env.get_template(PAGE_FILENAME)
 
-
-# Load js
-# 1. load only once in each session.
-# 2. When people refreshes the pages within the same session, js should also be loaded.
 
 class Jarvis(object):
     """
@@ -44,15 +51,20 @@ class Jarvis(object):
     # template_environment = Environment(lstrip_blocks=True, trim_blocks=True,
     #                                   loader=pl)
 
-    ## TODO: Use a global js_global to prevent loading js again.
-    pyd3_js_url = "pyd3.min.js"
-    display(HTML("<script src='%s'></script>" % (pyd3_js_url)))
-    css_url = "files/d3.pyd3.css"
-    display(HTML("""<link media="all" href="%s" type="text/css"
-                  rel="stylesheet"/>""" % (css_url)))
-    display(HTML("""<link rel="stylesheet" href="files/jquery-ui.min.css" type="text/css"/>"""))
-    display(HTML("""<link rel="stylesheet" href="files/sumoselect.css" type="text/css"/>"""))
-    display(HTML("""<script>console.log("Loaded libraries.")</script>"""))
+    global _JS_INITIALIZED
+
+    if not _JS_INITIALIZED:
+        display(HTML("""
+            <style> %s </style>
+            <script type="text/javascript"> %s </script>
+            """ % (_get_file("files/d3.pyd3.css"), _get_file('pyd3.min.js'))))
+        _JS_INITIALIZED = True
+
+        #TODO: Bundle up css files.
+#       display(HTML("""<link media="all" href="%s" type="text/css"
+#       rel="stylesheet"/>""" % _get_file("jquery-ui.min.css")))
+#       display(HTML("""<link rel="stylesheet" href="%s" type="text/css"/>"""
+#                % _get_file("sumoselect.css")))
 
     def __init__(self, dataframe, **kwargs):
 
@@ -64,6 +76,21 @@ class Jarvis(object):
             self.map_type = kwargs.get('map_type', None)
             self.geo_unit_column = kwargs.get("unit", None)
             self.geo_value_column = kwargs.get("values", None)
+
+            map_options = {
+                "world": {"path": "files/maps/countries.json"},
+                "usStates": {"path": "files/maps/us-states.json"},
+                "orthographic": {"path": "files/maps/countries.json"}
+            }
+
+            map_type = map_options[self.map_type]
+            map_file_path = map_type['path']
+            topology = resource_string('jarvis', map_file_path).decode('utf-8')
+
+            display(HTML("""
+                <script type="text/javascript">
+                    var topology = %s;
+                </script>""" % topology))
 
         self.TEMPLATE_FILE = "chartBuilder.html"
         self.df_json = dataframe.to_json(orient='records')

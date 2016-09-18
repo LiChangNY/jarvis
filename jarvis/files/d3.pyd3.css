@@ -4,6 +4,9 @@ body {
    font-family: sans-serif;
 }
 
+.chart {
+   position: relative
+}
 
 .chart-title {
  font: 12px sans-serif;
