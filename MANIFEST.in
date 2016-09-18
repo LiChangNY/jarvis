@@ -1,1 +1,3 @@
 recursive-include jarvis *
+exclude *.pyc
+exclude *test

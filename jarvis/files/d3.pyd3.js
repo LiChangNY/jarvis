@@ -1,4 +1,4 @@
-var pyd3 = (function() {
+pyd3 = (function() {
 
 // This is the ChartBuilder constructor
 // It gets called whenever you new up a class that inherits from ChartBuilder or whenever
@@ -479,14 +479,6 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
        data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
     }
 
-    //TODO: Give options to load users' own map
-    var mapType = {
-        world: {base: "files/maps/countries.json", mapKey: 'units', unit: "country"},
-        usStates: {base: "files/maps/us-states.json", mapKey: "units", unit: "state"},
-        orthographic: {base: "files/maps/countries.json", mapKey: "units", unit:"country"}
-    }
-
-
     this.drawMap = function(data, center, scale, rotate) {
 
         var path, projection;
@@ -535,30 +527,51 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
         var self = this;
 
 
-        // Perform an synchronous request to load JSON
-        $.ajax({
-          url: mapType[type].base,
-          async: false,
-          dataType: 'json',
-          success: function (topology) {
+        var drawBaseMap = function(topojson, topology, mapKey, mapUnit){
+                self.paths = g.selectAll(mapUnit)
+                  .data(topojson.feature(topology, topology.objects[mapKey]).features)
+                  .enter()
+                 .append('g')
+                  .attr("class", mapUnit)
+                  .attr('data-name', function(d) {
+                    return d.properties.name;
+                  })
+                  .attr('data-id', function(d) {
+                    return d.id;
+                  })
+                 .append("path")
+                  .attr('class', 'land')
+                  .style("stroke", "white")
+                  .attr("d", path)
 
-            self.paths = g.selectAll(mapType[type].unit)
-              .data(topojson.feature(topology, topology.objects[mapType[type].mapKey]).features)
-              .enter()
-             .append('g')
-              .attr("class", mapType[type].unit)
-              .attr('data-name', function(d) {
-                return d.properties.name;
-              })
-              .attr('data-id', function(d) {
-                return d.id;
-              })
-             .append("path")
-              .attr('class', 'land')
-              .style("stroke", "white")
-              .attr("d", path)
-          }
-        });
+        }
+            var mapType = {
+                world: {base: "files/maps/countries.json", key: 'units', unit: "country"},
+                usStates: {base: "files/maps/us-states.json", key: "units", unit: "state"},
+                orthographic: {base: "files/maps/countries.json", key: "units", unit:"country"}
+            };
+
+            var mapKey = mapType[type].key
+            , mapUnit = mapType[type].unit;
+
+        //If users use Python, typology should have been defined when Jarvis object is instantiated.
+        //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
+        if (typeof topology == "undefined") {
+
+            $.ajax({
+              url: mapType[type].base,
+              async: false,
+              dataType: 'json',
+              success: function (topology) {
+                drawBaseMap(topojson, topology, mapKey, mapUnit);
+
+              }
+            });
+
+        } else {
+            drawBaseMap(topojson, topology, mapKey, mapUnit);
+
+        }
 
         this.path = path;
         this.projection = projection;
