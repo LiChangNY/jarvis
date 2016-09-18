@@ -13,6 +13,7 @@ ChartBuilder = function(id, canvasWidth, canvasHeight, margin) {
 ChartBuilder.prototype.drawCanvas = function() {
     return d3
         .select(this._id)
+        .attr("class", "chart")
         .append("svg")
             .attr("width", this._canvasWidth)
             .attr("height", this._canvasHeight)
