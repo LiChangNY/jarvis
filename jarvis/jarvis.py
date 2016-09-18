@@ -89,8 +89,7 @@ class Jarvis(object):
 
             display(HTML("""
                 <script type="text/javascript">
-                    var topology = %s
-                    console.log(mapKey, mapUnit);
+                    var topology = %s;
                 </script>""" % topology))
 
         self.TEMPLATE_FILE = "chartBuilder.html"

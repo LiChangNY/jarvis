@@ -605,8 +605,8 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                 tooltip
                     .text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
                     .style("position", "absolute")
-                    .style("left", (d3.event.pageX) + "px"  )
-                    .style("top", (d3.event.pageY -30) + "px")
+                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
+                    .style("top", (d3.mouse(this)[1]) + "px")
                     .style('font-size', '14px');
             })
             .on("mouseout", function() {
