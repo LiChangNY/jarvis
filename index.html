@@ -6,9 +6,9 @@
 
 <base href="jarvis/" />
 
-<link media="all" href="files/d3.pyd3.css" type="text/css" rel="stylesheet">
+<link media="all" href="files/jarvis.css" type="text/css" rel="stylesheet">
 <script src='files/d3.v3.min.js'></script>
-<script src='files/d3.pyd3.js'></script>
+<script src='files/jarvis.js'></script>
 <script src="files/topojson.v1.min.js"></script>
 <script src="files/d3.geo.zoom.js"></script>
 
@@ -62,7 +62,7 @@ Line Chart<br/><br/>
 
 <script type="text/javascript">
 
-pyd3.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
+jarvis.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
           {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
           {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
           {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
@@ -87,7 +87,7 @@ pyd3.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":40
           'Series 1': [100, 20, 200, 40, 300]});
 
 
-pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
+jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'searches': 729, 'state': 'Minnesota'},
  {'searches': 33, 'state': 'Montana'},
  {'searches': 668, 'state': 'North Dakota'},
@@ -139,11 +139,11 @@ pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'searches': 922, 'state': 'Michigan'},
  {'searches': 968, 'state': 'Alaska'}],
  {map_type: 'usStates', "_id": "chart3", geo_unit_column: 'state', geo_value_column: 'searches',
- canvas_height:600, legend: true})
+ canvas_height:600, show_legend: true})
 
 
 
- pyd3.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
+ jarvis.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
  {'country': 'Angola', 'searches': 374},
  {'country': 'Albania', 'searches': 990},
  {'country': 'Aland', 'searches': 633},
@@ -360,12 +360,10 @@ pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  "_id": "chart2",
  geo_unit_column: 'country',
  geo_value_column: 'searches',
- legend_x: 5,
- legend_y: 200,
  enable_zoom: true})
 
 
- pyd3.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
+ jarvis.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
  {'country': 'Angola', 'searches': 374},
  {'country': 'Albania', 'searches': 990},
  {'country': 'Aland', 'searches': 633},
@@ -582,8 +580,6 @@ pyd3.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  "_id": "chart1",
  geo_unit_column: 'country',
  geo_value_column: 'searches',
- legend_x: 5,
- legend_y: 200,
  canvas_height: 600,
  canvas_width: 600,
  enable_zoom: true,

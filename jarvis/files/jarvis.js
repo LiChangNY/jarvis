@@ -1,4 +1,4 @@
-pyd3 = (function() {
+jarvis = (function() {
 
 // This is the ChartBuilder constructor
 // It gets called whenever you new up a class that inherits from ChartBuilder or whenever
@@ -757,14 +757,14 @@ function drawMapChart(data, options) {
     var legendX = options.legend_x || 0
     , legendY = options.legend_y || margin.top
     , legendHeight = options.legend_height || 70
-    , showLegend = options.legend || null
+    , showLegend = options.show_legend || null
 
     var enableZoom = options.enable_zoom || false
     , enableClickToCenter = options.enable_click_to_center || false
 
     var chart = new MapBuilder(chartId, data, mapType ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
-                    .drawMap(data, [0,0], 150, [0,0])
+                    .drawMap(data = data, center = [0,0], scale = 150, rotate = [0,0])
 
     if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
 

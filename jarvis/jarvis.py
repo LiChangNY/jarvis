@@ -57,7 +57,7 @@ class Jarvis(object):
         display(HTML("""
             <style> %s </style>
             <script type="text/javascript"> %s </script>
-            """ % (_get_file("files/d3.pyd3.css"), _get_file('pyd3.min.js'))))
+            """ % (_get_file("files/jarvis.css"), _get_file('jarvis.min.js'))))
         _JS_INITIALIZED = True
 
         #TODO: Bundle up css files.
