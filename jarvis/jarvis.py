@@ -110,7 +110,7 @@ class Jarvis(object):
         #self._id = self.chart_type + "_" + str(Jarvis[self.chart_type]['count'])
 
         Jarvis._count += 1
-        self._id = self.model + "_" + str(Jarvis._count) + "_" + self.chart_type
+        self._id = self.model.lower() + "_" + str(Jarvis._count) + "_" + self.chart_type
 
 
     def show(self):

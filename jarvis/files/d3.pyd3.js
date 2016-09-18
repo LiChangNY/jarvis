@@ -513,7 +513,6 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
         if (type == 'orthographic') {
 
-            //TODO: Fix graticule and background
             g.append('path')
                 .datum({type: 'Sphere'})
                 .attr('class', 'background')
