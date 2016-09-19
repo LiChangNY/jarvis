@@ -5,5 +5,5 @@ uglifyjs jarvis/files/jquery.min.js \
          jarvis/files/jquery.sumoselect.min.js \
          jarvis/files/d3.v3.min.js \
          jarvis/files/d3.geo.zoom.js \
-         jarvis/files/d3.pyd3.js \
-         -o jarvis/pyd3.min.js
+         jarvis/files/jarvis.js \
+         -o jarvis/jarvis.min.js

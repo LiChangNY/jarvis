@@ -27,17 +27,6 @@ def _get_file(file):
 
         return js_string
 
-# CONTENT_FILENAME = "./content.html"
-# PAGE_FILENAME = "./page.html"
-
-
-# pl = PackageLoader('jarvis', 'templates')
-# jinja2_env = Environment(lstrip_blocks=True, trim_blocks=True, loader=pl)
-
-# template_content = jinja2_env.get_template(CONTENT_FILENAME)
-# template_page = jinja2_env.get_template(PAGE_FILENAME)
-
-
 class Jarvis(object):
     """
     Jarvis Base class.
@@ -45,19 +34,16 @@ class Jarvis(object):
     #: chart count
     _count = 0
 
-    # this attribute is overriden by children of this
-    # class
-    # CHART_FILENAME = None
-    # template_environment = Environment(lstrip_blocks=True, trim_blocks=True,
-    #                                   loader=pl)
-
     global _JS_INITIALIZED
 
     if not _JS_INITIALIZED:
         display(HTML("""
             <style> %s </style>
             <script type="text/javascript"> %s </script>
-            """ % (_get_file("files/d3.pyd3.css"), _get_file('pyd3.min.js'))))
+            """ % (_get_file("files/jarvis.css"),
+                   _get_file('jarvis.min.js')  #Use for production
+                   #_get_file("files/jarvis.js") #Use for testing
+                   )))
         _JS_INITIALIZED = True
 
         #TODO: Bundle up css files.
@@ -72,19 +58,21 @@ class Jarvis(object):
         self.model = self.__class__.__name__  #: The chart model
         self.chart_type = kwargs.get('chart_type', 'bar')
 
-        if self.chart_type == 'map':
-            self.map_type = kwargs.get('map_type', None)
+        if "map" in self.chart_type:
+            self.projection_type = kwargs.get('chart_type', "mercator_map").split("_")[0]
+            self.region = kwargs.get("region", "US")
+            self.theme = kwargs.get('theme', "choropleth")
             self.geo_unit_column = kwargs.get("unit", None)
             self.geo_value_column = kwargs.get("values", None)
 
             map_options = {
                 "world": {"path": "files/maps/countries.json"},
-                "usStates": {"path": "files/maps/us-states.json"},
-                "orthographic": {"path": "files/maps/countries.json"}
+                "US": {"path": "files/maps/us-states.json"},
+                #"orthographic": {"path": "files/maps/countries.json"}
             }
 
-            map_type = map_options[self.map_type]
-            map_file_path = map_type['path']
+            map_region = map_options[self.region]
+            map_file_path = map_region['path']
             topology = resource_string('jarvis', map_file_path).decode('utf-8')
 
             display(HTML("""
