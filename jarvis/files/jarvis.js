@@ -457,7 +457,7 @@ var drawLineChart = function(data, options, filters) {
 
 }
 
-MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
+MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeight,
                       width, height, margin, geoUnitColumn, geoValueColumn) {
 
     // Call parent constructor with arguments
@@ -487,7 +487,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
         path = d3.geo.path()
         , graticule = d3.geo.graticule();
 
-        if (type == 'world') {
+        if (projectionType == 'mercator' && region == "world") {
 
             projection = d3.geo.mercator()
                 .center(center)
@@ -496,7 +496,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
             path.projection(projection);
 
-        } else if (type == 'orthographic') {
+        } else if (projectionType == 'orthographic') {
 
             projection = d3.geo.orthographic()
                 .translate([width / 2, height / 2])
@@ -511,7 +511,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
         var g = this.svg.append("g");
 
 
-        if (type == 'orthographic') {
+        if (projectionType == 'orthographic') {
 
             g.append('path')
                 .datum({type: 'Sphere'})
@@ -545,21 +545,21 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
                   .attr("d", path)
 
         }
-            var mapType = {
+            var regionOptions = {
                 world: {base: "files/maps/countries.json", key: 'units', unit: "country"},
-                usStates: {base: "files/maps/us-states.json", key: "units", unit: "state"},
-                orthographic: {base: "files/maps/countries.json", key: "units", unit:"country"}
+                US: {base: "files/maps/us-states.json", key: "units", unit: "state"},
+                //orthographic: {base: "files/maps/countries.json", key: "units", unit:"country"}
             };
 
-            var mapKey = mapType[type].key
-            , mapUnit = mapType[type].unit;
+            var mapKey = regionOptions[region].key
+            , mapUnit = regionOptions[region].unit;
 
         //If users use Python, typology should have been defined when Jarvis object is instantiated.
         //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
         if (typeof topology == "undefined") {
 
             $.ajax({
-              url: mapType[type].base,
+              url:  regionOptions[region].base,
               async: false,
               dataType: 'json',
               success: function (topology) {
@@ -723,7 +723,7 @@ MapBuilder = function(id, data, type, canvasWidth, canvasHeight,
 
     this.svg = this.drawCanvas();
 
-    if (type == "orthographic") {
+    if (projectionType == "orthographic") {
        this.svg.attr('viewBox', '0, 0, ' + width + ', ' + height)
     }
 
@@ -750,9 +750,11 @@ function drawMapChart(data, options) {
     var width = options.width || canvasWidth - margin.left - margin.right
     , height = options.height || canvasHeight- margin.top - margin.bottom
 
-    var mapType = options.map_type || "world"
-    var geoUnitColumn = options.geo_unit_column
-    var geoValueColumn = options.geo_value_column
+    var projectionType = options.projection_type || "mercator"
+    , region = options.region || "US"
+    , theme = options.theme || "choropleth"
+    , geoUnitColumn = options.geo_unit_column
+    , geoValueColumn = options.geo_value_column;
 
     var legendX = options.legend_x || 0
     , legendY = options.legend_y || margin.top
@@ -762,16 +764,18 @@ function drawMapChart(data, options) {
     var enableZoom = options.enable_zoom || false
     , enableClickToCenter = options.enable_click_to_center || false
 
-    var chart = new MapBuilder(chartId, data, mapType ,canvasWidth, canvasHeight,
+    var chart = new MapBuilder(chartId, data, projectionType, region ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
                     .drawMap(data = data, center = [0,0], scale = 150, rotate = [0,0])
 
     if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
 
     if (data != null) {
-        chart
-            .addColor()
-            .addTooltip()
+        if (theme == "choropleth") {
+            chart
+                .addColor()
+                .addTooltip()
+        }
     }
 
     if (enableZoom) { chart.enableZoom();}

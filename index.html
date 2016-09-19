@@ -138,8 +138,14 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'searches': 663, 'state': 'Maine'},
  {'searches': 922, 'state': 'Michigan'},
  {'searches': 968, 'state': 'Alaska'}],
- {map_type: 'usStates', "_id": "chart3", geo_unit_column: 'state', geo_value_column: 'searches',
- canvas_height:600, show_legend: true})
+ { projection_type: "mercator",
+   region: "US",
+   theme: "choropleth",
+   "_id": "chart3",
+   geo_unit_column: 'state',
+   geo_value_column: 'searches',
+   canvas_height:600,
+   show_legend: true})
 
 
 
@@ -356,11 +362,16 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'country': 'South Africa', 'searches': 931},
  {'country': 'Zambia', 'searches': 204},
  {'country': 'Zimbabwe', 'searches': 377}],
- {map_type: "world",
- "_id": "chart2",
- geo_unit_column: 'country',
- geo_value_column: 'searches',
- enable_zoom: true})
+ {
+   projection_type: "mercator",
+   region: "world",
+   theme: "choropleth",
+   "_id": "chart2",
+   geo_unit_column: 'country',
+   geo_value_column: 'searches',
+   enable_zoom: true
+ }
+ )
 
 
  jarvis.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
@@ -576,14 +587,18 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'country': 'South Africa', 'searches': 931},
  {'country': 'Zambia', 'searches': 204},
  {'country': 'Zimbabwe', 'searches': 377}],
- {map_type: "orthographic",
- "_id": "chart1",
- geo_unit_column: 'country',
- geo_value_column: 'searches',
- canvas_height: 600,
- canvas_width: 600,
- enable_zoom: true,
- enable_click_to_center: true})
+ {
+   projection_type: "orthographic",
+   region: "world",
+   theme: "choropleth",
+   "_id": "chart1",
+   geo_unit_column: 'country',
+   geo_value_column: 'searches',
+   canvas_height: 600,
+   canvas_width: 600,
+   enable_zoom: true,
+   enable_click_to_center: true
+ })
 
 </script>
 </body>
