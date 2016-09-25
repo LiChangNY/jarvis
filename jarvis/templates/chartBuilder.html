@@ -11,7 +11,7 @@
 <script type="text/javascript">
 
 
-jarvis.MapChart(data = {{ chart.data|safe }}, {{ chart.options|safe }})
+var {{ chart._id }} = jarvis.MapChart(data = {{ chart.data|safe }}, {{ chart.options|safe }})
 
 </script>
 

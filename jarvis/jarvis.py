@@ -61,7 +61,7 @@ class Jarvis(object):
         if "map" in self.chart_type:
             self.projection_type = kwargs.get('chart_type', "mercator_map").split("_")[0]
             self.region = kwargs.get("region", "US")
-            self.theme = kwargs.get('theme', "choropleth")
+            #self.theme = kwargs.get('theme', "choropleth")
             self.geo_unit_column = kwargs.get("unit", None)
             self.geo_value_column = kwargs.get("values", None)
 
@@ -98,10 +98,8 @@ class Jarvis(object):
         #self._id = self.chart_type + "_" + str(Jarvis[self.chart_type]['count'])
 
         Jarvis._count += 1
-        self._id = self.model.lower() + "_" + str(Jarvis._count) + "_" + self.chart_type
+        self._id = self.model.lower() + "_" + str(Jarvis._count) # + "_" + self.chart_type
 
-
-    def show(self):
         template = jinja_environment.get_template(self.TEMPLATE_FILE)
 
         html_content = template.render(chart={"options": json.dumps(self, default=lambda o: o.__dict__),
@@ -109,8 +107,40 @@ class Jarvis(object):
                                               "filters": self.filters,
                                               "_id": self._id})
 
-
         display(HTML(html_content))
+
+    def addColor(self):
+        display(HTML("""
+            <script type="text/javascript">
+                %s.addColor();
+            </script>
+        """ % self._id))
+        return self;
+
+    def addTooltip(self):
+        display(HTML("""
+            <script type="text/javascript">
+                %s.addTooltip();
+            </script>
+        """ % self._id))
+        return self;
+
+    def enableZoom(self):
+        display(HTML("""
+            <script type="text/javascript">
+                %s.enableZoom();
+            </script>
+        """ % self._id))
+        return self;
+
+
+    def enableClickToCenter(self):
+        display(HTML("""
+            <script type="text/javascript">
+                %s.enableClickToCenter();
+            </script>
+        """ % self._id))
+        return self;
 
 
 class d3map(Jarvis):
