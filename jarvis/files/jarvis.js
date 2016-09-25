@@ -664,7 +664,7 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
    }
 
-   this.enableRotateToCenter = function () {
+   this.enableClickToCenter = function () {
         var self = this;
         this.paths
             .on("click", function(x) {
@@ -752,7 +752,7 @@ function drawMapChart(data, options) {
 
     var projectionType = options.projection_type || "mercator"
     , region = options.region || "US"
-    , theme = options.theme || "choropleth"
+    //, theme = options.theme || "choropleth"
     , geoUnitColumn = options.geo_unit_column
     , geoValueColumn = options.geo_value_column;
 
@@ -770,17 +770,43 @@ function drawMapChart(data, options) {
 
     if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
 
-    if (data != null) {
-        if (theme == "choropleth") {
-            chart
-                .addColor()
-                .addTooltip()
-        }
+    var addColor = function() {
+        console.log("called addColor");
+        chart.addColor();
+        return mapChartApi;
     }
 
-    if (enableZoom) { chart.enableZoom();}
-    if (enableClickToCenter) {chart.enableRotateToCenter();}
+    var addTooltip = function() {
+        console.log("called addTooltip");
+        chart.addTooltip();
+        return mapChartApi;
+    }
 
+
+    var addCircle = function() {
+        console.log("called addCircle");
+        return mapChartApi;
+    }
+
+    var enableZoom = function(){
+        chart.enableZoom();
+        return mapChartApi;
+    }
+
+    var enableClickToCenter = function(){
+        chart.enableClickToCenter();
+        return mapChartApi;
+    }
+
+    var mapChartApi = {
+        addColor: addColor,
+        addCircle: addCircle,
+        addTooltip: addTooltip,
+        enableZoom: enableZoom,
+        enableClickToCenter: enableClickToCenter
+    }
+
+    return mapChartApi;
 }
 
 return {

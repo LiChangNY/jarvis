@@ -145,7 +145,10 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    geo_unit_column: 'state',
    geo_value_column: 'searches',
    canvas_height:600,
-   show_legend: true})
+   //show_legend: true
+   })
+   .addColor()
+   .addTooltip();
 
 
 
@@ -369,9 +372,12 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    "_id": "chart2",
    geo_unit_column: 'country',
    geo_value_column: 'searches',
-   enable_zoom: true
+   //enable_zoom: true
  }
  )
+ .addColor()
+ .addTooltip()
+ .enableZoom()
 
 
  jarvis.MapChart(data = [{'country': 'Afghanistan', 'searches': 725},
@@ -599,6 +605,10 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    enable_zoom: true,
    enable_click_to_center: true
  })
+ .addColor()
+ .addTooltip()
+ .enableZoom()
+ .enableClickToCenter();
 
 </script>
 </body>
