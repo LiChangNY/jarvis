@@ -463,9 +463,11 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
+    console.log("Data", data);
+
    //TODO: Add color palettes
    if (data != null) {
-       var dataByUnits = d3.map();
+       //var dataByUnits = d3.map();
 
        var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
         , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
@@ -477,7 +479,10 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
                       .range(['#F0F8FF', '#003300']);
 
        // TODO: geoValueColumn can be multiple.
-       data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
+       //data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
+
+       //console.log("dataByUnits", dataByUnits);
+
     }
 
     this.drawMap = function(data, center, scale, rotate) {
@@ -489,6 +494,8 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
         if (projectionType == 'mercator' && region == "world") {
 
+            scale = scale || 150;
+
             projection = d3.geo.mercator()
                 .center(center)
                 .scale(scale)
@@ -498,6 +505,8 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
         } else if (projectionType == 'orthographic') {
 
+            scale = scale || 150;
+
             projection = d3.geo.orthographic()
                 .translate([width / 2, height / 2])
                 .scale(scale)
@@ -506,6 +515,17 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
                 .rotate([0, -30]);
 
             path.projection(projection);
+
+        } else if (projectionType == 'albersUsa') {
+
+            scale = scale || 1000;
+
+            projection = d3.geo.albersUsa()
+                .translate([width / 2, height / 2])
+                .scale(scale)
+
+            path.projection(projection);
+
         }
 
         var g = this.svg.append("g");
@@ -528,21 +548,27 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
 
         var drawBaseMap = function(topojson, topology, mapKey, mapUnit){
+
                 self.paths = g.selectAll(mapUnit)
                   .data(topojson.feature(topology, topology.objects[mapKey]).features)
                   .enter()
                  .append('g')
                   .attr("class", mapUnit)
-                  .attr('data-name', function(d) {
-                    return d.properties.name;
-                  })
-                  .attr('data-id', function(d) {
-                    return d.id;
-                  })
                  .append("path")
                   .attr('class', 'land')
                   .style("stroke", "white")
                   .attr("d", path)
+                  .attr('data-id', function(d) {
+                    return d.id;
+                  })
+                  .attr('data-name', function(d) {
+                    return d.properties.name;
+                  })
+                  .attr('data-value', function(d) {
+                    var match = data.find(function (d2) { return d2[geoUnitColumn] == d.properties.name});
+
+                    if (match) { return match[geoValueColumn]; }
+                  })
 
         }
             var regionOptions = {
@@ -581,20 +607,31 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
     this.addColor = function(){
           //TODO: Add series for coloring
-          this.paths.style("fill", function(d) { return colorScale(dataByUnits.get(d.properties.name))})
+
+          this.paths.style("fill", function(d) {
+
+            //return colorScale(dataByUnits.get(d.properties.name))
+            return colorScale(this.getAttribute("data-value"));
+          })
 
           return this;
     }
 
 
-    this.addTooltip = function() {
+    this.addTooltip = function(elements, getText) {
 
         var tooltip = d3.select(id).append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
-          this.paths
+          elements
             .on("mouseover", function(d){
+
+                var text = this.getAttribute("data-name");
+
+                if (this.getAttribute("data-value")) {
+                    text += ": " + this.getAttribute("data-value");
+                }
 
                 tooltip
                     .transition()
@@ -603,7 +640,8 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
                 //TODO: Allow customized tooltip
                 tooltip
-                    .text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
+                    //.text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
+                    .text(text)
                     .style("position", "absolute")
                     .style("left", (d3.mouse(this)[0]+30) + "px"  )
                     .style("top", (d3.mouse(this)[1]) + "px")
@@ -702,19 +740,25 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
         return this;
     }
 
-    //TODO: Not using it at the moment.
-    this.addLayer = function(type, data) {
+    this.addCircle = function(scale) {
 
-         circles = this.svg.selectAll("circle")
-            .data(dataByUnits).enter()
+        var projection = this.projection;
+
+        var circles = this.svg.selectAll("circle")
+            .data(data).enter()
             .append("circle")
             .attr("class","circle")
-            .attr("id", function (d) { return d.origin;})
+            .attr("id", function (d) { return d[geoUnitColumn];})
             .attr("cx", function (d) { return projection([d.long, d.lat])[0]; })
             .attr("cy", function (d) { return projection([d.long, d.lat])[1]; })
-            .attr("r", function (d) {  return Math.log(d.flightCounts); })
+            .attr("r", function (d) {  return Math.log(d[geoValueColumn]) * scale; })
             .attr("fill", "#1f77b4")
-            .attr('opacity', opacityCircle)
+            .attr('opacity', 0.5)
+            .attr("data-name", function(d) { return d[geoUnitColumn]; })
+            .attr("data-value", function(d) { return d[geoValueColumn]; });
+
+        this.addTooltip(circles)
+
         return this
     }
 
@@ -766,44 +810,36 @@ function drawMapChart(data, options) {
 
     var chart = new MapBuilder(chartId, data, projectionType, region ,canvasWidth, canvasHeight,
                                 width, height, margin, geoUnitColumn, geoValueColumn)
-                    .drawMap(data = data, center = [0,0], scale = 150, rotate = [0,0])
+                    .drawMap(data = data, center = [0,0], scale = options.scale, rotate = [0,0])
 
     if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
 
-    var addColor = function() {
-        console.log("called addColor");
-        chart.addColor();
-        return mapChartApi;
-    }
-
-    var addTooltip = function() {
-        console.log("called addTooltip");
-        chart.addTooltip();
-        return mapChartApi;
-    }
-
-
-    var addCircle = function() {
-        console.log("called addCircle");
-        return mapChartApi;
-    }
-
-    var enableZoom = function(){
-        chart.enableZoom();
-        return mapChartApi;
-    }
-
-    var enableClickToCenter = function(){
-        chart.enableClickToCenter();
-        return mapChartApi;
-    }
 
     var mapChartApi = {
-        addColor: addColor,
-        addCircle: addCircle,
-        addTooltip: addTooltip,
-        enableZoom: enableZoom,
-        enableClickToCenter: enableClickToCenter
+        addColor: function() {
+            chart.addColor();
+            return mapChartApi;
+        },
+
+        addCircle: function(scale) {
+            chart.addCircle(scale)
+            return mapChartApi;
+        },
+
+        addTooltip: function() {
+            chart.addTooltip(chart.paths);
+            return mapChartApi;
+        },
+
+        enableZoom: function(){
+            chart.enableZoom();
+            return mapChartApi;
+        },
+
+        enableClickToCenter: function(){
+            chart.enableClickToCenter();
+            return mapChartApi;
+        }
     }
 
     return mapChartApi;

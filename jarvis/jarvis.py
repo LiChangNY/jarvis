@@ -58,6 +58,9 @@ class Jarvis(object):
         self.model = self.__class__.__name__  #: The chart model
         self.chart_type = kwargs.get('chart_type', 'bar')
 
+        self.canvas_height = kwargs.get("canvas_height", 400)
+        self.canvas_weight = kwargs.get("canvas_weight", 900)
+
         if "map" in self.chart_type:
             self.projection_type = kwargs.get('chart_type', "mercator_map").split("_")[0]
             self.region = kwargs.get("region", "US")
@@ -115,6 +118,14 @@ class Jarvis(object):
                 %s.addColor();
             </script>
         """ % self._id))
+        return self;
+
+    def addCircle(self, scale):
+        display(HTML("""
+            <script type="text/javascript">
+                %s.addCircle(%f);
+            </script>
+        """ % (self._id, scale)))
         return self;
 
     def addTooltip(self):
