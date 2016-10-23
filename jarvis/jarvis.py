@@ -56,7 +56,7 @@ class Jarvis(object):
 
         # set the model
         self.model = self.__class__.__name__  #: The chart model
-        self.chart_type = kwargs.get('chart_type', 'bar')
+        self.chart_type = kwargs.get('chart_type', 'LineChart')
 
         self.canvas_height = kwargs.get("canvas_height", 400)
         self.canvas_weight = kwargs.get("canvas_weight", 900)
@@ -78,11 +78,6 @@ class Jarvis(object):
             map_file_path = map_region['path']
             topology = resource_string('jarvis', map_file_path).decode('utf-8')
 
-            display(HTML("""
-                <script type="text/javascript">
-                    var topology = %s;
-                </script>""" % topology))
-
         self.TEMPLATE_FILE = "chartBuilder.html"
         self.df_json = dataframe.to_json(orient='records')
         self.series_count = len(dataframe.columns)
@@ -93,22 +88,16 @@ class Jarvis(object):
 
         self.filters = kwargs.get("filters", None)
 
-        # Another way of id
-        #if self.chart_type in Jarvis:
-        #    Jarvis[self.chart_type]['count'] +=1
-        #else:
-        #    Jarvis[self.chart_type] = {'count': 0}
-        #self._id = self.chart_type + "_" + str(Jarvis[self.chart_type]['count'])
-
         Jarvis._count += 1
-        self._id = self.model.lower() + "_" + str(Jarvis._count) # + "_" + self.chart_type
+        self._id = self.model.lower() + "_" + str(Jarvis._count)
 
         template = jinja_environment.get_template(self.TEMPLATE_FILE)
 
         html_content = template.render(chart={"options": json.dumps(self, default=lambda o: o.__dict__),
                                               "data": self.df_json,
                                               "filters": self.filters,
-                                              "_id": self._id})
+                                              "_id": self._id,
+                                              "topology": topology})
 
         display(HTML(html_content))
 
@@ -154,12 +143,11 @@ class Jarvis(object):
         return self;
 
 
-class d3map(Jarvis):
+class MapChart(Jarvis):
 
     def __init__(self, **kwargs):
 
-        super(d3map, self).__init__(**kwargs)
+        super(MapChart, self).__init__(**kwargs)
 
-        self.model = 'map'
-        self.chart_type = kwargs.pop('chart_type', 'map')
+        print self.chart_type
 

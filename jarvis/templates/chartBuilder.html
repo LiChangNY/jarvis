@@ -10,8 +10,7 @@
 
 <script type="text/javascript">
 
-
-var {{ chart._id }} = jarvis.MapChart(data = {{ chart.data|safe }}, {{ chart.options|safe }})
+var {{ chart._id }} = jarvis.MapChart(data = {{ chart.data|safe }}, {{ chart.options|safe }}, {{ chart.topology|safe}});
 
 </script>
 

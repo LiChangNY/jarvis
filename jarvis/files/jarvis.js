@@ -457,176 +457,138 @@ var drawLineChart = function(data, options, filters) {
 
 }
 
-MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeight,
-                      width, height, margin, geoUnitColumn, geoValueColumn) {
+MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, canvasHeight,
+                      width, height, margin, geoUnitColumn, geoValueColumn, scale) {
 
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
-    console.log("Data", data);
-
    //TODO: Add color palettes
    if (data != null) {
-       //var dataByUnits = d3.map();
-
-       var valueMin = d3.min(data, function(d) { return d[geoValueColumn]})
-        , valueMax = d3.max(data, function(d) { return d[geoValueColumn] });
-
-       var colorDomain = [valueMin, valueMax];
-
        var colorScale = d3.scale.linear()
-                      .domain(colorDomain)
-                      .range(['#F0F8FF', '#003300']);
+            .domain([
+                d3.min(data, function(d) { return d[geoValueColumn] }),
+                d3.max(data, function(d) { return d[geoValueColumn] })
+            ])
+            .range(['#F0F8FF', '#003300']);
 
        // TODO: geoValueColumn can be multiple.
-       //data.forEach(function(d) {dataByUnits.set(d[geoUnitColumn], +d[geoValueColumn]);})
+    }
 
-       //console.log("dataByUnits", dataByUnits);
+    this.svg = this.drawCanvas();
+
+    var path = d3.geo.path(),
+        g = this.svg.append("g"),
+        projection;
+
+    if (projectionType == 'mercator' && region == "world") {
+        projection = d3.geo.mercator()
+            .center([0,0])
+            .scale(scale || 150)
+            //.rotate([-180,0]);
+    } else if (projectionType == 'orthographic') {
+
+        projection = d3.geo.orthographic()
+            .translate([width / 2, height / 2])
+            .scale(scale || 150)
+            .clipAngle(90)
+            .precision(0.1)
+            .rotate([0, -30]);
+
+        //this.svg.attr('viewBox', '0, 0, ' + width + ', ' + height);
+
+    } else if (projectionType == 'albersUsa') {
+        projection = d3.geo.albersUsa()
+            .translate([width / 2, height / 2])
+            .scale(scale || 1000)
+    }
+
+    path.projection(projection);
+
+
+    if (projectionType == 'orthographic') {
+
+        g.append('path')
+        .datum({type: 'Sphere'})
+        .attr('class', 'background')
+        .attr('d', path);
+
+        g.append('path')
+          .datum(d3.geo.graticule())
+          .attr('class', 'graticule')
+          .attr('d', path);
 
     }
 
-    this.drawMap = function(data, center, scale, rotate) {
+    var drawBaseMap = function(topology, mapKey, mapUnit){
 
-        var path, projection;
-
-        path = d3.geo.path()
-        , graticule = d3.geo.graticule();
-
-        if (projectionType == 'mercator' && region == "world") {
-
-            scale = scale || 150;
-
-            projection = d3.geo.mercator()
-                .center(center)
-                .scale(scale)
-                //.rotate([-180,0]);
-
-            path.projection(projection);
-
-        } else if (projectionType == 'orthographic') {
-
-            scale = scale || 150;
-
-            projection = d3.geo.orthographic()
-                .translate([width / 2, height / 2])
-                .scale(scale)
-                .clipAngle(90)
-                .precision(0.1)
-                .rotate([0, -30]);
-
-            path.projection(projection);
-
-        } else if (projectionType == 'albersUsa') {
-
-            scale = scale || 1000;
-
-            projection = d3.geo.albersUsa()
-                .translate([width / 2, height / 2])
-                .scale(scale)
-
-            path.projection(projection);
-
-        }
-
-        var g = this.svg.append("g");
-
-
-        if (projectionType == 'orthographic') {
-
-            g.append('path')
-                .datum({type: 'Sphere'})
-                .attr('class', 'background')
-                .attr('d', path);
-
-            g.append('path')
-              .datum(graticule)
-              .attr('class', 'graticule')
-              .attr('d', path);
-        }
-
-        var self = this;
-
-
-        var drawBaseMap = function(topojson, topology, mapKey, mapUnit){
-
-                self.paths = g.selectAll(mapUnit)
-                  .data(topojson.feature(topology, topology.objects[mapKey]).features)
-                  .enter()
-                 .append('g')
-                  .attr("class", mapUnit)
-                 .append("path")
-                  .attr('class', 'land')
-                  .style("stroke", "white")
-                  .attr("d", path)
-                  .attr('data-id', function(d) {
-                    return d.id;
-                  })
-                  .attr('data-name', function(d) {
-                    return d.properties.name;
-                  })
-                  .attr('data-value', function(d) {
+            return g.selectAll(mapUnit)
+              .data(topojson.feature(topology, topology.objects[mapKey]).features)
+              .enter()
+             .append('g')
+              .attr("class", mapUnit)
+             .append("path")
+              .attr('class', 'land')
+              .style("stroke", "white")
+              .attr("d", path)
+              .attr('data-id', function(d) {
+                return d.id;
+              })
+              .attr('data-name', function(d) {
+                return d.properties.name;
+              })
+              .attr('data-value', function(d) {
+                if (data) {
                     var match = data.find(function (d2) { return d2[geoUnitColumn] == d.properties.name});
 
                     if (match) { return match[geoValueColumn]; }
-                  })
-
-        }
-            var regionOptions = {
-                world: {base: "files/maps/countries.json", key: 'units', unit: "country"},
-                US: {base: "files/maps/us-states.json", key: "units", unit: "state"},
-                //orthographic: {base: "files/maps/countries.json", key: "units", unit:"country"}
-            };
-
-            var mapKey = regionOptions[region].key
-            , mapUnit = regionOptions[region].unit;
-
-        //If users use Python, typology should have been defined when Jarvis object is instantiated.
-        //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
-        if (typeof topology == "undefined") {
-
-            $.ajax({
-              url:  regionOptions[region].base,
-              async: false,
-              dataType: 'json',
-              success: function (topology) {
-                drawBaseMap(topojson, topology, mapKey, mapUnit);
-
-              }
-            });
-
-        } else {
-            drawBaseMap(topojson, topology, mapKey, mapUnit);
-
-        }
-
-        this.path = path;
-        this.projection = projection;
-
-        return this;
+                }
+              })
     }
+
+    var regionOptions = {
+        world: {base: "files/maps/countries.json", key: 'units', unit: "country"},
+        US: {base: "files/maps/us-states.json", key: "units", unit: "state"},
+    };
+
+    //If users use Python, typology should have been defined when Jarvis object is instantiated.
+    //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
+    if (typeof topology == "undefined") {
+        console.log("topology is undefined");
+
+        var topology;
+
+        $.ajax({
+          url:  regionOptions[region].base,
+          async: false,
+          dataType: 'json',
+          success: function (result) {
+            topology = result;
+          }
+        });
+    }
+
+    this.paths = drawBaseMap(topology, regionOptions[region].key, regionOptions[region].unit);
+    this.path = path;
+    this.projection = projection;
 
     this.addColor = function(){
           //TODO: Add series for coloring
-
           this.paths.style("fill", function(d) {
-
             //return colorScale(dataByUnits.get(d.properties.name))
             return colorScale(this.getAttribute("data-value"));
-          })
+          });
 
           return this;
     }
 
-
     this.addTooltip = function(elements, getText) {
-
         var tooltip = d3.select(id).append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
           elements
             .on("mouseover", function(d){
-
                 var text = this.getAttribute("data-name");
 
                 if (this.getAttribute("data-value")) {
@@ -654,67 +616,58 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
                     .style("opacity", 0);
             })
           return this;
-
     }
 
-
-   this.zoom = function() {
-       var svg = this.svg
-       , projection = this.projection
-       , path = this.path;
-
-      return d3.geo.zoom()
-          .projection(projection)
-          .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
-          .on('zoom.redraw', function(){
-
-            d3.event.sourceEvent.preventDefault();
-            svg.selectAll('path').attr('d',path);
-          });
-
-   }
-
    this.enableZoom = function() {
-        this.svg.selectAll('path').call(this.zoom());
-   };
+        var svg = this.svg
+        , projection = this.projection
+        , path = this.path;
 
+        var zoom = d3.geo.zoom()
+            .projection(projection)
+            .scaleExtent([projection.scale() * 0.7, projection.scale() * 8])
+            .on('zoom.redraw', function(){
+                d3.event.sourceEvent.preventDefault();
+                svg.selectAll('path').attr('d',path);
+            });
 
-   this.clickToCenter = function(x) {
-
-        var coords = d3.geo.centroid(x);
-        coords[0] = -coords[0];
-        coords[1] = -coords[1];
-
-       var svg = this.svg
-       , projection = this.projection
-       , path = this.path;
-
-        d3.transition()
-        .duration(1250)
-        .tween('rotate', function() {
-            var r = d3.interpolate(projection.rotate(), coords);
-            return function(t) {
-               projection.rotate(r(t));
-               svg.selectAll('path').attr('d', path);
-            };
-        })
-        .transition();
-
+        svg.selectAll('path').call(zoom);
+        return this;
    }
 
    this.enableClickToCenter = function () {
-        var self = this;
+       var svg = this.svg
+       , projection = this.projection
+       , path = this.path;
+
+        var clickToCenter = function(x) {
+            var coords = d3.geo.centroid(x);
+            coords[0] = -coords[0];
+            coords[1] = -coords[1];
+
+            d3.transition()
+            .duration(1250)
+            .tween('rotate', function() {
+                var r = d3.interpolate(projection.rotate(), coords);
+                return function(t) {
+                   projection.rotate(r(t));
+                   svg.selectAll('path').attr('d', path);
+                };
+            })
+            .transition();
+       };
         this.paths
             .on("click", function(x) {
-                self.clickToCenter(x);
-            })
+                clickToCenter(x);
+            });
+        return this;
     }
 
     this.drawLegend = function(height, position) {
 
         //TODO: Make legend more progressive. Now it only has lowest and highest value.
 
-        this.legend = this.svg.append("g")
+        var legend = this.svg.append("g")
             .attr("class","legend")
             .attr("transform", "translate(" + position.x + "," + position.y + ")")
             .selectAll("g")
@@ -723,7 +676,7 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
 
         var ls_w = 20, ls_h = 20;
 
-        this.legend.append("rect")
+        legend.append("rect")
           .attr("x", 20)
           .attr("y", function(d, i){ return height - (i*ls_h) - 2*ls_h;})
           .attr("width", ls_w)
@@ -731,17 +684,15 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
           .style("fill", function(d, i) { return colorScale(d); })
           .style("opacity", 0.8);
 
-        this.legend.append("text")
+        legend.append("text")
           .attr("x", 50)
           .attr("y", function(d, i){ return height - (i*ls_h) - ls_h - 4;})
-          .text(function(d, i){ return colorDomain[i]; })
-
+          .text(function(d, i){ return colorDomain[i]; });
 
         return this;
     }
 
     this.addCircle = function(scale) {
-
         var projection = this.projection;
 
         var circles = this.svg.selectAll("circle")
@@ -757,63 +708,54 @@ MapBuilder = function(id, data, projectionType, region, canvasWidth, canvasHeigh
             .attr("data-name", function(d) { return d[geoUnitColumn]; })
             .attr("data-value", function(d) { return d[geoValueColumn]; });
 
-        this.addTooltip(circles)
+        this.addTooltip(circles);
 
-        return this
-    }
-
-
-
-
-    this.svg = this.drawCanvas();
-
-    if (projectionType == "orthographic") {
-       this.svg.attr('viewBox', '0, 0, ' + width + ', ' + height)
+        return this;
     }
 
     return this;
-
 }
 
 MapBuilder.prototype = Object.create(ChartBuilder.prototype);
 MapBuilder.prototype.constructor = MapBuilder;
 MapBuilder.prototype.parent = ChartBuilder.prototype;
 
-function drawMapChart(data, options) {
+function drawMapChart(data, options, topology) {
 
-    var canvasWidth = options.canvas_width || 960
-    , canvasHeight = options.canvas_height || 400
-    , margin = {}
-    margin.left = options.margin_left || 80
-    margin.right = options.margin_right || 65
-    margin.top = options.margin_top ||40
-    margin.bottom = options.margin_bottom || 60
+    var canvasWidth = options.canvas_width || 960,
+        canvasHeight = options.canvas_height || 400,
+        margin = {
+            left: options.margin_left || 80,
+            right: options.margin_right || 65,
+            top: options.margin_top || 40,
+            bottom: options.margin_bottom || 60
+        };
 
-    var chartId = "#" + options._id
+    var chart = new MapBuilder(
+        "#" + options._id,
+        data,
+        topology,
+        options.projection_type || "mercator",
+        options.region || "US",
+        canvasWidth,
+        canvasHeight,
+        options.width || canvasWidth - margin.left - margin.right,
+        options.height || canvasHeight- margin.top - margin.bottom,
+        margin,
+        options.geo_unit_column,
+        options.geo_value_column,
+        scale = options.scale
+    );
 
-    var width = options.width || canvasWidth - margin.left - margin.right
-    , height = options.height || canvasHeight- margin.top - margin.bottom
-
-    var projectionType = options.projection_type || "mercator"
-    , region = options.region || "US"
-    //, theme = options.theme || "choropleth"
-    , geoUnitColumn = options.geo_unit_column
-    , geoValueColumn = options.geo_value_column;
-
-    var legendX = options.legend_x || 0
-    , legendY = options.legend_y || margin.top
-    , legendHeight = options.legend_height || 70
-    , showLegend = options.show_legend || null
-
-    var enableZoom = options.enable_zoom || false
-    , enableClickToCenter = options.enable_click_to_center || false
-
-    var chart = new MapBuilder(chartId, data, projectionType, region ,canvasWidth, canvasHeight,
-                                width, height, margin, geoUnitColumn, geoValueColumn)
-                    .drawMap(data = data, center = [0,0], scale = options.scale, rotate = [0,0])
-
-    if (showLegend) {chart.drawLegend(legendHeight, {x: legendX, y:legendY})}
-
+    if (options.show_legend) {
+        chart.drawLegend(
+            options.legend_height || 70,
+            {
+                x: options.legend_x || 0,
+                y: options.legend_y || margin.top
+            }
+        );
+    }
 
     var mapChartApi = {
         addColor: function() {
