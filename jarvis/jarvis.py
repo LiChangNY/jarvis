@@ -41,8 +41,7 @@ class Jarvis(object):
             <style> %s </style>
             <script type="text/javascript"> %s </script>
             """ % (_get_file("files/jarvis.css"),
-                   _get_file('jarvis.min.js')  #Use for production
-                   #_get_file("files/jarvis.js") #Use for testing
+                   _get_file('jarvis.min.js')
                    )))
         _JS_INITIALIZED = True
 
@@ -52,31 +51,13 @@ class Jarvis(object):
 #       display(HTML("""<link rel="stylesheet" href="%s" type="text/css"/>"""
 #                % _get_file("sumoselect.css")))
 
-    def __init__(self, dataframe, **kwargs):
+    def __init__(self, dataframe, *args, **kwargs):
 
-        # set the model
         self.model = self.__class__.__name__  #: The chart model
-        self.chart_type = kwargs.get('chart_type', 'LineChart')
 
         self.canvas_height = kwargs.get("canvas_height", 400)
         self.canvas_weight = kwargs.get("canvas_weight", 900)
 
-        if "map" in self.chart_type:
-            self.projection_type = kwargs.get('chart_type', "mercator_map").split("_")[0]
-            self.region = kwargs.get("region", "US")
-            #self.theme = kwargs.get('theme', "choropleth")
-            self.geo_unit_column = kwargs.get("unit", None)
-            self.geo_value_column = kwargs.get("values", None)
-
-            map_options = {
-                "world": {"path": "files/maps/countries.json"},
-                "US": {"path": "files/maps/us-states.json"},
-                #"orthographic": {"path": "files/maps/countries.json"}
-            }
-
-            map_region = map_options[self.region]
-            map_file_path = map_region['path']
-            topology = resource_string('jarvis', map_file_path).decode('utf-8')
 
         self.TEMPLATE_FILE = "chartBuilder.html"
         self.df_json = dataframe.to_json(orient='records')
@@ -93,11 +74,18 @@ class Jarvis(object):
 
         template = jinja_environment.get_template(self.TEMPLATE_FILE)
 
-        html_content = template.render(chart={"options": json.dumps(self, default=lambda o: o.__dict__),
-                                              "data": self.df_json,
-                                              "filters": self.filters,
-                                              "_id": self._id,
-                                              "topology": topology})
+        self.chart_options = {"options": json.dumps(self, default=lambda o: o.__dict__),
+                              "data": self.df_json,
+                              "filters": self.filters,
+                              "_id": self._id,
+                              "model": self.model}
+
+        if self.additional_chart_options:
+            self.chart_options.update(self.additional_chart_options)
+
+        #print self.chart_options
+
+        html_content = template.render(chart=self.chart_options)
 
         display(HTML(html_content))
 
@@ -145,9 +133,26 @@ class Jarvis(object):
 
 class MapChart(Jarvis):
 
-    def __init__(self, **kwargs):
 
-        super(MapChart, self).__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
 
-        print self.chart_type
+        self.projection_type = kwargs.get('projection', "mercator")
+        self.region = kwargs.get("region", "US")
+        # self.theme = kwargs.get('theme', "choropleth")
+        self.geo_unit_column = kwargs.get("unit", None)
+        self.geo_value_column = kwargs.get("values", None)
+
+        map_options = {
+            "world": {"path": "files/maps/countries.json"},
+            "US": {"path": "files/maps/us-states.json"},
+        }
+
+        map_region = map_options[self.region]
+        map_file_path = map_region['path']
+        topology = resource_string('jarvis', map_file_path).decode('utf-8')
+
+        self.additional_chart_options = {"topology": topology}
+
+        super(MapChart, self).__init__(*args, **kwargs)
+
 
