@@ -30,7 +30,14 @@
 <body>
 <h1>Jarvis Gallery</h1>
 
+<p>This page illustrates charts that are currently supported by Jarvis. You can render charts using the Javascript library and in Jupyter Notebook.</p>
+<br></br>
+<br></br>
 
+Radial chart
+<div class="chart" id="chart6"></div>
+
+Map with circles
 <div class="chart" id="chart5"></div>
 
 Globe map: Zoom effect + Click-to-rotate.
@@ -64,6 +71,270 @@ Line Chart<br/><br/>
 <div class="chart" id="chart4"></div>
 
 <script type="text/javascript">
+
+
+jarvis.TreeChart(
+   data = [
+    {
+        "actor": "Peter Dinklage",
+        "house": "House Lannister",
+        "name": "Tyrion Lannister",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Nikolaj Coster-Waldau",
+        "house": "House Lannister",
+        "name": "Jaime Lannister",
+        "to": "Tyrion Lannister"
+    },
+    {
+        "actor": "Lena Headey",
+        "house": "House Lannister",
+        "name": "Cersei Lannister",
+        "to": "Tyrion Lannister"
+    },
+    {
+        "actor": "Emilia Clarke",
+        "house": "House Targaryen",
+        "name": "Daenerys Targaryen",
+        "to": "null"
+    },
+    {
+        "actor": "Kit Harington",
+        "house": "House Stark",
+        "name": "Jon Snow",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Aidan Gillen",
+        "house": "Not Applicable",
+        "name": "Petyr Baelish",
+        "to": "Sansa Stark"
+    },
+    {
+        "actor": "Iain Glen",
+        "house": "House Mormont",
+        "name": "Jorah Mormont",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Sophie Turner",
+        "house": "House Stark",
+        "name": "Sansa Stark",
+        "to": "Sansa Stark"
+    },
+    {
+        "actor": "Maisie Williams",
+        "house": "House Stark",
+        "name": "Arya Stark",
+        "to": "Arya Stark"
+    },
+    {
+        "actor": "Alfie Allen",
+        "house": "House Greyjoy",
+        "name": "Theon Greyjoy",
+        "to": "Roose Bolton"
+    },
+    {
+        "actor": "Isaac Hempstead Wright",
+        "house": "House Stark",
+        "name": "Bran Stark",
+        "to": "Bran Stark"
+    },
+    {
+        "actor": "Rory McCann",
+        "house": "House Clegane",
+        "name": "Sandor Clegane",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Jack Gleeson",
+        "house": "House Baratheon",
+        "name": "Joffrey Baratheon",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Michelle Fairley",
+        "house": "House Stark",
+        "name": "Catelyn Stark",
+        "to": "Ned Stark"
+    },
+    {
+        "actor": "Richard Madden",
+        "house": "House Stark",
+        "name": "Robb Stark",
+        "to": "Ned Stark"
+    },
+    {
+        "actor": "Sean Bean",
+        "house": "House Stark",
+        "name": "Ned Stark",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Mark Addy",
+        "house": "House Baratheon",
+        "name": "Robert Baratheon",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Harry Lloyd",
+        "house": "House Targaryen",
+        "name": "Viserys Targaryen",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Conleth Hill",
+        "house": "Not Applicable",
+        "name": "Varys",
+        "to": "Tyrion Lannister"
+    },
+    {
+        "actor": "John Bradley",
+        "house": "House Tarly",
+        "name": "Samwell Tarly",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Jerome Flynn",
+        "house": "Not Applicable",
+        "name": "Bronn",
+        "to": "Jamie Lannister"
+    },
+    {
+        "actor": "Charles Dance",
+        "house": "House Lannister",
+        "name": "Tywin Lannister",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Sibel Kekilli",
+        "house": "Not Applicable",
+        "name": "Shae",
+        "to": "Tyrion Lannister"
+    },
+    {
+        "actor": "James Cosmo",
+        "house": "House Mormont",
+        "name": "Jeor Mormont",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Joe Dempsie",
+        "house": "House Baratheon",
+        "name": "Gendry",
+        "to": "Robert Baratheon"
+    },
+    {
+        "actor": "Dean-Charles Chapman",
+        "house": "House Baratheon",
+        "name": "Tommen Baratheon",
+        "to": "Robert Baratheon"
+    },
+    {
+        "actor": "Tom Wlaschiha",
+        "house": "Not Applicable",
+        "name": "Jaqen H'ghar",
+        "to": "Arya Stark"
+    },
+    {
+        "actor": "Jason Momoa",
+        "house": "Not Applicable",
+        "name": "Khal Drogo",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Liam Cunningham",
+        "house": "House Baratheon",
+        "name": "Davos Seaworth",
+        "to": "Stannis Baratheon"
+    },
+    {
+        "actor": "Carice van Houten",
+        "house": "Not Declared",
+        "name": "Melisandre",
+        "to": "Stannis Baratheon"
+    },
+    {
+        "actor": "Natalie Dormer",
+        "house": "House Tyrell",
+        "name": "Margaery Tyrell",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Stephen Dillane",
+        "house": "House Baratheon",
+        "name": "Stannis Baratheon",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Rose Leslie",
+        "house": "Wildlings",
+        "name": "Ygritte",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Oona Chaplin",
+        "house": "House Stark",
+        "name": "Talisa Stark",
+        "to": "Robert Stark"
+    },
+    {
+        "actor": "Gwendoline Christie",
+        "house": "House Tarth",
+        "name": "Brienne of Tarth",
+        "to": "Sansa Stark"
+    },
+    {
+        "actor": "Hannah Murray",
+        "house": "Wildlings",
+        "name": "Gilly",
+        "to": "Samwell Tarly"
+    },
+    {
+        "actor": "Michael McElhatton",
+        "house": "House Bolton",
+        "name": "Roose Bolton",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Kristofer Hivju",
+        "house": "Wildlings",
+        "name": "Tormund Giantsbane",
+        "to": "Jon Snow"
+    },
+    {
+        "actor": "Iwan Rheon",
+        "house": "House Bolton",
+        "name": "Ramsay Bolton",
+        "to": "Roose Bolton"
+    },
+    {
+        "actor": "Michiel Huisman",
+        "house": "Not Applicable",
+        "name": "Daario Naharis",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Nathalie Emmanuel",
+        "house": "Not Applicable",
+        "name": "Missandei",
+        "to": "Daenerys Targaryen"
+    },
+    {
+        "actor": "Indira Varma",
+        "house": "House Martell",
+        "name": "Ellaria Sand",
+        "to": "Cersei Lannister"
+    },
+    {
+        "actor": "Jonathan Pryce",
+        "house": "Not Applicable",
+        "name": "The High Sparrow",
+        "to": "Cersei Lannister"
+    }],
+    {"_id":"chart6",  "child_col": "actor", "parent_col": "to", "diameter": 700})
+
 
 jarvis.MapChart(data = [{"airport":"Thigpen ","long":-89.23450472,"lat":31.95376472,"traffic":14},{"airport":"Livingston Municipal","long":-95.01792778,"lat":30.68586111,"traffic":99},{"airport":"Meadow Lake","long":-104.5698933,"lat":38.94574889,"traffic":8},{"airport":"Perry-Warsaw","long":-78.05208056,"lat":42.74134667,"traffic":16},{"airport":"Hilliard Airpark","long":-81.90594389,"lat":30.6880125,"traffic":27},{"airport":"Tishomingo County","long":-88.20111111,"lat":34.49166667,"traffic":52},{"airport":"Gragg-Wade ","long":-86.61145333,"lat":32.85048667,"traffic":82},{"airport":"Capitol","long":-88.17786917,"lat":43.08751,"traffic":28},{"airport":"Columbiana County","long":-80.64140639,"lat":40.67331278,"traffic":1},{"airport":"Memphis Memorial","long":-92.22696056,"lat":40.44725889,"traffic":34},{"airport":"Calhoun County","long":-89.34285194,"lat":33.93011222,"traffic":78},{"airport":"Hawley Municipal","long":-96.35089861,"lat":46.88384889,"traffic":78},{"airport":"Griffith-Merrillville ","long":-87.40109333,"lat":41.51961917,"traffic":58},{"airport":"Gatesville - City\\/County","long":-97.79696778,"lat":31.42127556,"traffic":63},{"airport":"Eureka","long":-116.0050597,"lat":39.60416667,"traffic":15},{"airport":"Moton  Municipal","long":-85.68003611,"lat":32.46047167,"traffic":72},{"airport":"Schaumburg","long":-88.10124278,"lat":41.98934083,"traffic":50},{"airport":"Rolla Municipal","long":-99.62087694,"lat":48.88434111,"traffic":74},{"airport":"Eupora Municipal","long":-89.31256917,"lat":33.53456583,"traffic":42},{"airport":"Randall ","long":-74.39191722,"lat":41.43156583,"traffic":43}],
    {projection_type: "albersUsa",

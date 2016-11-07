@@ -6,6 +6,7 @@ jarvis/jarvis.min.js
 jarvis/jarvis.py
 jarvis/jarvis.pyc
 jarvis/test.ipynb
+jarvis/test.js
 jarvis.egg-info/PKG-INFO
 jarvis.egg-info/SOURCES.txt
 jarvis.egg-info/dependency_links.txt
@@ -25,4 +26,6 @@ jarvis/files/maps/countries.json
 jarvis/files/maps/us-states.json
 jarvis/templates/chartBuilder.html
 jarvis/test/airports.csv
+jarvis/test/arc.csv
 jarvis/test/country_test.csv
+jarvis/test/got.csv

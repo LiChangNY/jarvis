@@ -74,16 +74,19 @@ class Jarvis(object):
 
         template = jinja_environment.get_template(self.TEMPLATE_FILE)
 
-        self.chart_options = {"options": json.dumps(self, default=lambda o: o.__dict__),
+        options = self.__dict__.copy()
+        options.pop('df_json')
+
+        self.chart_options = {#"options": json.dumps(self, default=lambda o: o.__dict__),
+                              "options": json.dumps(options),
                               "data": self.df_json,
                               "filters": self.filters,
                               "_id": self._id,
                               "model": self.model}
 
-        if self.additional_chart_options:
-            self.chart_options.update(self.additional_chart_options)
+        if hasattr(self, 'additional_chart_options') and self.additional_chart_options:
 
-        #print self.chart_options
+            self.chart_options.update(self.additional_chart_options)
 
         html_content = template.render(chart=self.chart_options)
 
@@ -156,3 +159,13 @@ class MapChart(Jarvis):
         super(MapChart, self).__init__(*args, **kwargs)
 
 
+class TreeChart(Jarvis):
+
+    def __init__(self, **kwargs):
+
+        self.type = kwargs.get('type', "radial")
+        self.child_col = kwargs.get('child_col', None)
+        self.parent_col = kwargs.get('parent_col', None)
+        self.diameter = kwargs.get('diameter', 600)
+
+        super(TreeChart, self).__init__(**kwargs)

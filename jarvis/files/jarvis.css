@@ -126,3 +126,20 @@ path {
 .land:hover {
   opacity: 0.7
 }
+
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.node {
+  font-size: 11px;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}

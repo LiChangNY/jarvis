@@ -554,7 +554,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
     //If users use Python, typology should have been defined when Jarvis object is instantiated.
     //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
     if (typeof topology == "undefined") {
-        console.log("topology is undefined");
+
 
         var topology;
 
@@ -582,18 +582,26 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
           return this;
     }
 
-    this.addTooltip = function(elements, getText) {
+    var tooltipText = function(element) {
+
+        var text = element.getAttribute("data-name");
+
+        if (element.getAttribute("data-value")) {
+            text += ": " + element.getAttribute("data-value");
+        }
+
+        return text;
+    }
+
+    this.addTooltip = function(elements) {
+
         var tooltip = d3.select(id).append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
 
+
           elements
             .on("mouseover", function(d){
-                var text = this.getAttribute("data-name");
-
-                if (this.getAttribute("data-value")) {
-                    text += ": " + this.getAttribute("data-value");
-                }
 
                 tooltip
                     .transition()
@@ -602,8 +610,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
 
                 //TODO: Allow customized tooltip
                 tooltip
-                    //.text(d.properties.name + ": " + dataByUnits.get(d.properties.name) )
-                    .text(text)
+                    .html(tooltipText(this))
                     .style("position", "absolute")
                     .style("left", (d3.mouse(this)[0]+30) + "px"  )
                     .style("top", (d3.mouse(this)[1]) + "px")
@@ -787,9 +794,164 @@ function drawMapChart(data, options, topology) {
     return mapChartApi;
 }
 
+
+TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight, width, height, margin,
+                        tooltipText, diameter ) {
+
+    // Call parent constructor with arguments
+    ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
+
+    var tree = d3.layout.tree()
+        .size([360, diameter / 2 - 120])
+        .separation(function(a, b) { return (a[parentCol] == b[parentCol] ? 1 : 2) / a.depth; });
+    var diagonal = d3.svg.diagonal.radial()
+        .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+
+    this.svg = d3.select(this._id)
+        .attr("class", "chart")
+        .append("svg")
+        .attr("width", diameter)
+        .attr("height", diameter - 100)
+      .append("g")
+        .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+    this.addTooltip = function(elements) {
+
+        var tooltip = d3.select(id).append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          elements
+            .on("mouseover", function(d){
+
+                tooltip
+                    .transition()
+                    .duration(50)
+                    .style("opacity", 1)
+
+                tooltip
+                    .html(tooltipText(d))
+                    .style("position", "absolute")
+                    .style("left", (d3.event.pageX + 30) + "px")
+                    .style("top", (d3.event.pageY/2 - 30) + "px")
+                    //.style("left", (d3.mouse(this)[0]+30) + "px"  )
+                    //.style("top", (d3.mouse(this)[1]) + "px")
+                    .style('font-size', '14px');
+            })
+            .on("mouseout", function() {
+                tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0);
+            })
+          return this;
+    }
+
+
+    // In courtesy of https://gist.github.com/d3noob/8329404, you can generate
+    // a tree array from flat data.
+    // create a name: node map
+    var dataMap = data.reduce(function(map, node) {
+        map[node.name] = node;
+        return map;
+    }, {});
+
+
+    // create the tree array
+    var treeData = [];
+    //var houseData = [];
+    data.forEach(function(node) {
+        // add to _parent
+        var _parent = dataMap[node[parentCol]];
+        //var house = node.house;
+        if (_parent) {
+            // create child array if it doesn't exist
+            (_parent.children || (_parent.children = []))
+            // add node to child array
+            .push(node);
+        } else {
+            // _parent is null or missing
+            treeData.push(node);
+        }
+        //if (houseData.indexOf(house) < 0) { houseData.push(house)}
+    });
+
+    var root = treeData[0],
+        nodes = tree.nodes(root),
+        links = tree.links(nodes);
+
+    var link = this.svg.selectAll("link")
+          .data(links)
+        .enter().append("path")
+          .attr("class", "link")
+          .attr("d", diagonal);
+      var node = this.svg.selectAll("node")
+          .data(nodes)
+        .enter().append("g")
+          .attr("class", "node")
+          .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+      //Add circle to each node.
+      node.append("circle")
+        .attr('class', 'circle')
+          .attr("r", 4.5)
+
+      //Add name labels to each circle
+      node.append("text")
+          .attr("dy", ".31em")
+          .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+          .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+          .text(function(d) { return d.name; });
+
+    this.addTooltip(node);
+
+    return this;
+
+}
+
+TreeBuilder.prototype = Object.create(ChartBuilder.prototype);
+TreeBuilder.prototype.constructor = TreeBuilder;
+TreeBuilder.prototype.parent = ChartBuilder.prototype;
+
+function drawTreeChart(data, options) {
+
+    // Required arguments
+    var childCol =  options.child_col
+    , parentCol = options.parent_col
+
+    // Optional arguments
+    var canvasWidth = options.canvas_width || 960
+    ,   canvasHeight = options.canvas_height || 400
+    ,   margin = {
+            left: options.margin_left || 80,
+            right: options.margin_right || 65,
+            top: options.margin_top || 40,
+            bottom: options.margin_bottom || 60
+        }
+
+    ,  tooltipText = options.tooltip_text || function(d) {return childCol + ": " + d[childCol]}
+    , diameter = options.diameter || 500
+
+    var chart = new TreeBuilder(
+        "#" + options._id,
+        data,
+        childCol,
+        parentCol,
+        canvasWidth,
+        canvasHeight,
+        options.width || canvasWidth - margin.left - margin.right,
+        options.height || canvasHeight- margin.top - margin.bottom,
+        margin,
+        tooltipText,
+        diameter
+    );
+
+}
+
+
 return {
     LineChart: drawLineChart,
-    MapChart: drawMapChart
+    MapChart: drawMapChart,
+    TreeChart: drawTreeChart
 };
 
 })();

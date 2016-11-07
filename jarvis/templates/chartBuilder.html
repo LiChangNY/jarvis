@@ -10,10 +10,13 @@
 
 <script type="text/javascript">
 
-var {{ chart._id }} = jarvis.{{chart.model}}(data = {{ chart.data|safe }},
-                                      {{ chart.options|safe }},
-                                      {{ chart.topology|safe}});
 
+var {{ chart._id }} = jarvis.{{chart.model}}(data = {{ chart.data|safe }},
+                                              {{ chart.options|safe }}
+                                              {% if chart.model == "MapChart" %}
+                                              , {{ chart.topology|safe}}
+                                              {% endif %}
+                                              );
 
 </script>
 
