@@ -1,1 +1,1 @@
-from .jarvis import Jarvis, MapChart
+from .jarvis import Jarvis, MapChart, TreeChart
