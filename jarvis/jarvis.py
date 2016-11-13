@@ -179,11 +179,12 @@ class SankeyChart(Jarvis):
         self.source_col = source_col
         self.target_col = target_col
         self.value_col = value_col
-        self.nodes = [dict(name=node) for node in
+        self.nodes = kwargs.get("nodes", [dict(name=node) for node in
                       list(pd.unique(dataframe[[self.source_col, self.target_col]]
                                      .values
                                      .ravel())
                            )]
+        )
 
         super(SankeyChart, self).__init__(dataframe, *args, **kwargs)
 

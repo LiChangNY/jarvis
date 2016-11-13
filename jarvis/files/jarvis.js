@@ -953,6 +953,8 @@ SankeyBuilder = function(id, data, nodes, canvasWidth, canvasHeight, width, heig
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
+
+    // Modified from https://github.com/soxofaan/d3-plugin-captain-sankey
     var formatNumber = d3.format(",.0f"),
         format = function(d) { return formatNumber(d); },
         color = d3.scale.category20();
