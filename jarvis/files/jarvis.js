@@ -893,7 +893,6 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
       //Add circle to each node.
       node.append("circle")
         .attr('class', 'circle')
-          .attr("r", 4.5)
 
       //Add name labels to each circle
       node.append("text")
@@ -953,13 +952,12 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
+    this.svg = this.drawCanvas();
 
     // Modified from https://github.com/soxofaan/d3-plugin-captain-sankey
     var formatNumber = d3.format(",.0f"),
         format = function(d) { return formatNumber(d); },
         color = d3.scale.category20();
-
-    this.svg = this.drawCanvas();
 
     var sankey = d3.sankey()
                  .nodeWidth(35)
@@ -1062,8 +1060,6 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
     return this;
 }
 
-
-
 SankeyBuilder.prototype = Object.create(ChartBuilder.prototype);
 SankeyBuilder.prototype.constructor = SankeyBuilder;
 SankeyBuilder.prototype.parent = ChartBuilder.prototype;
@@ -1078,7 +1074,6 @@ function drawSankeyChart(data, options) {
 
     // Use ES6 arrow functions to rename JSON array to source, target, value columns
     var data = data.map(function(obj) { return {source: obj[sourceCol], target: obj[targetCol], value: obj[valueCol]}});
-    console.log(data)
 
     // A very clever solution by http://www.d3noob.org/2013/02/formatting-data-for-sankey-diagrams-in.html
     graph = {"nodes" : [], "links" : []};
@@ -1138,11 +1133,152 @@ function drawSankeyChart(data, options) {
 
 }
 
+//Go Luke!
+ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, height, margin, tooltipText){
+
+    // Call parent constructor with arguments
+    ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
+
+    this.svg = this.drawCanvas();
+
+    //Adapted from http://bl.ocks.org/mbostock/2706022
+    var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([width, height])
+    .linkDistance(60)
+    .charge(-220)
+    .on("tick", tick)
+    .start();
+
+    var link = this.svg.selectAll(".link")
+        .data(force.links())
+      .enter().append("line")
+        .attr("class", "link");
+
+    var node = this.svg.selectAll(".node")
+        .data(force.nodes())
+      .enter().append("g")
+        .attr("class", "node")
+        .call(force.drag);
+
+    node.append("circle")
+        .attr("class", "circle")
+
+    node.append("text")
+        .attr("class", "text")
+        .attr("dy", ".35em")
+        .text(function(d) { return d.name; });
+
+    function tick() {
+      link
+          .attr("x1", function(d) { return d.source.x; })
+          .attr("y1", function(d) { return d.source.y; })
+          .attr("x2", function(d) { return d.target.x; })
+          .attr("y2", function(d) { return d.target.y; });
+
+      node
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    }
+
+    //TODO: Move addTooltip to ChartBuilder class
+    this.addTooltip = function(elements) {
+
+        var tooltip = d3.select(id).append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          elements
+            .on("mouseover", function(d){
+                tooltip
+                    .transition()
+                    .duration(50)
+                    .style("opacity", 1)
+
+                tooltip
+                    .html(tooltipText(d))
+                    .style("position", "absolute")
+                    //.style("left", (d3.event.pageX + 30) + "px")
+                    //.style("top", (d3.event.pageY/2 - 30) + "px")
+                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
+                    .style("top", (d3.mouse(this)[1]) + "px")
+                    .style('font-size', '14px');
+            })
+            .on("mouseout", function() {
+                tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0);
+            })
+          return this;
+    }
+
+    this.addTooltip(link);
+
+    return this;
+
+}
+
+ForceBuilder.prototype = Object.create(ChartBuilder.prototype);
+ForceBuilder.prototype.constructor = ForceBuilder;
+ForceBuilder.prototype.parent = ChartBuilder.prototype;
+
+function drawForceGraph(data, options){
+
+    // Required arguments
+    var sourceCol =  options.source_col || 'source'
+    , targetCol = options.target_col || 'target'
+    //, valueCol = options.value_col || 'value'
+
+    // Use ES6 arrow functions to rename JSON array to source, target, value columns
+    var links = data.map(function(obj) { return {source: obj[sourceCol],
+                                        target: obj[targetCol] //,
+                                        //value: obj[valueCol]
+    }});
+
+
+    // Optional arguments
+    var canvasWidth = options.canvas_width || 960
+    ,   canvasHeight = options.canvas_height || 400
+    ,   margin = {
+            left: options.margin_left || 80,
+            right: options.margin_right || 65,
+            top: options.margin_top || 40,
+            bottom: options.margin_bottom || 60
+        }
+    ,  tooltipText = options.tooltip_text || function(d) {
+        return d.source.name + " to " + d.target.name;
+   }
+
+    var nodes = {};
+
+    // Compute the distinct nodes from the links.
+    links.forEach(function(link) {
+      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+    });
+
+    var chart = new ForceBuilder(
+        "#" + options._id,
+        links,
+        nodes,
+        canvasWidth,
+        canvasHeight,
+        options.width || canvasWidth - margin.left - margin.right,
+        options.height || canvasHeight- margin.top - margin.bottom,
+        margin,
+        tooltipText
+    );
+}
+
+
 return {
     LineChart: drawLineChart,
     MapChart: drawMapChart,
     TreeChart: drawTreeChart,
-    SankeyChart: drawSankeyChart
+    SankeyChart: drawSankeyChart,
+    ForceGraph: drawForceGraph
+
 };
 
 })();

@@ -1,1 +1,1 @@
-from .jarvis import Jarvis, MapChart, TreeChart, SankeyChart
+from .jarvis import Jarvis, MapChart, TreeChart, SankeyChart, ForceGraph
