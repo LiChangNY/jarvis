@@ -9,6 +9,7 @@
 <link media="all" href="files/jarvis.css" type="text/css" rel="stylesheet">
 <script src='files/d3.v3.min.js'></script>
 <script src='files/jarvis.js'></script>
+<script src='files/sankey.js'></script>
 <script src="files/topojson.v1.min.js"></script>
 <script src="files/d3.geo.zoom.js"></script>
 
@@ -33,6 +34,9 @@
 <p>This page illustrates charts that are currently supported by Jarvis. You can render charts using the Javascript library and in Jupyter Notebook.</p>
 <br></br>
 <br></br>
+
+Sankey chart
+<div class="chart" id="chart7"></div>
 
 Radial chart
 <div class="chart" id="chart6"></div>
@@ -71,6 +75,13 @@ Line Chart<br/><br/>
 <div class="chart" id="chart4"></div>
 
 <script type="text/javascript">
+
+
+jarvis.SankeyChart(data=[{"sourceCountry":9,"targetCountry":13,"searches":25},{"sourceCountry":14,"targetCountry":9,"searches":37},{"sourceCountry":14,"targetCountry":11,"searches":16},{"sourceCountry":14,"targetCountry":12,"searches":8},{"sourceCountry":14,"targetCountry":10,"searches":68},{"sourceCountry":6,"targetCountry":14,"searches":154},{"sourceCountry":6,"targetCountry":8,"searches":40},{"sourceCountry":1,"targetCountry":6,"searches":345},{"sourceCountry":1,"targetCountry":7,"searches":66},{"sourceCountry":1,"targetCountry":3,"searches":17},{"sourceCountry":1,"targetCountry":4,"searches":25},{"sourceCountry":1,"targetCountry":5,"searches":117},{"sourceCountry":0,"targetCountry":1,"searches":692},{"sourceCountry":0,"targetCountry":2,"searches":19}],
+{_id:"chart7", canvas_width: 900, canvas_height: 600,
+   nodes: [{"name": "j"}, {"name": "n"}, {"name": "o"}, {"name": "l"}, {"name": "m"}, {"name": "k"}, {"name": "g"}, {"name": "i"}, {"name": "b"}, {"name": "h"}, {"name": "d"}, {"name": "e"}, {"name": "f"}, {"name": "a"}, {"name": "c"}],
+   source_col: "sourceCountry", target_col:"targetCountry", value_col: "searches"}
+)
 
 
 jarvis.TreeChart(

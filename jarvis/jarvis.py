@@ -4,6 +4,7 @@ from IPython.display import display, HTML, Javascript
 import os
 import jinja2
 from pkg_resources import resource_string
+import pandas as pd
 
 
 try:
@@ -137,13 +138,13 @@ class Jarvis(object):
 class MapChart(Jarvis):
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dataframe, projection="mercator", region=None, unit=None, value=None,
+                 *args, **kwargs):
 
-        self.projection_type = kwargs.get('projection', "mercator")
-        self.region = kwargs.get("region", "US")
-        # self.theme = kwargs.get('theme', "choropleth")
-        self.geo_unit_column = kwargs.get("unit", None)
-        self.geo_value_column = kwargs.get("values", None)
+        self.projection_type = projection
+        self.region = region
+        self.geo_unit_column=unit
+        self.geo_value_column=value
 
         map_options = {
             "world": {"path": "files/maps/countries.json"},
@@ -156,16 +157,36 @@ class MapChart(Jarvis):
 
         self.additional_chart_options = {"topology": topology}
 
-        super(MapChart, self).__init__(*args, **kwargs)
+        super(MapChart, self).__init__(dataframe, *args, **kwargs)
 
 
 class TreeChart(Jarvis):
 
-    def __init__(self, **kwargs):
+    def __init__(self, dataframe, type = 'radial', child_col=None, parent_col=None, *args, **kwargs):
 
-        self.type = kwargs.get('type', "radial")
-        self.child_col = kwargs.get('child_col', None)
-        self.parent_col = kwargs.get('parent_col', None)
+        self.type = type
+        self.child_col = child_col
+        self.parent_col = parent_col
         self.diameter = kwargs.get('diameter', 600)
 
-        super(TreeChart, self).__init__(**kwargs)
+        super(TreeChart, self).__init__(dataframe, *args, **kwargs)
+
+
+class SankeyChart(Jarvis):
+
+    def __init__(self, dataframe, source_col='source',target_col='target', value_col='value', *args, **kwargs):
+
+        self.source_col = source_col
+        self.target_col = target_col
+        self.value_col = value_col
+        self.nodes = kwargs.get("nodes", [dict(name=node) for node in
+                      list(pd.unique(dataframe[[self.source_col, self.target_col]]
+                                     .values
+                                     .ravel())
+                           )]
+        )
+
+        super(SankeyChart, self).__init__(dataframe, *args, **kwargs)
+
+
+

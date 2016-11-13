@@ -138,8 +138,24 @@ path {
   font-size: 11px;
 }
 
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  font-size: 13px;
+}
+
 .link {
   fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+
+.link:hover {
+  stroke-opacity: .5;
 }

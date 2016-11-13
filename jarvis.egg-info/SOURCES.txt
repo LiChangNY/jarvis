@@ -5,8 +5,8 @@ jarvis/__init__.py
 jarvis/jarvis.min.js
 jarvis/jarvis.py
 jarvis/jarvis.pyc
+jarvis/records
 jarvis/test.ipynb
-jarvis/test.js
 jarvis.egg-info/PKG-INFO
 jarvis.egg-info/SOURCES.txt
 jarvis.egg-info/dependency_links.txt
@@ -20,6 +20,7 @@ jarvis/files/jquery-ui.min.css
 jarvis/files/jquery-ui.min.js
 jarvis/files/jquery.min.js
 jarvis/files/jquery.sumoselect.min.js
+jarvis/files/sankey.js
 jarvis/files/sumoselect.css
 jarvis/files/topojson.v1.min.js
 jarvis/files/maps/countries.json
@@ -29,3 +30,4 @@ jarvis/test/airports.csv
 jarvis/test/arc.csv
 jarvis/test/country_test.csv
 jarvis/test/got.csv
+jarvis/test/route.csv
