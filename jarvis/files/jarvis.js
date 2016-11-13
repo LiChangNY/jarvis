@@ -948,10 +948,170 @@ function drawTreeChart(data, options) {
 }
 
 
+SankeyBuilder = function(id, data, nodes, canvasWidth, canvasHeight, width, height, margin, tooltipText) {
+
+    // Call parent constructor with arguments
+    ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
+
+    var formatNumber = d3.format(",.0f"),
+        format = function(d) { return formatNumber(d); },
+        color = d3.scale.category20();
+
+    this.svg = this.drawCanvas();
+
+    var sankey = d3.sankey()
+                 .nodeWidth(35)
+                 .nodePadding(10)
+                 .size([width, height]);
+
+    var path = sankey.link();
+
+    sankey.nodes(nodes)
+        .links(data)
+        .layout(32);
+
+    var link = this.svg.append("g")
+                .selectAll(".link")
+                .data(data)//.data(data.links)
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", path)
+                .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+                .sort(function(a, b) { return b.dy - a.dy; });
+
+    var node = this.svg.append("g").selectAll(".node")
+        .data(nodes)
+      .enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")"; })
+      .call(d3.behavior.drag()
+        .origin(function(d) { return d; })
+        .on("dragstart", function() { this.parentNode.appendChild(this); })
+        .on("drag", dragmove));
+
+    sankey.relayout();
+
+    node.filter(function(d) { return d.value != 0; }) // append text only if node value is not zero
+        .append("rect")
+        .attr("height", function(d) { return d.dy; })
+        .attr("width", sankey.nodeWidth())
+        .style("fill", function(d) {
+            return d.color = color(d.name);
+        })
+        .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+      .append("title")
+        .text(function(d) { return d.name + "\n" + format(d.value); });
+
+    node.filter(function(d) { return d.value != 0; }) // append text only if node value is not zero
+        .append("text")
+        .attr("x", -6)
+        .attr("y", function(d) { return d.dy / 2; })
+        .attr("dy", ".35em")
+        .attr("text-anchor", "end")
+        .attr("transform", null)
+        .text(function(d) { return d.name; })
+        .filter(function(d) { return d.x == 0; }) // at first column append text after column
+        .attr("x", 6 + sankey.nodeWidth())
+        .attr("text-anchor", "start");
+
+    function dragmove(d) {
+      d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) +  ")");
+      sankey.relayout();
+      link.attr("d", path);
+    }
+
+
+    //TODO: Move addTooltip to ChartBuilder class
+    this.addTooltip = function(elements) {
+
+        var tooltip = d3.select(id).append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          elements
+            .on("mouseover", function(d){
+                tooltip
+                    .transition()
+                    .duration(50)
+                    .style("opacity", 1)
+
+                tooltip
+                    .html(tooltipText(d))
+                    .style("position", "absolute")
+                    //.style("left", (d3.event.pageX + 30) + "px")
+                    //.style("top", (d3.event.pageY/2 - 30) + "px")
+                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
+                    .style("top", (d3.mouse(this)[1]) + "px")
+                    .style('font-size', '14px');
+            })
+            .on("mouseout", function() {
+                tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0);
+            })
+          return this;
+    }
+
+
+    this.addTooltip(link);
+
+    return this;
+}
+
+
+
+SankeyBuilder.prototype = Object.create(ChartBuilder.prototype);
+SankeyBuilder.prototype.constructor = SankeyBuilder;
+SankeyBuilder.prototype.parent = ChartBuilder.prototype;
+
+function drawSankeyChart(data, options) {
+
+    // Required arguments
+    var sourceCol =  options.source_col || 'source'
+    , targetCol = options.target_col || 'target'
+    , valueCol = options.value_col || 'value'
+    , nodes = options.nodes;
+
+    // Use ES6 arrow functions to rename JSON array to source, target, value columns
+    var data = data.map(function(obj) { return {source: obj[sourceCol], target: obj[targetCol], value: obj[valueCol]}});
+
+    // Optional arguments
+    var canvasWidth = options.canvas_width || 960
+    ,   canvasHeight = options.canvas_height || 400
+    ,   margin = {
+            left: options.margin_left || 80,
+            right: options.margin_right || 65,
+            top: options.margin_top || 40,
+            bottom: options.margin_bottom || 60
+        }
+
+    ,  tooltipText = options.tooltip_text || function(d) {
+        console.log(d);
+        return d.source.name + " to " + d.target.name + ": " + d.value
+    }
+
+
+    var chart = new SankeyBuilder(
+        "#" + options._id,
+        data,
+        nodes,
+        canvasWidth,
+        canvasHeight,
+        options.width || canvasWidth - margin.left - margin.right,
+        options.height || canvasHeight- margin.top - margin.bottom,
+        margin,
+        tooltipText
+    );
+
+}
+
 return {
     LineChart: drawLineChart,
     MapChart: drawMapChart,
-    TreeChart: drawTreeChart
+    TreeChart: drawTreeChart,
+    SankeyChart: drawSankeyChart
 };
 
 })();

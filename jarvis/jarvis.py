@@ -4,6 +4,7 @@ from IPython.display import display, HTML, Javascript
 import os
 import jinja2
 from pkg_resources import resource_string
+import pandas as pd
 
 
 try:
@@ -169,3 +170,22 @@ class TreeChart(Jarvis):
         self.diameter = kwargs.get('diameter', 600)
 
         super(TreeChart, self).__init__(**kwargs)
+
+
+class SankeyChart(Jarvis):
+
+    def __init__(self, dataframe, source_col='source',target_col='target', value_col='value', *args, **kwargs):
+
+        self.source_col = source_col
+        self.target_col = target_col
+        self.value_col = value_col
+        self.nodes = [dict(name=node) for node in
+                      list(pd.unique(dataframe[[self.source_col, self.target_col]]
+                                     .values
+                                     .ravel())
+                           )]
+
+        super(SankeyChart, self).__init__(dataframe, *args, **kwargs)
+
+
+
