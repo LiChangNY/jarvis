@@ -132,6 +132,7 @@ path {
   fill: #fff;
   stroke: steelblue;
   stroke-width: 2px;
+  r: 4;
 }
 
 .node {
@@ -146,7 +147,7 @@ path {
 
 .node text {
   pointer-events: none;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .link {
