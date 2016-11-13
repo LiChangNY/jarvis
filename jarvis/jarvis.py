@@ -162,14 +162,14 @@ class MapChart(Jarvis):
 
 class TreeChart(Jarvis):
 
-    def __init__(self, **kwargs):
+    def __init__(self, dataframe, type = 'radial', child_col=None, parent_col=None, *args, **kwargs):
 
-        self.type = kwargs.get('type', "radial")
-        self.child_col = kwargs.get('child_col', None)
-        self.parent_col = kwargs.get('parent_col', None)
+        self.type = type
+        self.child_col = child_col
+        self.parent_col = parent_col
         self.diameter = kwargs.get('diameter', 600)
 
-        super(TreeChart, self).__init__(**kwargs)
+        super(TreeChart, self).__init__(dataframe, *args, **kwargs)
 
 
 class SankeyChart(Jarvis):
