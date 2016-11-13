@@ -138,13 +138,13 @@ class Jarvis(object):
 class MapChart(Jarvis):
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dataframe, projection="mercator", region=None, unit=None, value=None,
+                 *args, **kwargs):
 
-        self.projection_type = kwargs.get('projection', "mercator")
-        self.region = kwargs.get("region", "US")
-        # self.theme = kwargs.get('theme', "choropleth")
-        self.geo_unit_column = kwargs.get("unit", None)
-        self.geo_value_column = kwargs.get("values", None)
+        self.projection_type = projection
+        self.region = region
+        self.geo_unit_column=unit
+        self.geo_value_column=value
 
         map_options = {
             "world": {"path": "files/maps/countries.json"},
@@ -157,7 +157,7 @@ class MapChart(Jarvis):
 
         self.additional_chart_options = {"topology": topology}
 
-        super(MapChart, self).__init__(*args, **kwargs)
+        super(MapChart, self).__init__(dataframe, *args, **kwargs)
 
 
 class TreeChart(Jarvis):
