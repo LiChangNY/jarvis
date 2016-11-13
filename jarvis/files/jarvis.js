@@ -948,7 +948,7 @@ function drawTreeChart(data, options) {
 }
 
 
-SankeyBuilder = function(id, data, nodes, canvasWidth, canvasHeight, width, height, margin, tooltipText) {
+SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, height, margin, tooltipText) {
 
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
@@ -969,12 +969,12 @@ SankeyBuilder = function(id, data, nodes, canvasWidth, canvasHeight, width, heig
     var path = sankey.link();
 
     sankey.nodes(nodes)
-        .links(data)
+        .links(links)
         .layout(32);
 
     var link = this.svg.append("g")
                 .selectAll(".link")
-                .data(data)//.data(data.links)
+                .data(links)
                 .enter().append("path")
                 .attr("class", "link")
                 .attr("d", path)
@@ -1078,6 +1078,35 @@ function drawSankeyChart(data, options) {
 
     // Use ES6 arrow functions to rename JSON array to source, target, value columns
     var data = data.map(function(obj) { return {source: obj[sourceCol], target: obj[targetCol], value: obj[valueCol]}});
+    console.log(data)
+
+    // A very clever solution by http://www.d3noob.org/2013/02/formatting-data-for-sankey-diagrams-in.html
+    graph = {"nodes" : [], "links" : []};
+
+    data.forEach(function (d) {
+      graph.nodes.push({ "name": d.source });
+      graph.nodes.push({ "name": d.target });
+      graph.links.push({ "source": d.source,
+                         "target": d.target,
+                         "value": +d.value });
+     });
+
+     // return only the distinct / unique nodes
+     graph.nodes = d3.keys(d3.nest()
+       .key(function (d) { return d.name; })
+       .map(graph.nodes));
+
+     // loop through each link replacing the text with its index from node
+     graph.links.forEach(function (d, i) {
+       graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
+       graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
+     });
+
+     // now loop through each nodes to make nodes an array of objects
+     // rather than an array of strings
+     graph.nodes.forEach(function (d, i) {
+       graph.nodes[i] = { "name": d };
+     });
 
     // Optional arguments
     var canvasWidth = options.canvas_width || 960
@@ -1090,15 +1119,15 @@ function drawSankeyChart(data, options) {
         }
 
     ,  tooltipText = options.tooltip_text || function(d) {
-        console.log(d);
+
         return d.source.name + " to " + d.target.name + ": " + d.value
     }
 
 
     var chart = new SankeyBuilder(
         "#" + options._id,
-        data,
-        nodes,
+        graph.links,
+        graph.nodes,
         canvasWidth,
         canvasHeight,
         options.width || canvasWidth - margin.left - margin.right,
