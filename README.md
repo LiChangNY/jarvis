@@ -17,7 +17,7 @@ If you want to visualize basic graphes (e.g., line charts, bar charts, and pie c
 
 3. Radial chart
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/radial.png" width="600" height="450">
+<img src="https://github.com/LiChangNY/jarvis/blob/master/img/radial.png" width="600" height="550">
 
 4. Geo-map
 
@@ -25,6 +25,6 @@ If you want to visualize basic graphes (e.g., line charts, bar charts, and pie c
 
 5. A map with orthographic projection
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/globe.png" width="600" height="450">
+<img src="https://github.com/LiChangNY/jarvis/blob/master/img/globe.png" width="480" height="450">
 
 See more examples here: https://lichangny.github.io/jarvis/. You can also download the [test.ipynb](https://github.com/LiChangNY/jarvis/blob/master/jarvis/test.ipynb) to see how to render charts in Jupyter Notebook.
