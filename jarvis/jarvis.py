@@ -32,7 +32,7 @@ class Jarvis(object):
     """
     Jarvis Base class.
     """
-    #: chart count
+    #chart count
     _count = 0
 
     global _JS_INITIALIZED
@@ -89,50 +89,62 @@ class Jarvis(object):
 
             self.chart_options.update(self.additional_chart_options)
 
-        html_content = template.render(chart=self.chart_options)
-
-        display(HTML(html_content))
+        self.html_content = template.render(chart=self.chart_options)
 
     def addColor(self):
-        display(HTML("""
+
+        self.html_content += """
             <script type="text/javascript">
                 %s.addColor();
             </script>
-        """ % self._id))
+        """ % self._id
+
         return self;
 
     def addCircle(self, scale):
-        display(HTML("""
+
+        self.html_content += """
             <script type="text/javascript">
                 %s.addCircle(%f);
             </script>
-        """ % (self._id, scale)))
+        """ % (self._id, scale)
+
         return self;
 
     def addTooltip(self):
-        display(HTML("""
+
+        self.html_content += """
             <script type="text/javascript">
                 %s.addTooltip();
             </script>
-        """ % self._id))
+        """ % self._id
+
         return self;
 
     def enableZoom(self):
-        display(HTML("""
+
+        self.html_content += """
             <script type="text/javascript">
                 %s.enableZoom();
             </script>
-        """ % self._id))
+        """ % self._id
+
         return self;
 
 
     def enableClickToCenter(self):
-        display(HTML("""
+
+        self.html_content += """
             <script type="text/javascript">
                 %s.enableClickToCenter();
             </script>
-        """ % self._id))
+        """ % self._id
+
         return self;
+
+    def show(self):
+
+        display(HTML(self.html_content))
 
 
 class MapChart(Jarvis):

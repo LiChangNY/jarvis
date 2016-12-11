@@ -8,6 +8,7 @@ ChartBuilder = function(id, canvasWidth, canvasHeight, margin) {
     this._canvasWidth = canvasWidth;
     this._canvasHeight = canvasHeight;
     this._margin = margin;
+    this.colorSet = d3.scale.category10()
 }
 
 ChartBuilder.prototype.drawCanvas = function() {
@@ -20,6 +21,44 @@ ChartBuilder.prototype.drawCanvas = function() {
         .append("g")
             .attr("transform", "translate(" + this._margin.left + "," + this._margin.top + ")");
 }
+
+ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
+
+
+
+        var tooltip = d3.select(this._id).append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+          elements
+            .on("mouseover", function(d){
+
+                //var element = element || d;
+
+                tooltip
+                    .transition()
+                    .duration(50)
+                    .style("opacity", 1)
+
+                tooltip
+                    .html(tooltipText(element))
+                    .style("position", "absolute")
+                    .style('font-size', '14px')
+                    //.style("left", (d3.event.pageX + 30) + "px")
+                    //.style("top", (d3.event.pageY/2 - 30) + "px")
+                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
+                    .style("top", (d3.mouse(this)[1]) + "px")
+
+            })
+            .on("mouseout", function() {
+                tooltip
+                    .transition()
+                    .duration(100)
+                    .style("opacity", 0);
+            })
+
+        return this;
+    }
 
 // This is the LineChartBuilder constructor
 // It gets called whenever you new up a LineChartBuilder
@@ -458,7 +497,7 @@ var drawLineChart = function(data, options, filters) {
 }
 
 MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, canvasHeight,
-                      width, height, margin, geoUnitColumn, geoValueColumn, scale) {
+                      width, height, margin, geoUnitColumn, geoValueColumn, scale, tooltipText) {
 
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
@@ -582,48 +621,32 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
           return this;
     }
 
-    var tooltipText = function(element) {
+   this.addTooltip = function(elements) {
+       var tooltip = d3.select(id).append("div")
+           .attr("class", "tooltip")
+           .style("opacity", 0)
+         elements
+           .on("mouseover", function(d) {
+               tooltip
+                   .transition()
+                   .duration(50)
+                   .style("opacity", 1)
 
-        var text = element.getAttribute("data-name");
-
-        if (element.getAttribute("data-value")) {
-            text += ": " + element.getAttribute("data-value");
-        }
-
-        return text;
-    }
-
-    this.addTooltip = function(elements) {
-
-        var tooltip = d3.select(id).append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-
-          elements
-            .on("mouseover", function(d){
-
-                tooltip
-                    .transition()
-                    .duration(50)
-                    .style("opacity", 1)
-
-                //TODO: Allow customized tooltip
-                tooltip
-                    .html(tooltipText(this))
-                    .style("position", "absolute")
-                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
-                    .style("top", (d3.mouse(this)[1]) + "px")
-                    .style('font-size', '14px');
-            })
-            .on("mouseout", function() {
-                tooltip
-                    .transition()
-                    .duration(100)
-                    .style("opacity", 0);
-            })
-          return this;
-    }
+               tooltip
+                   .html(tooltipText(this))
+                   .style("position", "absolute")
+                   .style("left", (d3.mouse(this)[0]+30) + "px"  )
+                   .style("top", (d3.mouse(this)[1]) + "px")
+                   .style('font-size', '14px');
+           })
+           .on("mouseout", function() {
+               tooltip
+                   .transition()
+                   .duration(100)
+                   .style("opacity", 0);
+           })
+         return this;
+   }
 
    this.enableZoom = function() {
         var svg = this.svg
@@ -715,7 +738,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
             .attr("data-name", function(d) { return d[geoUnitColumn]; })
             .attr("data-value", function(d) { return d[geoValueColumn]; });
 
-        this.addTooltip(circles);
+        this.addTooltip(circles, tooltipText);
 
         return this;
     }
@@ -736,6 +759,13 @@ function drawMapChart(data, options, topology) {
             right: options.margin_right || 65,
             top: options.margin_top || 40,
             bottom: options.margin_bottom || 60
+        },
+        tooltipText = options.tooltip_text || function(element) {
+            var text = element.getAttribute("data-name");
+            if (element.getAttribute("data-value")) {
+                text += ": " + element.getAttribute("data-value");
+            }
+            return text;
         };
 
     var chart = new MapBuilder(
@@ -751,7 +781,8 @@ function drawMapChart(data, options, topology) {
         margin,
         options.geo_unit_column,
         options.geo_value_column,
-        scale = options.scale
+        scale = options.scale,
+        tooltipText
     );
 
     if (options.show_legend) {
@@ -815,39 +846,6 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
       .append("g")
         .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
 
-    this.addTooltip = function(elements) {
-
-        var tooltip = d3.select(id).append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-          elements
-            .on("mouseover", function(d){
-
-                tooltip
-                    .transition()
-                    .duration(50)
-                    .style("opacity", 1)
-
-                tooltip
-                    .html(tooltipText(d))
-                    .style("position", "absolute")
-                    .style("left", (d3.event.pageX + 30) + "px")
-                    .style("top", (d3.event.pageY/2 - 30) + "px")
-                    //.style("left", (d3.mouse(this)[0]+30) + "px"  )
-                    //.style("top", (d3.mouse(this)[1]) + "px")
-                    .style('font-size', '14px');
-            })
-            .on("mouseout", function() {
-                tooltip
-                    .transition()
-                    .duration(100)
-                    .style("opacity", 0);
-            })
-          return this;
-    }
-
-
     // In courtesy of https://gist.github.com/d3noob/8329404, you can generate
     // a tree array from flat data.
     // create a name: node map
@@ -901,7 +899,7 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
           .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
           .text(function(d) { return d.name; });
 
-    this.addTooltip(node);
+    this.addTooltip(node, tooltipText);
 
     return this;
 
@@ -1021,41 +1019,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
       link.attr("d", path);
     }
 
-
-    //TODO: Move addTooltip to ChartBuilder class
-    this.addTooltip = function(elements) {
-
-        var tooltip = d3.select(id).append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-          elements
-            .on("mouseover", function(d){
-                tooltip
-                    .transition()
-                    .duration(50)
-                    .style("opacity", 1)
-
-                tooltip
-                    .html(tooltipText(d))
-                    .style("position", "absolute")
-                    //.style("left", (d3.event.pageX + 30) + "px")
-                    //.style("top", (d3.event.pageY/2 - 30) + "px")
-                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
-                    .style("top", (d3.mouse(this)[1]) + "px")
-                    .style('font-size', '14px');
-            })
-            .on("mouseout", function() {
-                tooltip
-                    .transition()
-                    .duration(100)
-                    .style("opacity", 0);
-            })
-          return this;
-    }
-
-
-    this.addTooltip(link);
+    this.addTooltip(link, tooltipText);
 
     return this;
 }
@@ -1139,6 +1103,8 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
+    console.log(this);
+
     this.svg = this.drawCanvas();
 
     //Adapted from http://bl.ocks.org/mbostock/2706022
@@ -1168,6 +1134,7 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     node.append("text")
         .attr("class", "text")
         .attr("dy", ".35em")
+        .attr("dx", "1em")
         .text(function(d) { return d.name; });
 
     function tick() {
@@ -1181,39 +1148,7 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
           .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
     }
 
-    //TODO: Move addTooltip to ChartBuilder class
-    this.addTooltip = function(elements) {
-
-        var tooltip = d3.select(id).append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-
-          elements
-            .on("mouseover", function(d){
-                tooltip
-                    .transition()
-                    .duration(50)
-                    .style("opacity", 1)
-
-                tooltip
-                    .html(tooltipText(d))
-                    .style("position", "absolute")
-                    //.style("left", (d3.event.pageX + 30) + "px")
-                    //.style("top", (d3.event.pageY/2 - 30) + "px")
-                    .style("left", (d3.mouse(this)[0]+30) + "px"  )
-                    .style("top", (d3.mouse(this)[1]) + "px")
-                    .style('font-size', '14px');
-            })
-            .on("mouseout", function() {
-                tooltip
-                    .transition()
-                    .duration(100)
-                    .style("opacity", 0);
-            })
-          return this;
-    }
-
-    this.addTooltip(link);
+    this.addTooltip(link, tooltipText);
 
     return this;
 
@@ -1232,8 +1167,7 @@ function drawForceGraph(data, options){
 
     // Use ES6 arrow functions to rename JSON array to source, target, value columns
     var links = data.map(function(obj) { return {source: obj[sourceCol],
-                                        target: obj[targetCol] //,
-                                        //value: obj[valueCol]
+                                        target: obj[targetCol]
     }});
 
 
