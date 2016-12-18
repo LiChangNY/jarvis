@@ -1,8 +1,13 @@
 jarvis = (function() {
 
-// This is the ChartBuilder constructor
-// It gets called whenever you new up a class that inherits from ChartBuilder or whenever
-// you new up a ChartBuilder itself
+String.prototype.format = function () {
+
+  var i = 0, args = arguments[0][0];
+  return this.replace(/\{.*?\}/g, function () {
+    return typeof args[i] != 'undefined' ? args[i++] : '';
+  });
+};
+
 ChartBuilder = function(id, canvasWidth, canvasHeight, margin) {
     this._id = id;
     this._canvasWidth = canvasWidth;
@@ -921,9 +926,34 @@ function drawTreeChart(data, options) {
             top: options.margin_top || 40,
             bottom: options.margin_bottom || 60
         }
-
-    ,  tooltipText = options.tooltip_text || function(d) {return childCol + ": " + d[childCol]}
     , diameter = options.diameter || 500
+
+    var tooltipText = function(d) {return childCol + ": " + d[childCol]}
+    , tooltipColumn = options.tooltipColumn || null
+    ,tooltipTemplate = options.tooltipTemplate || null
+
+    function defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText) {
+
+        if (tooltipTemplate != null) {
+
+            var tooltipColumns = tooltipTemplate.match(/[^{}]+(?=\})/g);
+
+            var tooltipText = function(d) {
+                var tooltipTextArray = [];
+                tooltipColumns.forEach(function(column){ tooltipTextArray.push(d[column]) });
+                return tooltipTemplate.format([tooltipTextArray]);
+            };
+
+        } else if (tooltipColumn != null) {
+            var tooltipText = function(d) {return d[tooltipColumn]}
+        }
+
+        return tooltipText
+
+    }
+
+    tooltipText = defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText)
+
 
     var chart = new TreeBuilder(
         "#" + options._id,

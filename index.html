@@ -348,7 +348,12 @@ jarvis.TreeChart(
         "name": "The High Sparrow",
         "to": "Cersei Lannister"
     }],
-    {"_id":"chart6",  "child_col": "actor", "parent_col": "to", "diameter": 700})
+    {"_id":"chart6",
+    "child_col": "actor",
+    "parent_col": "to",
+    "diameter": 700,
+    "tooltipTemplate": "{actor} from {house} is casted by {name}."
+    })
 
 
 jarvis.MapChart(data = [{"airport":"Thigpen ","long":-89.23450472,"lat":31.95376472,"traffic":14},{"airport":"Livingston Municipal","long":-95.01792778,"lat":30.68586111,"traffic":99},{"airport":"Meadow Lake","long":-104.5698933,"lat":38.94574889,"traffic":8},{"airport":"Perry-Warsaw","long":-78.05208056,"lat":42.74134667,"traffic":16},{"airport":"Hilliard Airpark","long":-81.90594389,"lat":30.6880125,"traffic":27},{"airport":"Tishomingo County","long":-88.20111111,"lat":34.49166667,"traffic":52},{"airport":"Gragg-Wade ","long":-86.61145333,"lat":32.85048667,"traffic":82},{"airport":"Capitol","long":-88.17786917,"lat":43.08751,"traffic":28},{"airport":"Columbiana County","long":-80.64140639,"lat":40.67331278,"traffic":1},{"airport":"Memphis Memorial","long":-92.22696056,"lat":40.44725889,"traffic":34},{"airport":"Calhoun County","long":-89.34285194,"lat":33.93011222,"traffic":78},{"airport":"Hawley Municipal","long":-96.35089861,"lat":46.88384889,"traffic":78},{"airport":"Griffith-Merrillville ","long":-87.40109333,"lat":41.51961917,"traffic":58},{"airport":"Gatesville - City\\/County","long":-97.79696778,"lat":31.42127556,"traffic":63},{"airport":"Eureka","long":-116.0050597,"lat":39.60416667,"traffic":15},{"airport":"Moton  Municipal","long":-85.68003611,"lat":32.46047167,"traffic":72},{"airport":"Schaumburg","long":-88.10124278,"lat":41.98934083,"traffic":50},{"airport":"Rolla Municipal","long":-99.62087694,"lat":48.88434111,"traffic":74},{"airport":"Eupora Municipal","long":-89.31256917,"lat":33.53456583,"traffic":42},{"airport":"Randall ","long":-74.39191722,"lat":41.43156583,"traffic":43}],

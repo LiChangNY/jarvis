@@ -65,6 +65,9 @@ class Jarvis(object):
         self.series_count = len(dataframe.columns)
         dataframe_columns = list(dataframe.columns.values)
 
+        self.tooltipColumn = kwargs.get("tooltip_column", None)
+        self.tooltipTemplate = kwargs.get("tooltip_template", None)
+
         self.enable_zoom = kwargs.get('enable_zoom', False)
         self.enable_click_to_center = kwargs.get("enable_click_to_center", False)
 
