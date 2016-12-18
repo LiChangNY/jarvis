@@ -4,159 +4,160 @@ body {
    font-family: sans-serif;
 }
 
-.chart {
+.jarvis-chart {
    position: relative
 }
 
-.chart-title {
+.jarvis-chart-title {
  font: 12px sans-serif;
 }
 
-.line {
+.jarvis-line {
     stroke-width: 1.5;
     fill: none;
  }
 
 
-.focus circle {
+.jarvis-focus circle {
   fill: none;
 
 }
 
-.overlay {
+.jarvis-overlay {
   fill: none;
   pointer-events: all;
 }
 
-.axis {
+.jarvis-axis {
  font: 10px sans-serif;
 }
-.axis path,
-.axis line {
+.jarvis-axis path,
+.jarvis-axis line {
     fill: none;
     stroke: grey;
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
 
-.y.axis path {
+.jarvis-y-axis path {
  display: none;
 }
-.x.axis path {
+.jarvis-x-axis path {
  display: none;
 }
 
-.grid .tick {
+.jarvis-grid .tick {
     stroke: lightgrey;
     stroke-opacity: 0.7;
     shape-rendering: crispEdges;
 }
-.grid path {
+.jarvis-grid path {
     stroke-width: 0;
 }
 
 
 
-.bar {
+.javirs-bar {
   cursor: pointer
 }
 
-.bar: hover {
+.javis-bar: hover {
   opacity: 0.8
 }
 
 
-.legend text {
+.jarvis-legend text {
   font: 14px sans-serif;
   cursor: pointer
 }
 
-.legend rect {
+.jarvis-legend rect {
   cursor: pointer
 }
 
-.legend tick {
+.jarvis-legend-tick {
   cursor: pointer
 }
 
-.tooltip {
+.jarvis-tooltip {
  text-align: middle;
  padding: 2px;
  background: white;
  border-radius: 3px;
 }
 
-.tooltip text {
+.jarvis-tooltip text {
  font-size: 20 px;
 }
 
 
-.circle{
+.jarvis-circle{
     stroke: white;
     stroke-width: 2;
 }
-.circle:hover{
+.jarvis-circle:hover{
     fill:orange;
 }
 
 
-path {
+jarvis-path {
     fill: none;
     stroke: black
 }
 
-.background {
+.jarvis-background {
   fill: white;
   stroke-width: .8px;
   stroke: black;
 }
 
-.graticule {
+.jarvis-graticule {
     stroke: rgba(0,0,0, .2);
     stroke-width: .5px;
+    fill: white;
 }
 
-.country .land, .state .land {
+.jarvis-country .jarvis-land, .jarvis-state .jarvis-land {
     fill: #DCDCDC;
     stroke: white;
     stroke-width: 1px;
     stroke-linejoin: round;
 }
 
-.land:hover {
+.jarvis-land:hover {
   opacity: 0.7
 }
 
 
-.node circle {
+.jarvis-node circle {
   fill: #fff;
   stroke: steelblue;
   stroke-width: 2px;
   r: 4;
 }
 
-.node {
+.jarvis-node {
   font-size: 11px;
 }
 
-.node rect {
+.jarvis-node rect {
   cursor: move;
   fill-opacity: .9;
   shape-rendering: crispEdges;
 }
 
-.node text {
+.jarvis-node text {
   pointer-events: none;
   font-size: 11px;
 }
 
-.link {
+.jarvis-link {
   fill: none;
   stroke: #000;
   stroke-opacity: .2;
 }
 
 
-.link:hover {
+.jarvis-link:hover {
   stroke-opacity: .5;
 }

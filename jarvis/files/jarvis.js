@@ -14,7 +14,7 @@ ChartBuilder = function(id, canvasWidth, canvasHeight, margin) {
 ChartBuilder.prototype.drawCanvas = function() {
     return d3
         .select(this._id)
-        .attr("class", "chart")
+        .attr("class", "jarvis-chart")
         .append("svg")
             .attr("width", this._canvasWidth)
             .attr("height", this._canvasHeight)
@@ -27,7 +27,7 @@ ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
 
 
         var tooltip = d3.select(this._id).append("div")
-            .attr("class", "tooltip")
+            .attr("class", "jarvis-tooltip")
             .style("opacity", 0);
 
           elements
@@ -107,7 +107,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
                 .attr("x", x)
                 .attr("y", y)
                 .attr("text-anchor", "middle")
-                .attr("class", 'chart-title')
+                .attr("class", 'jarvis-chart-title')
                 .text(title);
 
         return this;
@@ -162,7 +162,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     this.drawXAxis = function(axisPosition, titlePosition, title) {
         this.svg
             .append("g")
-                .attr("class", "x axis")
+                .attr("class", "jarvis-axis")
                 .attr("transform", "translate(" + axisPosition.x + ", " + axisPosition.y + ")")
                 .call(xAxis)
             .append("text")
@@ -186,8 +186,8 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
     this.drawYAxis = function(titlePosition, title ) {
         this.svg.append("g")
-            .attr("class", "y axis")
-            .style('fill', 'steelblue')
+            .attr("class", "jarvis-axis")
+            //.style('fill', 'steelblue')
             .call(yAxis)
           .append("text")
             .attr("transform", "rotate(-90)")
@@ -212,16 +212,16 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
 
         //Update svg
         var multiLines = this.svg
-            .selectAll(".line-g")
+            .selectAll(".jarvis-line-g")
             .data(data)
 
         //Enter new data.
         multiLines
             .enter()
             .append("g")
-                .attr("class", "line-g")
+                .attr("class", "jarvis-line-g")
             .append("path")
-                .attr("class", "line")
+                .attr("class", "jarvis-line")
                 .style("stroke", function(d, i) { return colorSet(i)})
                 .attr("id", function(d, i) { return "line-"+i ;});
 
@@ -240,7 +240,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
         this.legendHeight = height;
 
         this.legend = this.svg.append("g")
-            .attr("class","legend")
+            .attr("class","jarvis-legend")
             .attr("transform", "translate(" + position.x + "," + position.y + ")")
             .selectAll("g")
             .data(d3.range(seriesCount))
@@ -261,7 +261,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     this.drawCircleTicks = function() {
         var self = this;
         return self.legend.append("circle")
-                .attr("class", "legend tick")
+                .attr("class", "jarvis-legend-tick")
                 .attr("cx", function(d) { return margin.right / 4;})
                 .attr("cy", function(d) { return d*(self.legendHeight/seriesCount); })
                 .attr("r", function (d) { return circleRadius; })
@@ -271,7 +271,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     this.drawRectTicks = function(){
         var self = this;
         return self.legend.append("rect")
-                .attr("class", "legend tick")
+                .attr("class", "jarvis-legend-tick")
                 .attr('x', function(d) { return margin.right/5; })
                 .attr('y', function(d) { return Math.floor(d*self.legendHeight/seriesCount); })
                 .attr("width", 10)
@@ -280,7 +280,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
     }
 
     this.colorTicks = function() {
-        return this.legend.selectAll('.legend.tick')
+        return this.legend.selectAll('.jarvis-legend-tick')
                .attr("id", function(d) {return "legend-tick-" + d; })
                .style("fill", function(d) {return colorSet(d);})
                .style('stroke', function(d) {return colorSet(d);})
@@ -332,7 +332,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
             .data(d3.range(seriesCount))
             .enter()
             .append("g")
-            .attr("class", "focus")
+            .attr("class", "jarvis-focus")
             .style('stroke', function(d) { return colorSet(d % 10); })
             .style("display", "none")
             .attr('id', function(d) { return 'focus-'+d; });
@@ -373,7 +373,7 @@ LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin
         var self = this;
         self.drawFocusCircle();
         self.svg.append("rect")
-            .attr("class", "overlay")
+            .attr("class", "jarvis-overlay")
             .attr("width", width)
             .attr("height", height)
             .on("mouseover", function() {self.changeFocusCircleState(null);})
@@ -549,12 +549,12 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
 
         g.append('path')
         .datum({type: 'Sphere'})
-        .attr('class', 'background')
+        .attr('class', 'jarvis-background')
         .attr('d', path);
 
         g.append('path')
           .datum(d3.geo.graticule())
-          .attr('class', 'graticule')
+          .attr('class', 'jarvis-graticule')
           .attr('d', path);
 
     }
@@ -565,9 +565,9 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
               .data(topojson.feature(topology, topology.objects[mapKey]).features)
               .enter()
              .append('g')
-              .attr("class", mapUnit)
+              .attr("class", "jarvis-"+mapUnit)
              .append("path")
-              .attr('class', 'land')
+              .attr('class', 'jarvis-land')
               .style("stroke", "white")
               .attr("d", path)
               .attr('data-id', function(d) {
@@ -623,7 +623,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
 
    this.addTooltip = function(elements) {
        var tooltip = d3.select(id).append("div")
-           .attr("class", "tooltip")
+           .attr("class", "jarvis-tooltip")
            .style("opacity", 0)
          elements
            .on("mouseover", function(d) {
@@ -698,7 +698,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         //TODO: Make legend more progressive. Now it only has lowest and highest value.
 
         var legend = this.svg.append("g")
-            .attr("class","legend")
+            .attr("class","jarvis-legend")
             .attr("transform", "translate(" + position.x + "," + position.y + ")")
             .selectAll("g")
             .data(colorDomain)
@@ -728,7 +728,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         var circles = this.svg.selectAll("circle")
             .data(data).enter()
             .append("circle")
-            .attr("class","circle")
+            .attr("class","jarvis-circle")
             .attr("id", function (d) { return d[geoUnitColumn];})
             .attr("cx", function (d) { return projection([d.long, d.lat])[0]; })
             .attr("cy", function (d) { return projection([d.long, d.lat])[1]; })
@@ -839,7 +839,7 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
     this.svg = d3.select(this._id)
-        .attr("class", "chart")
+        .attr("class", "jarvis-chart")
         .append("svg")
         .attr("width", diameter)
         .attr("height", diameter - 100)
@@ -881,16 +881,16 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
     var link = this.svg.selectAll("link")
           .data(links)
         .enter().append("path")
-          .attr("class", "link")
+          .attr("class", "jarvis-link")
           .attr("d", diagonal);
       var node = this.svg.selectAll("node")
           .data(nodes)
         .enter().append("g")
-          .attr("class", "node")
+          .attr("class", "jarvis-node")
           .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
       //Add circle to each node.
       node.append("circle")
-        .attr('class', 'circle')
+        .attr('class', 'jarvis-circle')
 
       //Add name labels to each circle
       node.append("text")
@@ -972,7 +972,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
                 .selectAll(".link")
                 .data(links)
                 .enter().append("path")
-                .attr("class", "link")
+                .attr("class", "jarvis-link")
                 .attr("d", path)
                 .style("stroke-width", function(d) { return Math.max(1, d.dy); })
                 .sort(function(a, b) { return b.dy - a.dy; });
@@ -980,7 +980,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
     var node = this.svg.append("g").selectAll(".node")
         .data(nodes)
       .enter().append("g")
-        .attr("class", "node")
+        .attr("class", "jarvis-node")
         .attr("transform", function(d) {
             return "translate(" + d.x + "," + d.y + ")"; })
       .call(d3.behavior.drag()
@@ -1120,19 +1120,19 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     var link = this.svg.selectAll(".link")
         .data(force.links())
       .enter().append("line")
-        .attr("class", "link");
+        .attr("class", "jarvis-link");
 
     var node = this.svg.selectAll(".node")
         .data(force.nodes())
       .enter().append("g")
-        .attr("class", "node")
+        .attr("class", "jarvis-node")
         .call(force.drag);
 
     node.append("circle")
-        .attr("class", "circle")
+        .attr("class", "jarvis-circle")
 
     node.append("text")
-        .attr("class", "text")
+        //.attr("class", "text")
         .attr("dy", ".35em")
         .attr("dx", "1em")
         .text(function(d) { return d.name; });
