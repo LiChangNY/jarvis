@@ -25,7 +25,6 @@ ChartBuilder.prototype.drawCanvas = function() {
 ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
 
 
-
         var tooltip = d3.select(this._id).append("div")
             .attr("class", "jarvis-tooltip")
             .style("opacity", 0);
@@ -33,7 +32,7 @@ ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
           elements
             .on("mouseover", function(d){
 
-                //var element = element || d;
+                var element = element || d;
 
                 tooltip
                     .transition()
@@ -60,8 +59,6 @@ ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
         return this;
     }
 
-// This is the LineChartBuilder constructor
-// It gets called whenever you new up a LineChartBuilder
 LineChartBuilder = function(id, canvasWidth, canvasHeight, width, height, margin, xSerie, ySeries,
                             data, colorSet) {
 
@@ -969,7 +966,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
         .layout(32);
 
     var link = this.svg.append("g")
-                .selectAll(".link")
+                .selectAll(".jarvis-link")
                 .data(links)
                 .enter().append("path")
                 .attr("class", "jarvis-link")
