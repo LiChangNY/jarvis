@@ -29,5 +29,7 @@ jarvis/templates/chartBuilder.html
 jarvis/test/airports.csv
 jarvis/test/arc.csv
 jarvis/test/country_test.csv
+jarvis/test/force graph.webm
 jarvis/test/got.csv
+jarvis/test/indeedians.csv
 jarvis/test/route.csv
