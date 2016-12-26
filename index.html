@@ -56,6 +56,8 @@ World map: Zoom effect.
 US state map: Basic interactivity.
 <div class="chart" id="chart3"></div>
 
+
+<!-- Hide line chart as it's still in dev.
 Line Chart<br/><br/>
 <label for="date">Date</label>
 <select name="Date" multiple="multiple" id="filter-date">
@@ -76,323 +78,47 @@ Line Chart<br/><br/>
 </select>
 
 <div class="chart" id="chart4"></div>
+--->
 
 <script type="text/javascript">
 
-jarvis.ForceGraph( data = [{"Origin":"ATL","Dest":"LGA","Sum of Flights_Count":10506},{"Origin":"ATL","Dest":"DFW","Sum of Flights_Count":9847},{"Origin":"ATL","Dest":"MCO","Sum of Flights_Count":9613},{"Origin":"ATL","Dest":"EWR","Sum of Flights_Count":8028},{"Origin":"ATL","Dest":"ORD","Sum of Flights_Count":7677},{"Origin":"ATL","Dest":"FLL","Sum of Flights_Count":7665},{"Origin":"ATL","Dest":"TPA","Sum of Flights_Count":7311},{"Origin":"ATL","Dest":"DCA","Sum of Flights_Count":7289},{"Origin":"ATL","Dest":"PHL","Sum of Flights_Count":6915},{"Origin":"ATL","Dest":"CLT","Sum of Flights_Count":6720},{"Origin":"ATL","Dest":"MIA","Sum of Flights_Count":6628},{"Origin":"ATL","Dest":"BOS","Sum of Flights_Count":5990},{"Origin":"ATL","Dest":"BWI","Sum of Flights_Count":5978},{"Origin":"ATL","Dest":"DEN","Sum of Flights_Count":5726},{"Origin":"ATL","Dest":"JAX","Sum of Flights_Count":5656},{"Origin":"ATL","Dest":"DTW","Sum of Flights_Count":5612},{"Origin":"ATL","Dest":"RDU","Sum of Flights_Count":5411},{"Origin":"ATL","Dest":"LAX","Sum of Flights_Count":5406},{"Origin":"ATL","Dest":"MSP","Sum of Flights_Count":5368},{"Origin":"ATL","Dest":"IAD","Sum of Flights_Count":5309},{"Origin":"ATL","Dest":"IAH","Sum of Flights_Count":5268},{"Origin":"ATL","Dest":"MEM","Sum of Flights_Count":4866},{"Origin":"ATL","Dest":"LAS","Sum of Flights_Count":4766},{"Origin":"ATL","Dest":"MSY","Sum of Flights_Count":4695},{"Origin":"ATL","Dest":"PHX","Sum of Flights_Count":4603},{"Origin":"ATL","Dest":"PIT","Sum of Flights_Count":4555},{"Origin":"ATL","Dest":"RIC","Sum of Flights_Count":4532},{"Origin":"ATL","Dest":"CHS","Sum of Flights_Count":4492},{"Origin":"ATL","Dest":"PNS","Sum of Flights_Count":4429},{"Origin":"ATL","Dest":"DAY","Sum of Flights_Count":4372},{"Origin":"ATL","Dest":"PBI","Sum of Flights_Count":4263},{"Origin":"ATL","Dest":"RSW","Sum of Flights_Count":4193},{"Origin":"SAT","Dest":"DFW","Sum of Flights_Count":5413},{"Origin":"SAT","Dest":"DAL","Sum of Flights_Count":4999},{"Origin":"SAT","Dest":"IAH","Sum of Flights_Count":3755},{"Origin":"SAT","Dest":"ATL","Sum of Flights_Count":3241},{"Origin":"SAT","Dest":"PHX","Sum of Flights_Count":2767},{"Origin":"SAT","Dest":"HOU","Sum of Flights_Count":2582},{"Origin":"SAT","Dest":"DEN","Sum of Flights_Count":2510},{"Origin":"SAT","Dest":"ORD","Sum of Flights_Count":1815},{"Origin":"SAT","Dest":"LAX","Sum of Flights_Count":1783},{"Origin":"SAT","Dest":"LAS","Sum of Flights_Count":1575},{"Origin":"SAT","Dest":"ELP","Sum of Flights_Count":1332},{"Origin":"SAT","Dest":"EWR","Sum of Flights_Count":954},{"Origin":"SAT","Dest":"CVG","Sum of Flights_Count":882},{"Origin":"SAT","Dest":"MEM","Sum of Flights_Count":788},{"Origin":"SAT","Dest":"MCO","Sum of Flights_Count":744},{"Origin":"SAT","Dest":"BWI","Sum of Flights_Count":730},{"Origin":"SAT","Dest":"MDW","Sum of Flights_Count":710},{"Origin":"SAT","Dest":"BNA","Sum of Flights_Count":676},{"Origin":"SAT","Dest":"CLT","Sum of Flights_Count":658},{"Origin":"SAT","Dest":"HRL","Sum of Flights_Count":656},{"Origin":"SAT","Dest":"SAN","Sum of Flights_Count":646},{"Origin":"SAT","Dest":"DTW","Sum of Flights_Count":642},{"Origin":"SAT","Dest":"SLC","Sum of Flights_Count":587},{"Origin":"SAT","Dest":"MCI","Sum of Flights_Count":578},{"Origin":"SAT","Dest":"ONT","Sum of Flights_Count":441},{"Origin":"SAT","Dest":"MSY","Sum of Flights_Count":430},{"Origin":"SAT","Dest":"ABQ","Sum of Flights_Count":426},{"Origin":"SAT","Dest":"SFO","Sum of Flights_Count":366},{"Origin":"SAT","Dest":"TPA","Sum of Flights_Count":365},{"Origin":"SAT","Dest":"PHL","Sum of Flights_Count":290},{"Origin":"SAT","Dest":"STL","Sum of Flights_Count":246},{"Origin":"SAT","Dest":"TUS","Sum of Flights_Count":240},{"Origin":"SAT","Dest":"IND","Sum of Flights_Count":236},{"Origin":"SAT","Dest":"CLE","Sum of Flights_Count":233},{"Origin":"SAT","Dest":"RDU","Sum of Flights_Count":228},{"Origin":"SAT","Dest":"SMF","Sum of Flights_Count":226},{"Origin":"SAT","Dest":"MSP","Sum of Flights_Count":191},{"Origin":"SAT","Dest":"IAD","Sum of Flights_Count":149},{"Origin":"SAT","Dest":"TUL","Sum of Flights_Count":89},{"Origin":"SAT","Dest":"OKC","Sum of Flights_Count":87},{"Origin":"SAT","Dest":"AUS","Sum of Flights_Count":2},{"Origin":"SAT","Dest":"AMA","Sum of Flights_Count":1},{"Origin":"SAT","Dest":"MGM","Sum of Flights_Count":1},{"Origin":"LGA","Dest":"AGS","Sum of Flights_Count":7},{"Origin":"LGA","Dest":"ATL","Sum of Flights_Count":10507},{"Origin":"LGA","Dest":"BHM","Sum of Flights_Count":591},{"Origin":"LGA","Dest":"BNA","Sum of Flights_Count":1217},{"Origin":"LGA","Dest":"BOS","Sum of Flights_Count":12035},{"Origin":"LGA","Dest":"CAE","Sum of Flights_Count":609},{"Origin":"LGA","Dest":"CAK","Sum of Flights_Count":793},{"Origin":"LGA","Dest":"CHS","Sum of Flights_Count":1414},{"Origin":"LGA","Dest":"CID","Sum of Flights_Count":156},{"Origin":"LGA","Dest":"CLE","Sum of Flights_Count":2920},{"Origin":"LGA","Dest":"CLT","Sum of Flights_Count":4958},{"Origin":"LGA","Dest":"CMH","Sum of Flights_Count":2350},{"Origin":"LGA","Dest":"CVG","Sum of Flights_Count":3635},{"Origin":"LGA","Dest":"DAB","Sum of Flights_Count":159},{"Origin":"LGA","Dest":"DCA","Sum of Flights_Count":11063},{"Origin":"LGA","Dest":"DEN","Sum of Flights_Count":2970},{"Origin":"LGA","Dest":"DFW","Sum of Flights_Count":5372},{"Origin":"LGA","Dest":"DSM","Sum of Flights_Count":705},{"Origin":"LGA","Dest":"DTW","Sum of Flights_Count":4601},{"Origin":"LGA","Dest":"EGE","Sum of Flights_Count":16},{"Origin":"LGA","Dest":"FLL","Sum of Flights_Count":3152},{"Origin":"LGA","Dest":"FNT","Sum of Flights_Count":392},{"Origin":"LGA","Dest":"GRR","Sum of Flights_Count":363},{"Origin":"LGA","Dest":"GSO","Sum of Flights_Count":927},{"Origin":"LGA","Dest":"GSP","Sum of Flights_Count":609},{"Origin":"LGA","Dest":"HDN","Sum of Flights_Count":15},{"Origin":"LGA","Dest":"HSV","Sum of Flights_Count":69},{"Origin":"LGA","Dest":"IAD","Sum of Flights_Count":1103},{"Origin":"LGA","Dest":"IAH","Sum of Flights_Count":3418},{"Origin":"LGA","Dest":"IND","Sum of Flights_Count":1331},{"Origin":"LGA","Dest":"JAX","Sum of Flights_Count":1285},{"Origin":"LGA","Dest":"LEX","Sum of Flights_Count":415},{"Origin":"LGA","Dest":"MCO","Sum of Flights_Count":3158},{"Origin":"LGA","Dest":"MEM","Sum of Flights_Count":1605},{"Origin":"LGA","Dest":"MIA","Sum of Flights_Count":3586},{"Origin":"LGA","Dest":"MKE","Sum of Flights_Count":592},{"Origin":"LGA","Dest":"MLB","Sum of Flights_Count":2},{"Origin":"LGA","Dest":"MSN","Sum of Flights_Count":620},{"Origin":"LGA","Dest":"MSP","Sum of Flights_Count":2719},{"Origin":"LGA","Dest":"MSY","Sum of Flights_Count":512},{"Origin":"LGA","Dest":"MYR","Sum of Flights_Count":123},{"Origin":"LGA","Dest":"ORD","Sum of Flights_Count":10862},{"Origin":"LGA","Dest":"PBI","Sum of Flights_Count":1934},{"Origin":"LGA","Dest":"PHF","Sum of Flights_Count":770},{"Origin":"LGA","Dest":"PHL","Sum of Flights_Count":1},{"Origin":"LGA","Dest":"PIT","Sum of Flights_Count":1297},{"Origin":"LGA","Dest":"RDU","Sum of Flights_Count":4423},{"Origin":"LGA","Dest":"RIC","Sum of Flights_Count":1336},{"Origin":"LGA","Dest":"RSW","Sum of Flights_Count":238},{"Origin":"LGA","Dest":"SAV","Sum of Flights_Count":995},{"Origin":"LGA","Dest":"SDF","Sum of Flights_Count":571},{"Origin":"LGA","Dest":"SLC","Sum of Flights_Count":24},{"Origin":"LGA","Dest":"SRQ","Sum of Flights_Count":74},{"Origin":"LGA","Dest":"STL","Sum of Flights_Count":1604},{"Origin":"LGA","Dest":"TPA","Sum of Flights_Count":1464},{"Origin":"LGA","Dest":"TVC","Sum of Flights_Count":50},{"Origin":"LGA","Dest":"TYS","Sum of Flights_Count":642},{"Origin":"LGA","Dest":"VPS","Sum of Flights_Count":2},{"Origin":"LGA","Dest":"XNA","Sum of Flights_Count":765},{"Origin":"SUN","Dest":"TWF","Sum of Flights_Count":1},{"Origin":"ICT","Dest":"COS","Sum of Flights_Count":1}],
-{_id:"chart8" , canvas_height:800, canvas_width: 900, source_col: "Origin", target_col: "Dest"});
+jarvis.ForceGraph(data=[{"source":"ATL","target":"LGA","Sum of Flights_Count":10506},{"source":"ATL","target":"DFW","Sum of Flights_Count":9847},{"source":"ATL","target":"MCO","Sum of Flights_Count":9613},{"source":"ATL","target":"EWR","Sum of Flights_Count":8028},{"source":"ATL","target":"ORD","Sum of Flights_Count":7677},{"source":"ATL","target":"FLL","Sum of Flights_Count":7665},{"source":"ATL","target":"TPA","Sum of Flights_Count":7311},{"source":"ATL","target":"DCA","Sum of Flights_Count":7289},{"source":"ATL","target":"PHL","Sum of Flights_Count":6915},{"source":"ATL","target":"CLT","Sum of Flights_Count":6720},{"source":"ATL","target":"MIA","Sum of Flights_Count":6628},{"source":"ATL","target":"BOS","Sum of Flights_Count":5990},{"source":"ATL","target":"BWI","Sum of Flights_Count":5978},{"source":"ATL","target":"DEN","Sum of Flights_Count":5726},{"source":"ATL","target":"JAX","Sum of Flights_Count":5656},{"source":"ATL","target":"DTW","Sum of Flights_Count":5612},{"source":"ATL","target":"RDU","Sum of Flights_Count":5411},{"source":"ATL","target":"LAX","Sum of Flights_Count":5406},{"source":"ATL","target":"MSP","Sum of Flights_Count":5368},{"source":"ATL","target":"IAD","Sum of Flights_Count":5309},{"source":"ATL","target":"IAH","Sum of Flights_Count":5268},{"source":"ATL","target":"MEM","Sum of Flights_Count":4866},{"source":"ATL","target":"LAS","Sum of Flights_Count":4766},{"source":"ATL","target":"MSY","Sum of Flights_Count":4695},{"source":"ATL","target":"PHX","Sum of Flights_Count":4603},{"source":"ATL","target":"PIT","Sum of Flights_Count":4555},{"source":"ATL","target":"RIC","Sum of Flights_Count":4532},{"source":"ATL","target":"CHS","Sum of Flights_Count":4492},{"source":"ATL","target":"PNS","Sum of Flights_Count":4429},{"source":"ATL","target":"DAY","Sum of Flights_Count":4372},{"source":"ATL","target":"PBI","Sum of Flights_Count":4263},{"source":"ATL","target":"RSW","Sum of Flights_Count":4193},{"source":"SAT","target":"DFW","Sum of Flights_Count":5413},{"source":"SAT","target":"DAL","Sum of Flights_Count":4999},{"source":"SAT","target":"IAH","Sum of Flights_Count":3755},{"source":"SAT","target":"ATL","Sum of Flights_Count":3241},{"source":"SAT","target":"PHX","Sum of Flights_Count":2767},{"source":"SAT","target":"HOU","Sum of Flights_Count":2582},{"source":"SAT","target":"DEN","Sum of Flights_Count":2510},{"source":"SAT","target":"ORD","Sum of Flights_Count":1815},{"source":"SAT","target":"LAX","Sum of Flights_Count":1783},{"source":"SAT","target":"LAS","Sum of Flights_Count":1575},{"source":"SAT","target":"ELP","Sum of Flights_Count":1332},{"source":"SAT","target":"EWR","Sum of Flights_Count":954},{"source":"SAT","target":"CVG","Sum of Flights_Count":882},{"source":"SAT","target":"MEM","Sum of Flights_Count":788},{"source":"SAT","target":"MCO","Sum of Flights_Count":744},{"source":"SAT","target":"BWI","Sum of Flights_Count":730},{"source":"SAT","target":"MDW","Sum of Flights_Count":710},{"source":"SAT","target":"BNA","Sum of Flights_Count":676},{"source":"SAT","target":"CLT","Sum of Flights_Count":658},{"source":"SAT","target":"HRL","Sum of Flights_Count":656},{"source":"SAT","target":"SAN","Sum of Flights_Count":646},{"source":"SAT","target":"DTW","Sum of Flights_Count":642},{"source":"SAT","target":"SLC","Sum of Flights_Count":587},{"source":"SAT","target":"MCI","Sum of Flights_Count":578},{"source":"SAT","target":"ONT","Sum of Flights_Count":441},{"source":"SAT","target":"MSY","Sum of Flights_Count":430},{"source":"SAT","target":"ABQ","Sum of Flights_Count":426},{"source":"SAT","target":"SFO","Sum of Flights_Count":366},{"source":"SAT","target":"TPA","Sum of Flights_Count":365},{"source":"SAT","target":"PHL","Sum of Flights_Count":290},{"source":"SAT","target":"STL","Sum of Flights_Count":246},{"source":"SAT","target":"TUS","Sum of Flights_Count":240},{"source":"SAT","target":"IND","Sum of Flights_Count":236},{"source":"SAT","target":"CLE","Sum of Flights_Count":233},{"source":"SAT","target":"RDU","Sum of Flights_Count":228},{"source":"SAT","target":"SMF","Sum of Flights_Count":226},{"source":"SAT","target":"MSP","Sum of Flights_Count":191},{"source":"SAT","target":"IAD","Sum of Flights_Count":149},{"source":"SAT","target":"TUL","Sum of Flights_Count":89},{"source":"SAT","target":"OKC","Sum of Flights_Count":87},{"source":"SAT","target":"AUS","Sum of Flights_Count":2},{"source":"SAT","target":"AMA","Sum of Flights_Count":1},{"source":"SAT","target":"MGM","Sum of Flights_Count":1},{"source":"LGA","target":"AGS","Sum of Flights_Count":7},{"source":"LGA","target":"ATL","Sum of Flights_Count":10507},{"source":"LGA","target":"BHM","Sum of Flights_Count":591},{"source":"LGA","target":"BNA","Sum of Flights_Count":1217},{"source":"LGA","target":"BOS","Sum of Flights_Count":12035},{"source":"LGA","target":"CAE","Sum of Flights_Count":609},{"source":"LGA","target":"CAK","Sum of Flights_Count":793},{"source":"LGA","target":"CHS","Sum of Flights_Count":1414},{"source":"LGA","target":"CID","Sum of Flights_Count":156},{"source":"LGA","target":"CLE","Sum of Flights_Count":2920},{"source":"LGA","target":"CLT","Sum of Flights_Count":4958},{"source":"LGA","target":"CMH","Sum of Flights_Count":2350},{"source":"LGA","target":"CVG","Sum of Flights_Count":3635},{"source":"LGA","target":"DAB","Sum of Flights_Count":159},{"source":"LGA","target":"DCA","Sum of Flights_Count":11063},{"source":"LGA","target":"DEN","Sum of Flights_Count":2970},{"source":"LGA","target":"DFW","Sum of Flights_Count":5372},{"source":"LGA","target":"DSM","Sum of Flights_Count":705},{"source":"LGA","target":"DTW","Sum of Flights_Count":4601},{"source":"LGA","target":"EGE","Sum of Flights_Count":16},{"source":"LGA","target":"FLL","Sum of Flights_Count":3152},{"source":"LGA","target":"FNT","Sum of Flights_Count":392},{"source":"LGA","target":"GRR","Sum of Flights_Count":363},{"source":"LGA","target":"GSO","Sum of Flights_Count":927},{"source":"LGA","target":"GSP","Sum of Flights_Count":609},{"source":"LGA","target":"HDN","Sum of Flights_Count":15},{"source":"LGA","target":"HSV","Sum of Flights_Count":69},{"source":"LGA","target":"IAD","Sum of Flights_Count":1103},{"source":"LGA","target":"IAH","Sum of Flights_Count":3418},{"source":"LGA","target":"IND","Sum of Flights_Count":1331},{"source":"LGA","target":"JAX","Sum of Flights_Count":1285},{"source":"LGA","target":"LEX","Sum of Flights_Count":415},{"source":"LGA","target":"MCO","Sum of Flights_Count":3158},{"source":"LGA","target":"MEM","Sum of Flights_Count":1605},{"source":"LGA","target":"MIA","Sum of Flights_Count":3586},{"source":"LGA","target":"MKE","Sum of Flights_Count":592},{"source":"LGA","target":"MLB","Sum of Flights_Count":2},{"source":"LGA","target":"MSN","Sum of Flights_Count":620},{"source":"LGA","target":"MSP","Sum of Flights_Count":2719},{"source":"LGA","target":"MSY","Sum of Flights_Count":512},{"source":"LGA","target":"MYR","Sum of Flights_Count":123},{"source":"LGA","target":"ORD","Sum of Flights_Count":10862},{"source":"LGA","target":"PBI","Sum of Flights_Count":1934},{"source":"LGA","target":"PHF","Sum of Flights_Count":770},{"source":"LGA","target":"PHL","Sum of Flights_Count":1},{"source":"LGA","target":"PIT","Sum of Flights_Count":1297},{"source":"LGA","target":"RDU","Sum of Flights_Count":4423},{"source":"LGA","target":"RIC","Sum of Flights_Count":1336},{"source":"LGA","target":"RSW","Sum of Flights_Count":238},{"source":"LGA","target":"SAV","Sum of Flights_Count":995},{"source":"LGA","target":"SDF","Sum of Flights_Count":571},{"source":"LGA","target":"SLC","Sum of Flights_Count":24},{"source":"LGA","target":"SRQ","Sum of Flights_Count":74},{"source":"LGA","target":"STL","Sum of Flights_Count":1604},{"source":"LGA","target":"TPA","Sum of Flights_Count":1464},{"source":"LGA","target":"TVC","Sum of Flights_Count":50},{"source":"LGA","target":"TYS","Sum of Flights_Count":642},{"source":"LGA","target":"VPS","Sum of Flights_Count":2},{"source":"LGA","target":"XNA","Sum of Flights_Count":765},{"source":"SUN","target":"TWF","Sum of Flights_Count":1},{"source":"ICT","target":"COS","Sum of Flights_Count":1}],
+{  _id:"chart8",
+   canvasHeight:800,
+   canvasWidth: 900,
+   sourceColumn: "Origin",
+   targetColumn: "Dest",
+   nodes:{'ABQ': {'name': 'ABQ', 'tooltip': 'test tooltip value'},'AGS': {'name': 'AGS', 'tooltip': 'test tooltip value'},'AMA': {'name': 'AMA', 'tooltip': 'test tooltip value'},'ATL': {'name': 'ATL', 'tooltip': 'test tooltip value'},'AUS': {'name': 'AUS', 'tooltip': 'test tooltip value'},'BHM': {'name': 'BHM', 'tooltip': 'test tooltip value'},'BNA': {'name': 'BNA', 'tooltip': 'test tooltip value'},'BOS': {'name': 'BOS', 'tooltip': 'test tooltip value'},'BWI': {'name': 'BWI', 'tooltip': 'test tooltip value'},'CAE': {'name': 'CAE', 'tooltip': 'test tooltip value'},'CAK': {'name': 'CAK', 'tooltip': 'test tooltip value'},'CHS': {'name': 'CHS', 'tooltip': 'test tooltip value'},'CID': {'name': 'CID', 'tooltip': 'test tooltip value'},'CLE': {'name': 'CLE', 'tooltip': 'test tooltip value'},'CLT': {'name': 'CLT', 'tooltip': 'test tooltip value'},'CMH': {'name': 'CMH', 'tooltip': 'test tooltip value'},'COS': {'name': 'COS', 'tooltip': 'test tooltip value'},'CVG': {'name': 'CVG', 'tooltip': 'test tooltip value'},'DAB': {'name': 'DAB', 'tooltip': 'test tooltip value'},'DAL': {'name': 'DAL', 'tooltip': 'test tooltip value'},'DAY': {'name': 'DAY', 'tooltip': 'test tooltip value'},'DCA': {'name': 'DCA', 'tooltip': 'test tooltip value'},'DEN': {'name': 'DEN', 'tooltip': 'test tooltip value'},'DFW': {'name': 'DFW', 'tooltip': 'test tooltip value'},'DSM': {'name': 'DSM', 'tooltip': 'test tooltip value'},'DTW': {'name': 'DTW', 'tooltip': 'test tooltip value'},'EGE': {'name': 'EGE', 'tooltip': 'test tooltip value'},'ELP': {'name': 'ELP', 'tooltip': 'test tooltip value'},'EWR': {'name': 'EWR', 'tooltip': 'test tooltip value'},'FLL': {'name': 'FLL', 'tooltip': 'test tooltip value'},'FNT': {'name': 'FNT', 'tooltip': 'test tooltip value'},'GRR': {'name': 'GRR', 'tooltip': 'test tooltip value'},'GSO': {'name': 'GSO', 'tooltip': 'test tooltip value'},'GSP': {'name': 'GSP', 'tooltip': 'test tooltip value'},'HDN': {'name': 'HDN', 'tooltip': 'test tooltip value'},'HOU': {'name': 'HOU', 'tooltip': 'test tooltip value'},'HRL': {'name': 'HRL', 'tooltip': 'test tooltip value'},'HSV': {'name': 'HSV', 'tooltip': 'test tooltip value'},'IAD': {'name': 'IAD', 'tooltip': 'test tooltip value'},'IAH': {'name': 'IAH', 'tooltip': 'test tooltip value'},'ICT': {'name': 'ICT', 'tooltip': 'test tooltip value'},'IND': {'name': 'IND', 'tooltip': 'test tooltip value'},'JAX': {'name': 'JAX', 'tooltip': 'test tooltip value'},'LAS': {'name': 'LAS', 'tooltip': 'test tooltip value'},'LAX': {'name': 'LAX', 'tooltip': 'test tooltip value'},'LEX': {'name': 'LEX', 'tooltip': 'test tooltip value'},'LGA': {'name': 'LGA', 'tooltip': 'test tooltip value'},'MCI': {'name': 'MCI', 'tooltip': 'test tooltip value'},'MCO': {'name': 'MCO', 'tooltip': 'test tooltip value'},'MDW': {'name': 'MDW', 'tooltip': 'test tooltip value'},'MEM': {'name': 'MEM', 'tooltip': 'test tooltip value'},'MGM': {'name': 'MGM', 'tooltip': 'test tooltip value'},'MIA': {'name': 'MIA', 'tooltip': 'test tooltip value'},'MKE': {'name': 'MKE', 'tooltip': 'test tooltip value'},'MLB': {'name': 'MLB', 'tooltip': 'test tooltip value'},'MSN': {'name': 'MSN', 'tooltip': 'test tooltip value'},'MSP': {'name': 'MSP', 'tooltip': 'test tooltip value'},'MSY': {'name': 'MSY', 'tooltip': 'test tooltip value'},'MYR': {'name': 'MYR', 'tooltip': 'test tooltip value'},'OKC': {'name': 'OKC', 'tooltip': 'test tooltip value'},'ONT': {'name': 'ONT', 'tooltip': 'test tooltip value'},'ORD': {'name': 'ORD', 'tooltip': 'test tooltip value'},'PBI': {'name': 'PBI', 'tooltip': 'test tooltip value'},'PHF': {'name': 'PHF', 'tooltip': 'test tooltip value'},'PHL': {'name': 'PHL', 'tooltip': 'test tooltip value'},'PHX': {'name': 'PHX', 'tooltip': 'test tooltip value'},'PIT': {'name': 'PIT', 'tooltip': 'test tooltip value'},'PNS': {'name': 'PNS', 'tooltip': 'test tooltip value'},'RDU': {'name': 'RDU', 'tooltip': 'test tooltip value'},'RIC': {'name': 'RIC', 'tooltip': 'test tooltip value'},'RSW': {'name': 'RSW', 'tooltip': 'test tooltip value'},'SAN': {'name': 'SAN', 'tooltip': 'test tooltip value'},'SAT': {'name': 'SAT', 'tooltip': 'test tooltip value'},'SAV': {'name': 'SAV', 'tooltip': 'test tooltip value'},'SDF': {'name': 'SDF', 'tooltip': 'test tooltip value'},'SFO': {'name': 'SFO', 'tooltip': 'test tooltip value'},'SLC': {'name': 'SLC', 'tooltip': 'test tooltip value'},'SMF': {'name': 'SMF', 'tooltip': 'test tooltip value'},'SRQ': {'name': 'SRQ', 'tooltip': 'test tooltip value'},'STL': {'name': 'STL', 'tooltip': 'test tooltip value'},'SUN': {'name': 'SUN', 'tooltip': 'test tooltip value'},'TPA': {'name': 'TPA', 'tooltip': 'test tooltip value'},'TUL': {'name': 'TUL', 'tooltip': 'test tooltip value'},'TUS': {'name': 'TUS', 'tooltip': 'test tooltip value'},'TVC': {'name': 'TVC', 'tooltip': 'test tooltip value'},'TWF': {'name': 'TWF', 'tooltip': 'test tooltip value'},'TYS': {'name': 'TYS', 'tooltip': 'test tooltip value'},'VPS': {'name': 'VPS', 'tooltip': 'test tooltip value'},'XNA': {'name': 'XNA', 'tooltip': 'test tooltip value'}}
+})
+.addTooltip()
+.addLinkTooltip();
 
 
 jarvis.SankeyChart(data= [{"searches":25,"sourceCountry":"j","targetCountry":"n"},{"searches":37,"sourceCountry":"o","targetCountry":"j"},{"searches":16,"sourceCountry":"o","targetCountry":"l"},{"searches":8,"sourceCountry":"o","targetCountry":"m"},{"searches":68,"sourceCountry":"o","targetCountry":"k"},{"searches":154,"sourceCountry":"g","targetCountry":"o"},{"searches":40,"sourceCountry":"g","targetCountry":"i"},{"searches":345,"sourceCountry":"b","targetCountry":"g"},{"searches":66,"sourceCountry":"b","targetCountry":"h"},{"searches":17,"sourceCountry":"b","targetCountry":"d"},{"searches":25,"sourceCountry":"b","targetCountry":"e"},{"searches":117,"sourceCountry":"b","targetCountry":"f"},{"searches":692,"sourceCountry":"a","targetCountry":"b"},{"searches":19,"sourceCountry":"a","targetCountry":"c"}],  
-{_id:"chart7", canvas_width: 900, canvas_height: 600, source_col: "sourceCountry", target_col:"targetCountry", value_col: "searches"} 
-)
+   {_id:"chart7", canvasWidth: 900, canvasWeight: 600, 
+   sourceColumn: "sourceCountry", targetColumn:"targetCountry", valueColumn: "searches",
+   tooltipTemplate: "{sourceCountry} generates {searches} to {targetCountry}."
+} ).addLinkTooltip()
 
 
 jarvis.TreeChart(
-   data = [
-    {
-        "actor": "Peter Dinklage",
-        "house": "House Lannister",
-        "name": "Tyrion Lannister",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Nikolaj Coster-Waldau",
-        "house": "House Lannister",
-        "name": "Jaime Lannister",
-        "to": "Tyrion Lannister"
-    },
-    {
-        "actor": "Lena Headey",
-        "house": "House Lannister",
-        "name": "Cersei Lannister",
-        "to": "Tyrion Lannister"
-    },
-    {
-        "actor": "Emilia Clarke",
-        "house": "House Targaryen",
-        "name": "Daenerys Targaryen",
-        "to": "null"
-    },
-    {
-        "actor": "Kit Harington",
-        "house": "House Stark",
-        "name": "Jon Snow",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Aidan Gillen",
-        "house": "Not Applicable",
-        "name": "Petyr Baelish",
-        "to": "Sansa Stark"
-    },
-    {
-        "actor": "Iain Glen",
-        "house": "House Mormont",
-        "name": "Jorah Mormont",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Sophie Turner",
-        "house": "House Stark",
-        "name": "Sansa Stark",
-        "to": "Sansa Stark"
-    },
-    {
-        "actor": "Maisie Williams",
-        "house": "House Stark",
-        "name": "Arya Stark",
-        "to": "Arya Stark"
-    },
-    {
-        "actor": "Alfie Allen",
-        "house": "House Greyjoy",
-        "name": "Theon Greyjoy",
-        "to": "Roose Bolton"
-    },
-    {
-        "actor": "Isaac Hempstead Wright",
-        "house": "House Stark",
-        "name": "Bran Stark",
-        "to": "Bran Stark"
-    },
-    {
-        "actor": "Rory McCann",
-        "house": "House Clegane",
-        "name": "Sandor Clegane",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Jack Gleeson",
-        "house": "House Baratheon",
-        "name": "Joffrey Baratheon",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Michelle Fairley",
-        "house": "House Stark",
-        "name": "Catelyn Stark",
-        "to": "Ned Stark"
-    },
-    {
-        "actor": "Richard Madden",
-        "house": "House Stark",
-        "name": "Robb Stark",
-        "to": "Ned Stark"
-    },
-    {
-        "actor": "Sean Bean",
-        "house": "House Stark",
-        "name": "Ned Stark",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Mark Addy",
-        "house": "House Baratheon",
-        "name": "Robert Baratheon",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Harry Lloyd",
-        "house": "House Targaryen",
-        "name": "Viserys Targaryen",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Conleth Hill",
-        "house": "Not Applicable",
-        "name": "Varys",
-        "to": "Tyrion Lannister"
-    },
-    {
-        "actor": "John Bradley",
-        "house": "House Tarly",
-        "name": "Samwell Tarly",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Jerome Flynn",
-        "house": "Not Applicable",
-        "name": "Bronn",
-        "to": "Jamie Lannister"
-    },
-    {
-        "actor": "Charles Dance",
-        "house": "House Lannister",
-        "name": "Tywin Lannister",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Sibel Kekilli",
-        "house": "Not Applicable",
-        "name": "Shae",
-        "to": "Tyrion Lannister"
-    },
-    {
-        "actor": "James Cosmo",
-        "house": "House Mormont",
-        "name": "Jeor Mormont",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Joe Dempsie",
-        "house": "House Baratheon",
-        "name": "Gendry",
-        "to": "Robert Baratheon"
-    },
-    {
-        "actor": "Dean-Charles Chapman",
-        "house": "House Baratheon",
-        "name": "Tommen Baratheon",
-        "to": "Robert Baratheon"
-    },
-    {
-        "actor": "Tom Wlaschiha",
-        "house": "Not Applicable",
-        "name": "Jaqen H'ghar",
-        "to": "Arya Stark"
-    },
-    {
-        "actor": "Jason Momoa",
-        "house": "Not Applicable",
-        "name": "Khal Drogo",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Liam Cunningham",
-        "house": "House Baratheon",
-        "name": "Davos Seaworth",
-        "to": "Stannis Baratheon"
-    },
-    {
-        "actor": "Carice van Houten",
-        "house": "Not Declared",
-        "name": "Melisandre",
-        "to": "Stannis Baratheon"
-    },
-    {
-        "actor": "Natalie Dormer",
-        "house": "House Tyrell",
-        "name": "Margaery Tyrell",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Stephen Dillane",
-        "house": "House Baratheon",
-        "name": "Stannis Baratheon",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Rose Leslie",
-        "house": "Wildlings",
-        "name": "Ygritte",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Oona Chaplin",
-        "house": "House Stark",
-        "name": "Talisa Stark",
-        "to": "Robert Stark"
-    },
-    {
-        "actor": "Gwendoline Christie",
-        "house": "House Tarth",
-        "name": "Brienne of Tarth",
-        "to": "Sansa Stark"
-    },
-    {
-        "actor": "Hannah Murray",
-        "house": "Wildlings",
-        "name": "Gilly",
-        "to": "Samwell Tarly"
-    },
-    {
-        "actor": "Michael McElhatton",
-        "house": "House Bolton",
-        "name": "Roose Bolton",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Kristofer Hivju",
-        "house": "Wildlings",
-        "name": "Tormund Giantsbane",
-        "to": "Jon Snow"
-    },
-    {
-        "actor": "Iwan Rheon",
-        "house": "House Bolton",
-        "name": "Ramsay Bolton",
-        "to": "Roose Bolton"
-    },
-    {
-        "actor": "Michiel Huisman",
-        "house": "Not Applicable",
-        "name": "Daario Naharis",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Nathalie Emmanuel",
-        "house": "Not Applicable",
-        "name": "Missandei",
-        "to": "Daenerys Targaryen"
-    },
-    {
-        "actor": "Indira Varma",
-        "house": "House Martell",
-        "name": "Ellaria Sand",
-        "to": "Cersei Lannister"
-    },
-    {
-        "actor": "Jonathan Pryce",
-        "house": "Not Applicable",
-        "name": "The High Sparrow",
-        "to": "Cersei Lannister"
-    }],
+data = [ { "actor": "Peter Dinklage", "house": "House Lannister", "name": "Tyrion Lannister", "to": "Daenerys Targaryen" }, { "actor": "Nikolaj Coster-Waldau", "house": "House Lannister", "name": "Jaime Lannister", "to": "Tyrion Lannister" }, { "actor": "Lena Headey", "house": "House Lannister", "name": "Cersei Lannister", "to": "Tyrion Lannister" }, { "actor": "Emilia Clarke", "house": "House Targaryen", "name": "Daenerys Targaryen", "to": "null" }, { "actor": "Kit Harington", "house": "House Stark", "name": "Jon Snow", "to": "Daenerys Targaryen" }, { "actor": "Aidan Gillen", "house": "Not Applicable", "name": "Petyr Baelish", "to": "Sansa Stark" }, { "actor": "Iain Glen", "house": "House Mormont", "name": "Jorah Mormont", "to": "Daenerys Targaryen" }, { "actor": "Sophie Turner", "house": "House Stark", "name": "Sansa Stark", "to": "Sansa Stark" }, { "actor": "Maisie Williams", "house": "House Stark", "name": "Arya Stark", "to": "Arya Stark" }, { "actor": "Alfie Allen", "house": "House Greyjoy", "name": "Theon Greyjoy", "to": "Roose Bolton" }, { "actor": "Isaac Hempstead Wright", "house": "House Stark", "name": "Bran Stark", "to": "Bran Stark" }, { "actor": "Rory McCann", "house": "House Clegane", "name": "Sandor Clegane", "to": "Cersei Lannister" }, { "actor": "Jack Gleeson", "house": "House Baratheon", "name": "Joffrey Baratheon", "to": "Cersei Lannister" }, { "actor": "Michelle Fairley", "house": "House Stark", "name": "Catelyn Stark", "to": "Ned Stark" }, { "actor": "Richard Madden", "house": "House Stark", "name": "Robb Stark", "to": "Ned Stark" }, { "actor": "Sean Bean", "house": "House Stark", "name": "Ned Stark", "to": "Jon Snow" }, { "actor": "Mark Addy", "house": "House Baratheon", "name": "Robert Baratheon", "to": "Cersei Lannister" }, { "actor": "Harry Lloyd", "house": "House Targaryen", "name": "Viserys Targaryen", "to": "Daenerys Targaryen" }, { "actor": "Conleth Hill", "house": "Not Applicable", "name": "Varys", "to": "Tyrion Lannister" }, { "actor": "John Bradley", "house": "House Tarly", "name": "Samwell Tarly", "to": "Jon Snow" }, { "actor": "Jerome Flynn", "house": "Not Applicable", "name": "Bronn", "to": "Jamie Lannister" }, { "actor": "Charles Dance", "house": "House Lannister", "name": "Tywin Lannister", "to": "Cersei Lannister" }, { "actor": "Sibel Kekilli", "house": "Not Applicable", "name": "Shae", "to": "Tyrion Lannister" }, { "actor": "James Cosmo", "house": "House Mormont", "name": "Jeor Mormont", "to": "Jon Snow" }, { "actor": "Joe Dempsie", "house": "House Baratheon", "name": "Gendry", "to": "Robert Baratheon" }, { "actor": "Dean-Charles Chapman", "house": "House Baratheon", "name": "Tommen Baratheon", "to": "Robert Baratheon" }, { "actor": "Tom Wlaschiha", "house": "Not Applicable", "name": "Jaqen H'ghar", "to": "Arya Stark" }, { "actor": "Jason Momoa", "house": "Not Applicable", "name": "Khal Drogo", "to": "Daenerys Targaryen" }, { "actor": "Liam Cunningham", "house": "House Baratheon", "name": "Davos Seaworth", "to": "Stannis Baratheon" }, { "actor": "Carice van Houten", "house": "Not Declared", "name": "Melisandre", "to": "Stannis Baratheon" }, { "actor": "Natalie Dormer", "house": "House Tyrell", "name": "Margaery Tyrell", "to": "Cersei Lannister" }, { "actor": "Stephen Dillane", "house": "House Baratheon", "name": "Stannis Baratheon", "to": "Jon Snow" }, { "actor": "Roseå Leslie", "house": "Wildlings", "name": "Ygritte", "to": "Jon Snow" }, { "actor": "Oona Chaplin", "house": "House Stark", "name": "Talisa Stark", "to": "Robert Stark" }, { "actor": "Gwendoline Christie", "house": "House Tarth", "name": "Brienne of Tarth", "to": "Sansa Stark" }, { "actor": "Hannah Murray", "house": "Wildlings", "name": "Gilly", "to": "Samwell Tarly" }, { "actor": "Michael McElhatton", "house": "House Bolton", "name": "Roose Bolton", "to": "Jon Snow" }, { "actor": "Kristofer Hivju", "house": "Wildlings", "name": "Tormund Giantsbane", "to": "Jon Snow" }, { "actor": "Iwan Rheon", "house": "House Bolton", "name": "Ramsay Bolton", "to": "Roose Bolton" }, { "actor": "Michiel Huisman", "house": "Not Applicable", "name": "Daario Naharis", "to": "Daenerys Targaryen" }, { "actor": "Nathalie Emmanuel", "house": "Not Applicable", "name": "Missandei", "to": "Daenerys Targaryen" }, { "actor": "Indira Varma", "house": "House Martell", "name": "Ellaria Sand", "to": "Cersei Lannister" }, { "actor": "Jonathan Pryce", "house": "Not Applicable", "name": "The High Sparrow", "to": "Cersei Lannister" }],
     {"_id":"chart6",
-    "child_col": "actor",
-    "parent_col": "to",
+    "childColumn": "actor",
+    "parentColumn": "to",
     "diameter": 700,
-    "tooltipTemplate": "{actor} from {house} is casted by {name}."
-    })
-
+    "tooltipTemplate": "{actor} from {house} is casted by {name}."})
+    .addTooltip();
 
 jarvis.MapChart(data = [{"airport":"Thigpen ","long":-89.23450472,"lat":31.95376472,"traffic":14},{"airport":"Livingston Municipal","long":-95.01792778,"lat":30.68586111,"traffic":99},{"airport":"Meadow Lake","long":-104.5698933,"lat":38.94574889,"traffic":8},{"airport":"Perry-Warsaw","long":-78.05208056,"lat":42.74134667,"traffic":16},{"airport":"Hilliard Airpark","long":-81.90594389,"lat":30.6880125,"traffic":27},{"airport":"Tishomingo County","long":-88.20111111,"lat":34.49166667,"traffic":52},{"airport":"Gragg-Wade ","long":-86.61145333,"lat":32.85048667,"traffic":82},{"airport":"Capitol","long":-88.17786917,"lat":43.08751,"traffic":28},{"airport":"Columbiana County","long":-80.64140639,"lat":40.67331278,"traffic":1},{"airport":"Memphis Memorial","long":-92.22696056,"lat":40.44725889,"traffic":34},{"airport":"Calhoun County","long":-89.34285194,"lat":33.93011222,"traffic":78},{"airport":"Hawley Municipal","long":-96.35089861,"lat":46.88384889,"traffic":78},{"airport":"Griffith-Merrillville ","long":-87.40109333,"lat":41.51961917,"traffic":58},{"airport":"Gatesville - City\\/County","long":-97.79696778,"lat":31.42127556,"traffic":63},{"airport":"Eureka","long":-116.0050597,"lat":39.60416667,"traffic":15},{"airport":"Moton  Municipal","long":-85.68003611,"lat":32.46047167,"traffic":72},{"airport":"Schaumburg","long":-88.10124278,"lat":41.98934083,"traffic":50},{"airport":"Rolla Municipal","long":-99.62087694,"lat":48.88434111,"traffic":74},{"airport":"Eupora Municipal","long":-89.31256917,"lat":33.53456583,"traffic":42},{"airport":"Randall ","long":-74.39191722,"lat":41.43156583,"traffic":43}],
-   {projection_type: "albersUsa",
-      region: "US",
-      "_id": "chart5",
-      geo_unit_column: 'airport',
-      geo_value_column: 'traffic',
-      canvas_height:600,
-
-      })
-   .addTooltip()
-   .addCircle(scale = 3.5);
-
-
-
-jarvis.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
-          {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
-          {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
-          {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
-          {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
-          {"df_json": [{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
-                        {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
-                        {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
-                        {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
-                        {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
-          "legend_tick": "bar", "height": 300, "x_serie": "Date", "interpolation_method": "cardinal",
-          "canvas_width": 960, "margin_right": 100, "width": 600, "x_axis_title": "x axis title goes here",
-          "second_y_axis_title": "", "y_series": ["Series 1", "Series 2", "Series 3"],
-          "TEMPLATE_FILE": "twoAxesLineChart.html", "legend_style": "expand",
-          "filter_values": {"Date": ["2015-01-01", "2015-01-15", "2015-02-01", "2015-02-15", "2015-03-01"],
-                            "Series 1": [100, 20, 200, 40, 300]}, "canvas_height": 400,
-          "chart_title": "Chart Title Goes Here",
-          "filter_series": ["Date", "Series 1"],
-          "y_axis_title": "y axis title goes here", "margin_top": 40,
-          "margin_left": 80, "margin_bottom": 60, "series_count": 4,
-          "_id": "chart4"},
-          {'Date': ['2015-01-01', '2015-01-15', '2015-02-01', '2015-02-15', '2015-03-01'],
-          'Series 1': [100, 20, 200, 40, 300]});
+{projectionType: "albersUsa",
+region: "US",
+"_id": "chart5",
+geoUnitColumn: 'airport',
+geoValueColumn: 'traffic',
+canvasHeight:600})
+.addTooltip()
+.addCircle(scale = 3.5);
 
 
 jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
@@ -446,14 +172,13 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'searches': 663, 'state': 'Maine'},
  {'searches': 922, 'state': 'Michigan'},
  {'searches': 968, 'state': 'Alaska'}],
- { projection_type: "albersUsa",
+ { projectionType: "albersUsa",
    region: "US",
    theme: "choropleth",
    "_id": "chart3",
-   geo_unit_column: 'state',
-   geo_value_column: 'searches',
-   canvas_height:600,
-   //show_legend: true
+   geoUnitColumn: 'state',
+   geoValueColumn: 'searches',
+   canvasHeight:600,
    })
    .addColor()
    .addTooltip();
@@ -674,13 +399,12 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'country': 'Zambia', 'searches': 204},
  {'country': 'Zimbabwe', 'searches': 377}],
  {
-   projection_type: "mercator",
+   projectionType: "mercator",
    region: "world",
    theme: "choropleth",
    "_id": "chart2",
-   geo_unit_column: 'country',
-   geo_value_column: 'searches',
-   //enable_zoom: true
+   geoUnitColumn: 'country',
+   geoValueColumn: 'searches',
  }
  )
  .addColor()
@@ -902,21 +626,45 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
  {'country': 'Zambia', 'searches': 204},
  {'country': 'Zimbabwe', 'searches': 377}],
  {
-   projection_type: "orthographic",
+   projectionType: "orthographic",
    region: "world",
    theme: "choropleth",
    "_id": "chart1",
-   geo_unit_column: 'country',
-   geo_value_column: 'searches',
-   canvas_height: 600,
-   canvas_width: 600,
-   enable_zoom: true,
-   enable_click_to_center: true
+   geoUnitColumn: 'country',
+   geoValueColumn: 'searches',
+   canvasHeight: 600,
+   canvasWidth: 600,
  })
  .addColor()
  .addTooltip()
  .enableZoom()
  .enableClickToCenter();
+
+
+//jarvis.LineChart([{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
+//          {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
+//          {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
+//          {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
+//          {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
+//          {"df_json": [{"Date":"2015-01-01","Series 1":100,"Series 2":200,"Series 3":400},
+//                        {"Date":"2015-01-15","Series 1":20,"Series 2":60,"Series 3":200},
+//                        {"Date":"2015-02-01","Series 1":200,"Series 2":200,"Series 3":200},
+//                        {"Date":"2015-02-15","Series 1":40,"Series 2":90,"Series 3":20},
+//                        {"Date":"2015-03-01","Series 1":300,"Series 2":500,"Series 3":20}],
+//          "legend_tick": "bar", "height": 300, "x_serie": "Date", "interpolation_method": "cardinal",
+//          "canvas_width": 960, "margin_right": 100, "width": 600, "x_axis_title": "x axis title goes here",
+//          "second_y_axis_title": "", "y_series": ["Series 1", "Series 2", "Series 3"],
+//          "TEMPLATE_FILE": "twoAxesLineChart.html", "legend_style": "expand",
+//          "filter_values": {"Date": ["2015-01-01", "2015-01-15", "2015-02-01", "2015-02-15", "2015-03-01"],
+//                            "Series 1": [100, 20, 200, 40, 300]}, "canvas_height": 400,
+//          "chart_title": "Chart Title Goes Here",
+//          "filter_series": ["Date", "Series 1"],
+//          "y_axis_title": "y axis title goes here", "margin_top": 40,
+//          "margin_left": 80, "margin_bottom": 60, "series_count": 4,
+//          "_id": "chart4"},
+//          {'Date': ['2015-01-01', '2015-01-15', '2015-02-01', '2015-02-15', '2015-03-01'],
+//          'Series 1': [100, 20, 200, 40, 300]});
+
 
 </script>
 </body>

@@ -29,6 +29,7 @@ ChartBuilder.prototype.drawCanvas = function() {
 
 ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
 
+        var self = this;
 
         var tooltip = d3.select(this._id).append("div")
             .attr("class", "jarvis-tooltip")
@@ -44,12 +45,26 @@ ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
                     .duration(50)
                     .style("opacity", 1)
 
+                //TODO: Fix positioning. Absolute positioning with d3.mouse only works for sankey, not radial
+                //console.log(element)
+                //console.log("element position:", element.x, element.y);
+                //console.log("page position:", d3.event.pageX, d3.event.pageY);
+                //console.log("mouse position", d3.mouse(this));
+                //console.log($(this).position())
+                //console.log($(self._id + " .jarvis-tooltip").position())
+                //var $tooltip = $(self._id + " .jarvis-tooltip").position()
+                //var position = $(this).position()
+                //console.log(d3.transform(d3.select(this).attr("transform")).translate)
+                //var rect = this.getBoundingClientRect()
+                //console.log(rect)
+
                 tooltip
                     .html(tooltipText(element))
                     .style("position", "absolute")
                     .style('font-size', '14px')
-                    //.style("left", (d3.event.pageX + 30) + "px")
-                    //.style("top", (d3.event.pageY/2 - 30) + "px")
+                    //.attr("transform", "translate(" + element.y + ")")
+                    //.attr("transform", "translate(" + (pos[0]-element.x) + "," + (pos[1]- element.y) + ")")
+                    //.attr("transform", "translate(" + element.x + "px," + element.y + "px)")
                     .style("left", (d3.mouse(this)[0]+30) + "px"  )
                     .style("top", (d3.mouse(this)[1]) + "px")
 
@@ -58,7 +73,7 @@ ChartBuilder.prototype.addTooltip = function(elements, tooltipText) {
                 tooltip
                     .transition()
                     .duration(100)
-                    .style("opacity", 0);
+                    .style("opacity", 0)
             })
 
         return this;
@@ -456,9 +471,11 @@ LineChartBuilder.prototype = Object.create(ChartBuilder.prototype)
 LineChartBuilder.prototype.constructor = LineChartBuilder;
 LineChartBuilder.prototype.parent = ChartBuilder.prototype;
 
+
 var drawLineChart = function(data, options, filters) {
 
     //*** Init attributes *** //
+    //TODO: Need to change the letter case.
     var xSerie =  options.x_serie
     , ySeries = options.y_series
     , filterSeries = options.filter_series
@@ -466,8 +483,8 @@ var drawLineChart = function(data, options, filters) {
     , xAxisTitle = options.x_axis_title || ""
     , yAxisTitle = options.y_axis_title || ""
 
-    var canvasWidth = options.canvas_width || 960
-    , canvasHeight = options.canvas_height || 400
+    var canvasWidth = options.canvasWidth || 960
+    , canvasHeight = options.canvasHeight || 400
     , margin = {}
     margin.left = options.margin_left || 80
     margin.right = options.margin_right || 65
@@ -754,15 +771,15 @@ MapBuilder.prototype.parent = ChartBuilder.prototype;
 
 function drawMapChart(data, options, topology) {
 
-    var canvasWidth = options.canvas_width || 960,
-        canvasHeight = options.canvas_height || 400,
+    var canvasWidth = options.canvasWidth || 960,
+        canvasHeight = options.canvasHeight || 400,
         margin = {
-            left: options.margin_left || 80,
-            right: options.margin_right || 65,
-            top: options.margin_top || 40,
-            bottom: options.margin_bottom || 60
+            left: options.marginLeft || 80,
+            right: options.marginRight || 65,
+            top: options.marginTop || 40,
+            bottom: options.marginBottom || 60
         },
-        tooltipText = options.tooltip_text || function(element) {
+        tooltipText = options.tooltipText || function(element) {
             var text = element.getAttribute("data-name");
             if (element.getAttribute("data-value")) {
                 text += ": " + element.getAttribute("data-value");
@@ -774,28 +791,18 @@ function drawMapChart(data, options, topology) {
         "#" + options._id,
         data,
         topology,
-        options.projection_type || "mercator",
+        options.projectionType || "mercator",
         options.region || "US",
         canvasWidth,
         canvasHeight,
         options.width || canvasWidth - margin.left - margin.right,
         options.height || canvasHeight- margin.top - margin.bottom,
         margin,
-        options.geo_unit_column,
-        options.geo_value_column,
+        options.geoUnitColumn,
+        options.geoValueColumn,
         scale = options.scale,
         tooltipText
     );
-
-    if (options.show_legend) {
-        chart.drawLegend(
-            options.legend_height || 70,
-            {
-                x: options.legend_x || 0,
-                y: options.legend_y || margin.top
-            }
-        );
-    }
 
     var mapChartApi = {
         addColor: function() {
@@ -828,7 +835,7 @@ function drawMapChart(data, options, topology) {
 }
 
 
-TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight, width, height, margin,
+TreeBuilder = function(id, data, childColumn, parentColumn, canvasWidth, canvasHeight, width, height, margin,
                         tooltipText, diameter ) {
 
     // Call parent constructor with arguments
@@ -836,7 +843,7 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
 
     var tree = d3.layout.tree()
         .size([360, diameter / 2 - 120])
-        .separation(function(a, b) { return (a[parentCol] == b[parentCol] ? 1 : 2) / a.depth; });
+        .separation(function(a, b) { return (a[parentColumn] == b[parentColumn] ? 1 : 2) / a.depth; });
     var diagonal = d3.svg.diagonal.radial()
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
@@ -859,21 +866,20 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
 
     // create the tree array
     var treeData = [];
-    //var houseData = [];
+
     data.forEach(function(node) {
-        // add to _parent
-        var _parent = dataMap[node[parentCol]];
-        //var house = node.house;
+
+        var _parent = dataMap[node[parentColumn]];
+
         if (_parent) {
-            // create child array if it doesn't exist
+
             (_parent.children || (_parent.children = []))
-            // add node to child array
             .push(node);
+
         } else {
-            // _parent is null or missing
+
             treeData.push(node);
         }
-        //if (houseData.indexOf(house) < 0) { houseData.push(house)}
     });
 
     var root = treeData[0],
@@ -885,23 +891,32 @@ TreeBuilder = function(id, data, childCol, parentCol, canvasWidth, canvasHeight,
         .enter().append("path")
           .attr("class", "jarvis-link")
           .attr("d", diagonal);
-      var node = this.svg.selectAll("node")
+
+    this.node = this.svg.selectAll("node")
           .data(nodes)
         .enter().append("g")
           .attr("class", "jarvis-node")
           .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-      //Add circle to each node.
-      node.append("circle")
+
+    //Add circle to each node.
+    this.node.append("circle")
         .attr('class', 'jarvis-circle')
 
-      //Add name labels to each circle
-      node.append("text")
-          .attr("dy", ".31em")
-          .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-          .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-          .text(function(d) { return d.name; });
+    //Add name labels to each circle
+    this.node.append("text")
+      .attr("dy", ".31em")
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+      .text(function(d) { return d.name; });
 
-    this.addTooltip(node, tooltipText);
+   //Override the addTooltip on the parent class. Temp solution until I can figure out the positioning problem.
+   this.addTooltip = function(elements, tooltipText) {
+      elements
+        .append("title")
+        .attr("class", "jarvis-tooltip")
+        .text(tooltipText)
+      return this;
+   }
 
     return this;
 
@@ -914,23 +929,23 @@ TreeBuilder.prototype.parent = ChartBuilder.prototype;
 function drawTreeChart(data, options) {
 
     // Required arguments
-    var childCol =  options.child_col
-    , parentCol = options.parent_col
+    var childColumn =  options.childColumn
+    , parentColumn = options.parentColumn
 
     // Optional arguments
-    var canvasWidth = options.canvas_width || 960
-    ,   canvasHeight = options.canvas_height || 400
+    var canvasWidth = options.canvasWidth || 960
+    ,   canvasHeight = options.canvasHeight || 400
     ,   margin = {
-            left: options.margin_left || 80,
-            right: options.margin_right || 65,
-            top: options.margin_top || 40,
-            bottom: options.margin_bottom || 60
+            left: options.marginLeft || 80,
+            right: options.marginRight || 65,
+            top: options.marginTop || 40,
+            bottom: options.marginBottom || 60
         }
     , diameter = options.diameter || 500
 
-    var tooltipText = function(d) {return childCol + ": " + d[childCol]}
+    var tooltipText = function(d) {return childColumn + ": " + d[childColumn]}
     , tooltipColumn = options.tooltipColumn || null
-    ,tooltipTemplate = options.tooltipTemplate || null
+    , tooltipTemplate = options.tooltipTemplate || null
 
     function defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText) {
 
@@ -952,14 +967,14 @@ function drawTreeChart(data, options) {
 
     }
 
-    tooltipText = defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText)
+    tooltipText = defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText);
 
 
     var chart = new TreeBuilder(
         "#" + options._id,
         data,
-        childCol,
-        parentCol,
+        childColumn,
+        parentColumn,
         canvasWidth,
         canvasHeight,
         options.width || canvasWidth - margin.left - margin.right,
@@ -969,6 +984,14 @@ function drawTreeChart(data, options) {
         diameter
     );
 
+    var treeChartApi = {
+        addTooltip: function(){
+            chart.addTooltip(chart.node, tooltipText);
+            return treeChartApi;
+        }
+    }
+
+    return treeChartApi;
 }
 
 
@@ -995,7 +1018,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
         .links(links)
         .layout(32);
 
-    var link = this.svg.append("g")
+    this.link = this.svg.append("g")
                 .selectAll(".jarvis-link")
                 .data(links)
                 .enter().append("path")
@@ -1004,7 +1027,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
                 .style("stroke-width", function(d) { return Math.max(1, d.dy); })
                 .sort(function(a, b) { return b.dy - a.dy; });
 
-    var node = this.svg.append("g").selectAll(".node")
+    var node = this.svg.append("g").selectAll(".jarvis-node")
         .data(nodes)
       .enter().append("g")
         .attr("class", "jarvis-node")
@@ -1043,10 +1066,8 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
     function dragmove(d) {
       d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) +  ")");
       sankey.relayout();
-      link.attr("d", path);
+      this.link.attr("d", path);
     }
-
-    this.addTooltip(link, tooltipText);
 
     return this;
 }
@@ -1058,23 +1079,30 @@ SankeyBuilder.prototype.parent = ChartBuilder.prototype;
 function drawSankeyChart(data, options) {
 
     // Required arguments
-    var sourceCol =  options.source_col || 'source'
-    , targetCol = options.target_col || 'target'
-    , valueCol = options.value_col || 'value'
-    , nodes = options.nodes;
+    var sourceColumn =  options.sourceColumn
+    , targetColumn = options.targetColumn
+    , valueColumn = options.valueColumn
 
-    // Use ES6 arrow functions to rename JSON array to source, target, value columns
-    var data = data.map(function(obj) { return {source: obj[sourceCol], target: obj[targetCol], value: obj[valueCol]}});
+    // Optional arguments
+    var canvasWidth = options.canvasWidth || 960
+    ,   canvasHeight = options.canvasHeight || 400
+    ,   margin = {
+            left: options.marginLeft || 80,
+            right: options.marginRight || 65,
+            top: options.marginTop || 40,
+            bottom: options.marginBottom || 60
+        }
+
 
     // A very clever solution by http://www.d3noob.org/2013/02/formatting-data-for-sankey-diagrams-in.html
     graph = {"nodes" : [], "links" : []};
 
     data.forEach(function (d) {
-      graph.nodes.push({ "name": d.source });
-      graph.nodes.push({ "name": d.target });
-      graph.links.push({ "source": d.source,
-                         "target": d.target,
-                         "value": +d.value });
+      graph.nodes.push({ name: d[sourceColumn] });
+      graph.nodes.push({ name: d[targetColumn] });
+      graph.links.push({ source: d[sourceColumn],
+                         target: d[targetColumn],
+                         value: +d[valueColumn] });
      });
 
      // return only the distinct / unique nodes
@@ -1094,21 +1122,10 @@ function drawSankeyChart(data, options) {
        graph.nodes[i] = { "name": d };
      });
 
-    // Optional arguments
-    var canvasWidth = options.canvas_width || 960
-    ,   canvasHeight = options.canvas_height || 400
-    ,   margin = {
-            left: options.margin_left || 80,
-            right: options.margin_right || 65,
-            top: options.margin_top || 40,
-            bottom: options.margin_bottom || 60
-        }
-
-    ,  tooltipText = options.tooltip_text || function(d) {
-
+    //Can't apply defineTooltipText here because sankey.js uses fixed keys: source, target, value
+    var tooltipText = function(d) {
         return d.source.name + " to " + d.target.name + ": " + d.value
     }
-
 
     var chart = new SankeyBuilder(
         "#" + options._id,
@@ -1122,6 +1139,14 @@ function drawSankeyChart(data, options) {
         tooltipText
     );
 
+    var sankeyChartApi = {
+        addLinkTooltip: function() {
+           chart.addTooltip(chart.link, tooltipText);
+           return sankeyChartApi;
+        }
+    }
+    return sankeyChartApi
+
 }
 
 //Go Luke!
@@ -1130,9 +1155,21 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
-    console.log(this);
-
     this.svg = this.drawCanvas();
+
+    var self = this;
+
+    this.tick = function() {
+
+      self.link
+          .attr("x1", function(d) { return d.source.x; })
+          .attr("y1", function(d) { return d.source.y; })
+          .attr("x2", function(d) { return d.target.x; })
+          .attr("y2", function(d) { return d.target.y; });
+
+      self.node
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    }
 
     //Adapted from http://bl.ocks.org/mbostock/2706022
     var force = d3.layout.force()
@@ -1141,41 +1178,30 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     .size([width, height])
     .linkDistance(60)
     .charge(-220)
-    .on("tick", tick)
+    .on("tick", this.tick)
     .start();
 
-    var link = this.svg.selectAll(".link")
+
+    this.link = this.svg.selectAll(".jarvis-link")
         .data(force.links())
       .enter().append("line")
-        .attr("class", "jarvis-link");
+        .attr("class", "jarvis-link")
 
-    var node = this.svg.selectAll(".node")
+
+    this.node = this.svg.selectAll(".jarvis-node")
         .data(force.nodes())
       .enter().append("g")
         .attr("class", "jarvis-node")
         .call(force.drag);
 
-    node.append("circle")
+    this.node.append("circle")
         .attr("class", "jarvis-circle")
 
-    node.append("text")
-        //.attr("class", "text")
+
+    this.node.append("text")
         .attr("dy", ".35em")
         .attr("dx", "1em")
         .text(function(d) { return d.name; });
-
-    function tick() {
-      link
-          .attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
-
-      node
-          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-    }
-
-    this.addTooltip(link, tooltipText);
 
     return this;
 
@@ -1188,41 +1214,33 @@ ForceBuilder.prototype.parent = ChartBuilder.prototype;
 function drawForceGraph(data, options){
 
     // Required arguments
-    var sourceCol =  options.source_col || 'source'
-    , targetCol = options.target_col || 'target'
-    //, valueCol = options.value_col || 'value'
-
-    // Use ES6 arrow functions to rename JSON array to source, target, value columns
-    var links = data.map(function(obj) { return {source: obj[sourceCol],
-                                        target: obj[targetCol]
-    }});
-
+    var sourceColumn =  options.sourceColumn
+    , targetColumn = options.targetColumn
+    , _nodes = options.nodes
+    , _links = data
 
     // Optional arguments
-    var canvasWidth = options.canvas_width || 960
-    ,   canvasHeight = options.canvas_height || 400
+    var canvasWidth = options.canvasWidth || 960
+    ,   canvasHeight = options.canvasHeight || 400
     ,   margin = {
-            left: options.margin_left || 80,
-            right: options.margin_right || 65,
-            top: options.margin_top || 40,
-            bottom: options.margin_bottom || 60
+            left: options.marginLeft || 80,
+            right: options.marginRight || 65,
+            top: options.marginTop || 40,
+            bottom: options.marginBottom || 60
         }
-    ,  tooltipText = options.tooltip_text || function(d) {
+    ,  tooltipText = options.tooltipText || function(d) {
         return d.source.name + " to " + d.target.name;
    }
 
-    var nodes = {};
-
-    // Compute the distinct nodes from the links.
-    links.forEach(function(link) {
-      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+    _links.forEach(function(_link) {
+      _link.source = _nodes[_link.source]
+      _link.target = _nodes[_link.target]
     });
 
     var chart = new ForceBuilder(
         "#" + options._id,
-        links,
-        nodes,
+        _links,
+        _nodes,
         canvasWidth,
         canvasHeight,
         options.width || canvasWidth - margin.left - margin.right,
@@ -1230,6 +1248,24 @@ function drawForceGraph(data, options){
         margin,
         tooltipText
     );
+
+    var forceGraphApi = {
+        addTooltip: function(type){
+            chart.node
+                .append('title')
+                .attr("class", "jarvis-tooltip")
+                .text(function(d) { return d.tooltip; })
+            return forceGraphApi;
+        },
+        addLinkTooltip: function() {
+
+            chart.addTooltip(chart.link, tooltipText);
+            return forceGraphApi;
+
+        }
+    }
+
+    return forceGraphApi;
 }
 
 

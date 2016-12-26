@@ -56,20 +56,17 @@ class Jarvis(object):
 
         self.model = self.__class__.__name__  #: The chart model
 
-        self.canvas_height = kwargs.get("canvas_height", 400)
-        self.canvas_weight = kwargs.get("canvas_weight", 900)
+        self.canvasHeight = kwargs.get("canvas_height", 400)
+        self.canvasWeight = kwargs.get("canvas_weight", 900)
 
 
         self.TEMPLATE_FILE = "chartBuilder.html"
         self.df_json = dataframe.to_json(orient='records')
-        self.series_count = len(dataframe.columns)
+        self.seriesCount = len(dataframe.columns)
         dataframe_columns = list(dataframe.columns.values)
 
         self.tooltipColumn = kwargs.get("tooltip_column", None)
         self.tooltipTemplate = kwargs.get("tooltip_template", None)
-
-        self.enable_zoom = kwargs.get('enable_zoom', False)
-        self.enable_click_to_center = kwargs.get("enable_click_to_center", False)
 
         self.filters = kwargs.get("filters", None)
 
@@ -124,6 +121,16 @@ class Jarvis(object):
 
         return self;
 
+    def addLinkTooltip(self):
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.addLinkTooltip();
+            </script>
+        """ % self._id
+
+        return self;
+
     def enableZoom(self):
 
         self.html_content += """
@@ -156,10 +163,10 @@ class MapChart(Jarvis):
     def __init__(self, dataframe, projection="mercator", region=None, unit=None, value=None,
                  *args, **kwargs):
 
-        self.projection_type = projection
+        self.projectionType = projection
         self.region = region
-        self.geo_unit_column=unit
-        self.geo_value_column=value
+        self.geoUnitColumn=unit
+        self.geoValueColumn=value
 
         map_options = {
             "world": {"path": "files/maps/countries.json"},
@@ -177,11 +184,11 @@ class MapChart(Jarvis):
 
 class TreeChart(Jarvis):
 
-    def __init__(self, dataframe, type = 'radial', child_col=None, parent_col=None, *args, **kwargs):
+    def __init__(self, dataframe, child_column, parent_column, type = 'radial', *args, **kwargs):
 
         self.type = type
-        self.child_col = child_col
-        self.parent_col = parent_col
+        self.childColumn = child_column
+        self.parentColumn = parent_column
         self.diameter = kwargs.get('diameter', 600)
 
         super(TreeChart, self).__init__(dataframe, *args, **kwargs)
@@ -189,11 +196,11 @@ class TreeChart(Jarvis):
 
 class SankeyChart(Jarvis):
 
-    def __init__(self, dataframe, source_col='source',target_col='target', value_col='value', *args, **kwargs):
+    def __init__(self, dataframe, source_column, target_column, value_column, *args, **kwargs):
 
-        self.source_col = source_col
-        self.target_col = target_col
-        self.value_col = value_col
+        self.sourceColumn = source_column
+        self.targetColumn = target_column
+        self.valueColumn = value_column
 
         super(SankeyChart, self).__init__(dataframe, *args, **kwargs)
 
@@ -201,9 +208,31 @@ class SankeyChart(Jarvis):
 
 class ForceGraph(Jarvis):
 
-    def __init__(self, dataframe, source_col='source',target_col='target', *args, **kwargs):
+    def __init__(self, links_dataframe, source_column,target_column,
+                 nodes, nodes_name_column=None, nodes_tooltip_column=None, *args, **kwargs):
 
-        self.source_col = source_col
-        self.target_col = target_col
+        if any(x not in links_dataframe.columns.values for x in [source_column, target_column]):
+            raise Exception("source_column and target_column must be present in link_dataframe and nodes object.")
 
-        super(ForceGraph, self).__init__(dataframe, *args, **kwargs)
+        self.sourceColumn = source_column
+        self.targetColumn = target_column
+        links_dataframe.rename(columns={source_column: 'source', target_column: "target"}, inplace=True)
+
+        self.nodes = {}
+        if isinstance(nodes, (list, set)):
+            for name in nodes:
+                self.nodes[name] = {'name': name}
+        elif isinstance(nodes, pd.DataFrame):
+            nodes.rename(columns={nodes_name_column: 'name', nodes_tooltip_column: 'tooltip'}, inplace=True)
+
+            # orient = 'index' will be the best. http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_dict.html
+            for d in nodes.to_dict(orient='record'):
+                self.nodes[d['name']] = d
+
+        nodes_name = set(links_dataframe['source']) | set(links_dataframe['target'])
+
+        if nodes_name != set(self.nodes.keys()):
+            raise Exception("nodes_name_column should have the same set of values as \
+                            source_column and target_column combined in links_dataframe.")
+
+        super(ForceGraph, self).__init__(links_dataframe, *args, **kwargs)
