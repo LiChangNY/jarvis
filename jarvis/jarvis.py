@@ -211,28 +211,31 @@ class ForceGraph(Jarvis):
     def __init__(self, links_dataframe, source_column,target_column,
                  nodes, nodes_name_column=None, nodes_tooltip_column=None, *args, **kwargs):
 
-        if any(x not in links_dataframe.columns.values for x in [source_column, target_column]):
+        links_df = links_dataframe.copy()
+        if any(x not in links_df.columns.values for x in [source_column, target_column]):
             raise Exception("source_column and target_column must be present in link_dataframe and nodes object.")
 
         self.sourceColumn = source_column
         self.targetColumn = target_column
-        links_dataframe.rename(columns={source_column: 'source', target_column: "target"}, inplace=True)
+        links_df.rename(columns={source_column: 'source', target_column: "target"}, inplace=True)
 
         self.nodes = {}
         if isinstance(nodes, (list, set)):
             for name in nodes:
                 self.nodes[name] = {'name': name}
         elif isinstance(nodes, pd.DataFrame):
-            nodes.rename(columns={nodes_name_column: 'name', nodes_tooltip_column: 'tooltip'}, inplace=True)
+
+            nodes_df = nodes.copy()
+            nodes_df.rename(columns={nodes_name_column: 'name', nodes_tooltip_column: 'tooltip'}, inplace=True)
 
             # orient = 'index' will be the best. http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_dict.html
-            for d in nodes.to_dict(orient='record'):
+            for d in nodes_df.to_dict(orient='record'):
                 self.nodes[d['name']] = d
 
-        nodes_name = set(links_dataframe['source']) | set(links_dataframe['target'])
+        links_df_nodes = set(links_df['source']) | set(links_df['target'])
 
-        if nodes_name != set(self.nodes.keys()):
+        if links_df_nodes != set(self.nodes.keys()):
             raise Exception("nodes_name_column should have the same set of values as \
                             source_column and target_column combined in links_dataframe.")
 
-        super(ForceGraph, self).__init__(links_dataframe, *args, **kwargs)
+        super(ForceGraph, self).__init__(links_df, *args, **kwargs)
