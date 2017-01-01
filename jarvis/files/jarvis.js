@@ -741,23 +741,27 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         return this;
     }
 
-    this.addCircle = function(scale) {
-        var projection = this.projection;
+    this.addMarker = function(shape, color, scale) {
+        var shape = shape || 'circle'
+        , color = color || "steelblue"
+        , scale = scale || 1.0
+        , projection = this.projection;
 
-        var circles = this.svg.selectAll("circle")
+        var markers = this.svg.selectAll(shape)
             .data(data).enter()
-            .append("circle")
+            .append(shape)
+            //TODO: This should be replaced by marker-specific css. Use circle as default.
             .attr("class","jarvis-circle")
             .attr("id", function (d) { return d[geoUnitColumn];})
             .attr("cx", function (d) { return projection([d.long, d.lat])[0]; })
             .attr("cy", function (d) { return projection([d.long, d.lat])[1]; })
             .attr("r", function (d) {  return Math.log(d[geoValueColumn]) * scale; })
-            .attr("fill", "#1f77b4")
+            .attr("fill", color)
             .attr('opacity', 0.5)
             .attr("data-name", function(d) { return d[geoUnitColumn]; })
             .attr("data-value", function(d) { return d[geoValueColumn]; });
 
-        this.addTooltip(circles, tooltipText);
+        this.addTooltip(markers, tooltipText);
 
         return this;
     }
@@ -810,8 +814,8 @@ function drawMapChart(data, options, topology) {
             return mapChartApi;
         },
 
-        addCircle: function(scale) {
-            chart.addCircle(scale)
+        addMarker: function(shape, scale, color) {
+            chart.addMarker(shape, scale, color)
             return mapChartApi;
         },
 
@@ -835,8 +839,8 @@ function drawMapChart(data, options, topology) {
 }
 
 
-TreeBuilder = function(id, data, childColumn, parentColumn, canvasWidth, canvasHeight, width, height, margin,
-                        tooltipText, diameter ) {
+TreeBuilder = function(id, data, childColumn, parentColumn,
+    canvasWidth, canvasHeight, width, height, margin, diameter ) {
 
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
@@ -909,15 +913,6 @@ TreeBuilder = function(id, data, childColumn, parentColumn, canvasWidth, canvasH
       .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
       .text(function(d) { return d.name; });
 
-   //Override the addTooltip on the parent class. Temp solution until I can figure out the positioning problem.
-   this.addTooltip = function(elements, tooltipText) {
-      elements
-        .append("title")
-        .attr("class", "jarvis-tooltip")
-        .text(tooltipText)
-      return this;
-   }
-
     return this;
 
 }
@@ -943,9 +938,18 @@ function drawTreeChart(data, options) {
         }
     , diameter = options.diameter || 500
 
-    var tooltipText = function(d) {return childColumn + ": " + d[childColumn]}
-    , tooltipColumn = options.tooltipColumn || null
-    , tooltipTemplate = options.tooltipTemplate || null
+    var chart = new TreeBuilder(
+        "#" + options._id,
+        data,
+        childColumn,
+        parentColumn,
+        canvasWidth,
+        canvasHeight,
+        options.width || canvasWidth - margin.left - margin.right,
+        options.height || canvasHeight- margin.top - margin.bottom,
+        margin,
+        diameter
+    );
 
     function defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText) {
 
@@ -967,26 +971,20 @@ function drawTreeChart(data, options) {
 
     }
 
-    tooltipText = defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText);
-
-
-    var chart = new TreeBuilder(
-        "#" + options._id,
-        data,
-        childColumn,
-        parentColumn,
-        canvasWidth,
-        canvasHeight,
-        options.width || canvasWidth - margin.left - margin.right,
-        options.height || canvasHeight- margin.top - margin.bottom,
-        margin,
-        tooltipText,
-        diameter
-    );
-
     var treeChartApi = {
-        addTooltip: function(){
-            chart.addTooltip(chart.node, tooltipText);
+
+        addTooltip: function(options){
+
+            var tooltipColumn = options.column || null
+            , tooltipTemplate = options.template || null
+            , tooltipText = defineTooltipText(tooltipColumn, tooltipTemplate, tooltipText) ||
+            function(d) {return childColumn + ": " + d[childColumn]}
+
+            chart.node
+                .append("title")
+                .attr("class", "jarvis-tooltip")
+                .text(tooltipText)
+
             return treeChartApi;
         }
     }
@@ -1197,7 +1195,6 @@ ForceBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, heig
     this.node.append("circle")
         .attr("class", "jarvis-circle")
 
-
     this.node.append("text")
         .attr("dy", ".35em")
         .attr("dx", "1em")
@@ -1250,7 +1247,8 @@ function drawForceGraph(data, options){
     );
 
     var forceGraphApi = {
-        addTooltip: function(type){
+
+        addTooltip: function(){
             chart.node
                 .append('title')
                 .attr("class", "jarvis-tooltip")
@@ -1262,6 +1260,23 @@ function drawForceGraph(data, options){
             chart.addTooltip(chart.link, tooltipText);
             return forceGraphApi;
 
+        },
+
+        addColor: function(column) {
+
+            chart.node.selectAll('.jarvis-node .jarvis-circle')
+                .style('stroke', function(d){ return chart.colorSet(d[column])})
+
+            return forceGraphApi;
+        },
+
+        sizeNode: function(column, scale) {
+
+            var adjust = adjust || 1;
+
+            chart.node.selectAll('.jarvis-node .jarvis-circle')
+                .style('r', function(d){ return d[column]*scale;})
+            return forceGraphApi;
         }
     }
 

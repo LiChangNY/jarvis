@@ -32,8 +32,8 @@ class Jarvis(object):
     """
     Jarvis Base class.
     """
-    #chart count
-    _count = 0
+
+    _count = 0 #The chart count
 
     global _JS_INITIALIZED
 
@@ -78,8 +78,7 @@ class Jarvis(object):
         options = self.__dict__.copy()
         options.pop('df_json')
 
-        self.chart_options = {#"options": json.dumps(self, default=lambda o: o.__dict__),
-                              "options": json.dumps(options),
+        self.chart_options = {"options": json.dumps(options),
                               "data": self.df_json,
                               "filters": self.filters,
                               "_id": self._id,
@@ -91,27 +90,27 @@ class Jarvis(object):
 
         self.html_content = template.render(chart=self.chart_options)
 
-    def addColor(self):
+    def addColor(self, column):
+
+        """
+        Function for adjust color properties to primary objects.
+        :param column: reference column for coloring.
+
+        """
+        ##TODO: Enable color options, e.g. scale vs. categorical values.
 
         self.html_content += """
             <script type="text/javascript">
-                %s.addColor();
+                %s.addColor(column="%s");
             </script>
-        """ % self._id
-
-        return self;
-
-    def addCircle(self, scale):
-
-        self.html_content += """
-            <script type="text/javascript">
-                %s.addCircle(%f);
-            </script>
-        """ % (self._id, scale)
-
-        return self;
+        """ % (self._id, column)
 
     def addTooltip(self):
+
+        """
+        Function to add tooltip to primary objects depending on the chart types.
+        """
+        ##TODO: Allow customized tooltip.
 
         self.html_content += """
             <script type="text/javascript">
@@ -123,30 +122,13 @@ class Jarvis(object):
 
     def addLinkTooltip(self):
 
+        """
+        Function to add tooltips to charts that have links (vs. nodes), e.g. SankeyChart, ForceGraph, TreeChart.
+        """
+
         self.html_content += """
             <script type="text/javascript">
                 %s.addLinkTooltip();
-            </script>
-        """ % self._id
-
-        return self;
-
-    def enableZoom(self):
-
-        self.html_content += """
-            <script type="text/javascript">
-                %s.enableZoom();
-            </script>
-        """ % self._id
-
-        return self;
-
-
-    def enableClickToCenter(self):
-
-        self.html_content += """
-            <script type="text/javascript">
-                %s.enableClickToCenter();
             </script>
         """ % self._id
 
@@ -181,6 +163,71 @@ class MapChart(Jarvis):
 
         super(MapChart, self).__init__(dataframe, *args, **kwargs)
 
+    def addColor(self):
+
+        """
+        Function to adjust color properties of the primary unit of geomap.
+        """
+
+        ##TODO: Still be better to use column so we can add colors if there're layers of unit.
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.addColor();
+            </script>
+        """ % self._id
+
+        return self;
+
+    def addMarker(self, shape='circle', color="steelblue", scale=1.0):
+
+        """
+        Function for adding markers based on "value" column.
+
+        :param shape: e.g. circle, rect, ellipse, line, polyline. Only circle supported ATM.
+        :param color: color properties.
+        :param scale: adjustment of scale.
+
+        """
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.addMarker(type='%s', color = '%s', scale=%f);
+            </script>
+        """ % (self._id, shape, color, scale)
+
+        return self;
+
+
+    def enableZoom(self):
+
+        """
+        Function to enable zooming interactivity.
+        """
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.enableZoom();
+            </script>
+        """ % self._id
+
+        return self;
+
+
+    def enableClickToCenter(self):
+
+        """
+        If enabled, chart object will move to center on the mouse position.
+        """
+        self.html_content += """
+            <script type="text/javascript">
+                %s.enableClickToCenter();
+            </script>
+        """ % self._id
+
+        return self;
+
+
 
 class TreeChart(Jarvis):
 
@@ -193,6 +240,23 @@ class TreeChart(Jarvis):
 
         super(TreeChart, self).__init__(dataframe, *args, **kwargs)
 
+
+    def addTooltip(self, column=None, template=None):
+        """
+        :param column: reference column for tooltips.
+        :param template: customized template.
+        """
+
+        self.tooltipTemplate = template
+        self.tooltipColumn = column
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.addTooltip({column:"%s", template:"%s"});
+            </script>
+        """ % (self._id, self.tooltipColumn, self.tooltipTemplate)
+
+        return self;
 
 class SankeyChart(Jarvis):
 
@@ -209,7 +273,7 @@ class SankeyChart(Jarvis):
 class ForceGraph(Jarvis):
 
     def __init__(self, links_dataframe, source_column,target_column,
-                 nodes, nodes_name_column=None, nodes_tooltip_column=None, *args, **kwargs):
+                 nodes, nodes_name_column, nodes_tooltip_column=None, *args, **kwargs):
 
         links_df = links_dataframe.copy()
         if any(x not in links_df.columns.values for x in [source_column, target_column]):
@@ -226,9 +290,13 @@ class ForceGraph(Jarvis):
         elif isinstance(nodes, pd.DataFrame):
 
             nodes_df = nodes.copy()
-            nodes_df.rename(columns={nodes_name_column: 'name', nodes_tooltip_column: 'tooltip'}, inplace=True)
+            nodes_df['name'] = nodes_df[nodes_name_column].copy()
 
-            # orient = 'index' will be the best. http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_dict.html
+            if nodes_tooltip_column:
+                nodes_df['tooltip'] = nodes_df[nodes_tooltip_column].copy()
+
+            # orient = 'index' will be the best.
+            # http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_dict.html
             for d in nodes_df.to_dict(orient='record'):
                 self.nodes[d['name']] = d
 
@@ -239,3 +307,21 @@ class ForceGraph(Jarvis):
                             source_column and target_column combined in links_dataframe.")
 
         super(ForceGraph, self).__init__(links_df, *args, **kwargs)
+
+
+    def sizeNode(self, column, scale=1):
+
+        """
+        Function to adjust the size of nodes.
+        :param column: reference column for sizing.
+        :param scale: adjustment of scale.
+        """
+        ##TODO: Should enable other math functions here.
+
+        self.html_content += """
+            <script type="text/javascript">
+                %s.sizeNode(column="%s", scale=%f);
+            </script>
+        """ % (self._id, column, scale)
+
+        return self;
