@@ -530,7 +530,6 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
             ])
             .range(['#F0F8FF', '#003300']);
 
-       // TODO: geoValueColumn can be multiple.
     }
 
     this.svg = this.drawCanvas();
@@ -539,6 +538,7 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         g = this.svg.append("g"),
         projection;
 
+    //TODO: Replace if-else with api scope.
     if (projectionType == 'mercator' && region == "world") {
         projection = d3.geo.mercator()
             .center([0,0])
@@ -741,10 +741,11 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         return this;
     }
 
-    this.addMarker = function(shape, color, scale) {
+    this.addMarker = function(shape, color, scale, coordinate) {
         var shape = shape || 'circle'
         , color = color || "steelblue"
         , scale = scale || 1.0
+        , coordinate = coordinate || undefined
         , projection = this.projection;
 
         var markers = this.svg.selectAll(shape)
@@ -753,8 +754,12 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
             //TODO: This should be replaced by marker-specific css. Use circle as default.
             .attr("class","jarvis-circle")
             .attr("id", function (d) { return d[geoUnitColumn];})
-            .attr("cx", function (d) { return projection([d.long, d.lat])[0]; })
-            .attr("cy", function (d) { return projection([d.long, d.lat])[1]; })
+            .attr("cx", function (d) {
+                return (coordinate)? d[coordinate[0]]: projection([d.long, d.lat])[0];
+                })
+            .attr("cy", function (d) {
+                return (coordinate)? d[coordinate[1]]: projection([d.long, d.lat])[1];
+             })
             .attr("r", function (d) {  return Math.log(d[geoValueColumn]) * scale; })
             .attr("fill", color)
             .attr('opacity', 0.5)
@@ -1262,17 +1267,40 @@ function drawForceGraph(data, options){
 
         },
 
-        addColor: function(column) {
+        addColor: function(column, options) {
+
+            console.log(options);
+
+            var setColor = d3.scale.category10();
+
+            if (options.palette.constructor == Array){
+                setColor = d3.scale.ordinal()
+                            .range(options.palette);
+            } else if (options.palette.constructor == Object) {
+                setColor = d3.scale.linear()
+                            .domain(d3.extent(d3.values(_nodes), function(d){ return d[column]}))
+                            .range([options.palette.min, options.palette.max])
+            } else if (options.palette.constructor = String) {
+                setColor = function(d) {return options.palette;}
+            }
+
+            for (_opt in options) {
+
+                chart.node.selectAll('.jarvis-node .jarvis-circle')
+                    .style(_opt, options[_opt])
+
+            }
 
             chart.node.selectAll('.jarvis-node .jarvis-circle')
-                .style('stroke', function(d){ return chart.colorSet(d[column])})
+                .style('stroke', function(d){ return (options.stroke)? setColor(d[column]): null;})
+                .style('fill', function(d){ return (options.fill)? setColor(d[column]): null;})
 
             return forceGraphApi;
         },
 
         sizeNode: function(column, scale) {
 
-            var adjust = adjust || 1;
+            var scale = scale || 1;
 
             chart.node.selectAll('.jarvis-node .jarvis-circle')
                 .style('r', function(d){ return d[column]*scale;})

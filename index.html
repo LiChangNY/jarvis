@@ -92,7 +92,9 @@ jarvis.ForceGraph(data=[{"source":"ATL","target":"LGA","Sum of Flights_Count":10
 })
 .addTooltip()
 .addLinkTooltip()
-.addColor(column='name')
+.addColor(column='name',
+          options = {palette:["#6363FF", "#FF7363", "#0a9700"], stroke: true, fill: true, opacity: 0.7,
+           "stroke-width":2, "stroke-opacity": 0.5})
 .sizeNode(column='flights', scale=1/50)
 
 
