@@ -114,7 +114,6 @@ class Jarvis(object):
             </script>
         """ % (self._id, column, options)
 
-        print self.html_content
 
     def addTooltip(self):
 
@@ -174,7 +173,7 @@ class MapChart(Jarvis):
 
         super(MapChart, self).__init__(dataframe, *args, **kwargs)
 
-    def addColor(self):
+    def addColor(self, options):
 
         """
         Function to adjust color properties of the primary unit of geomap.
@@ -184,13 +183,13 @@ class MapChart(Jarvis):
 
         self.html_content += """
             <script type="text/javascript">
-                %s.addColor();
+                %s.addColor(options=%s);
             </script>
-        """ % self._id
+        """ % (self._id, options)
 
         return self;
 
-    def addMarker(self, shape='circle', color="steelblue", scale=1.0, coordinate=None):
+    def addMarker(self, options):
 
         """
         Function for adding markers based on "value" column.
@@ -204,9 +203,9 @@ class MapChart(Jarvis):
         ##TODO: Add reference column, default as geoUnitColumn
         self.html_content += """
             <script type="text/javascript">
-                %s.addMarker(type='%s', color = '%s', scale=%f, coordinate = '%s');
+                %s.addMarker(options=%s);
             </script>
-        """ % (self._id, shape, color, scale, coordinate)
+        """ % (self._id, options)
 
         return self;
 

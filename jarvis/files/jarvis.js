@@ -521,24 +521,12 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
     // Call parent constructor with arguments
     ChartBuilder.call(this, id, canvasWidth, canvasHeight, margin);
 
-   //TODO: Add color palettes
-   if (data != null) {
-       var colorScale = d3.scale.linear()
-            .domain([
-                d3.min(data, function(d) { return d[geoValueColumn] }),
-                d3.max(data, function(d) { return d[geoValueColumn] })
-            ])
-            .range(['#F0F8FF', '#003300']);
-
-    }
-
     this.svg = this.drawCanvas();
 
     var path = d3.geo.path(),
         g = this.svg.append("g"),
         projection;
 
-    //TODO: Replace if-else with api scope.
     if (projectionType == 'mercator' && region == "world") {
         projection = d3.geo.mercator()
             .center([0,0])
@@ -613,7 +601,6 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
     //If users use the JS library directory, I will need to perform an asynchronous request o load map JSON.
     if (typeof topology == "undefined") {
 
-
         var topology;
 
         $.ajax({
@@ -626,18 +613,62 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         });
     }
 
+    //Add a step to normalize data by assigning id.
+    // data is an array of objects. Applied to countries only.
+//    if (typeof countryLookup == "undefined") {
+//
+//        var countryLookup;
+//
+//        $.ajax({
+//          url: "files/maps/countries-names.json",
+//          async: false,
+//          dataType: 'json',
+//          success: function (result) {
+//            countryLookup = result;
+//
+//            dataByUnit = d3.map(data, function(d) {return d[geoUnitColumn]})._
+//
+//           //Assign alpha-3 id to the raw getUnitColumn values.
+//           for (key in dataByUnit) dataByUnit[key] = Object.assign({}, dataByUnit[key], countryLookup[key])
+//
+//           dataWithId = d3.values(dataByUnit);
+//
+//          }
+//        });
+//    }
+
     this.paths = drawBaseMap(topology, regionOptions[region].key, regionOptions[region].unit);
     this.path = path;
     this.projection = projection;
 
-    this.addColor = function(){
-          //TODO: Add series for coloring
-          this.paths.style("fill", function(d) {
-            //return colorScale(dataByUnits.get(d.properties.name))
-            return colorScale(this.getAttribute("data-value"));
-          });
 
-          return this;
+    this.addColor = function(options){
+
+          var range = d3.extent(data, function(d) { return d[geoValueColumn]; })
+          , setColor = d3.scale.category10()
+
+            if (options.palette.constructor == Array){
+                setColor = d3.scale.ordinal()
+                            .range(options.palette);
+            } else if (options.palette.constructor == Object) {
+                setColor = d3.scale.linear()
+                            .domain(range)
+                            .range([options.palette.min, options.palette.max])
+            } else if (options.palette.constructor = String) {
+                setColor = function(d) {return options.palette;}
+            }
+
+            for (_opt in options) {
+
+                this.paths.style(_opt, options[_opt])
+
+            }
+
+            this.paths
+                .style('fill', function(d){
+                return setColor(this.getAttribute("data-value"))})
+
+            return this;
     }
 
    this.addTooltip = function(elements) {
@@ -741,11 +772,12 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
         return this;
     }
 
-    this.addMarker = function(shape, color, scale, coordinate) {
-        var shape = shape || 'circle'
-        , color = color || "steelblue"
-        , scale = scale || 1.0
-        , coordinate = coordinate || undefined
+    this.addMarker = function(options) {
+        var shape = options.shape || 'circle'
+        , color = options.color || "steelblue"
+        , scale = options.scale || 1.0
+        , opacity = options.opacity || 1.0
+        , coordinate = options.coordinate || undefined
         , projection = this.projection;
 
         var markers = this.svg.selectAll(shape)
@@ -755,14 +787,14 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
             .attr("class","jarvis-circle")
             .attr("id", function (d) { return d[geoUnitColumn];})
             .attr("cx", function (d) {
-                return (coordinate)? d[coordinate[0]]: projection([d.long, d.lat])[0];
+                return projection([d.long, d.lat])[0];
                 })
             .attr("cy", function (d) {
-                return (coordinate)? d[coordinate[1]]: projection([d.long, d.lat])[1];
+                return projection([d.long, d.lat])[1];
              })
             .attr("r", function (d) {  return Math.log(d[geoValueColumn]) * scale; })
             .attr("fill", color)
-            .attr('opacity', 0.5)
+            .attr('opacity', opacity)
             .attr("data-name", function(d) { return d[geoUnitColumn]; })
             .attr("data-value", function(d) { return d[geoValueColumn]; });
 
@@ -814,8 +846,8 @@ function drawMapChart(data, options, topology) {
     );
 
     var mapChartApi = {
-        addColor: function() {
-            chart.addColor();
+        addColor: function(column, options) {
+            chart.addColor(column, options);
             return mapChartApi;
         },
 
@@ -1269,8 +1301,7 @@ function drawForceGraph(data, options){
 
         addColor: function(column, options) {
 
-            console.log(options);
-
+            var range = d3.extent(d3.values(_nodes), function(d){ return d[column]});
             var setColor = d3.scale.category10();
 
             if (options.palette.constructor == Array){
@@ -1278,7 +1309,7 @@ function drawForceGraph(data, options){
                             .range(options.palette);
             } else if (options.palette.constructor == Object) {
                 setColor = d3.scale.linear()
-                            .domain(d3.extent(d3.values(_nodes), function(d){ return d[column]}))
+                            .domain(range)
                             .range([options.palette.min, options.palette.max])
             } else if (options.palette.constructor = String) {
                 setColor = function(d) {return options.palette;}

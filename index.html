@@ -120,7 +120,7 @@ geoUnitColumn: 'airport',
 geoValueColumn: 'traffic',
 canvasHeight:600})
 .addTooltip()
-.addMarker(shape='circle', "steelblue", scale = 3.5);
+.addMarker({shape:'circle', color:"steelblue", scale: 3.5, opacity: 0.5});
 
 
 jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
@@ -182,7 +182,7 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    geoValueColumn: 'searches',
    canvasHeight:600,
    })
-   .addColor()
+   .addColor(options = {palette: {min:"#6363FF", max: "#01046b"}, opacity: 0.7})
    .addTooltip();
 
 
@@ -409,7 +409,7 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    geoValueColumn: 'searches',
  }
  )
- .addColor()
+ .addColor(options = {palette: {min:"lightgreen", max: "#456b01"}, opacity: 0.4})
  .addTooltip()
  .enableZoom()
 
@@ -637,7 +637,7 @@ jarvis.MapChart(data = [{'searches': 623, 'state': 'Massachusetts'},
    canvasHeight: 600,
    canvasWidth: 600,
  })
- .addColor()
+ .addColor(options = {palette: {min:"lightblue", max: "steelblue"}, opacity: 0.5})
  .addTooltip()
  .enableZoom()
  .enableClickToCenter();

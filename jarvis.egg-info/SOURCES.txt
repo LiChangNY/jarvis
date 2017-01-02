@@ -6,6 +6,7 @@ jarvis/jarvis.min.js
 jarvis/jarvis.py
 jarvis/jarvis.pyc
 jarvis/records
+jarvis/split
 jarvis/test.ipynb
 jarvis.egg-info/PKG-INFO
 jarvis.egg-info/SOURCES.txt
@@ -23,7 +24,11 @@ jarvis/files/jquery.sumoselect.min.js
 jarvis/files/sankey.js
 jarvis/files/sumoselect.css
 jarvis/files/topojson.v1.min.js
+jarvis/files/maps/countries-names.csv
+jarvis/files/maps/countries-names.json
+jarvis/files/maps/countries-names.txt
 jarvis/files/maps/countries.json
+jarvis/files/maps/country_converter.py
 jarvis/files/maps/us-states.json
 jarvis/templates/chartBuilder.html
 jarvis/test/airports.csv
