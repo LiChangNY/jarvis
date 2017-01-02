@@ -90,20 +90,30 @@ class Jarvis(object):
 
         self.html_content = template.render(chart=self.chart_options)
 
-    def addColor(self, column):
+    def addColor(self, column, options):
 
         """
         Function for adjust color properties to primary objects.
-        :param column: reference column for coloring.
-
+        :param column: reference column for color encoding.
+        :param options: options to configure color encoding, examples:
+            options:{
+                "palette": "steelblue" # A string. All nodes share the same color regardless of column value.
+                           ["#6363FF", "#FF7363", "#0a9700"] # A list. Use if column value is categorical.
+                           {"min": "#6363FF", "max": "#0a9700"} # A dictionary, if column value is on a continuous scale.
+                "stroke": "true" # Apply color palette to stroke
+                "fill": "true", # Apply color palette to fill
+                "opacity": "0.7", # Specify opacity of the node
+                "stroke-width":2, # Specify stroke width of the node
+                "stroke-opacity": 0.5 #Specify stroke opacity of the node
+                     }
         """
-        ##TODO: Enable color options, e.g. scale vs. categorical values.
 
         self.html_content += """
             <script type="text/javascript">
-                %s.addColor(column="%s");
+                %s.addColor(column="%s", options = %s);
             </script>
-        """ % (self._id, column)
+        """ % (self._id, column, options)
+
 
     def addTooltip(self):
 
@@ -163,7 +173,7 @@ class MapChart(Jarvis):
 
         super(MapChart, self).__init__(dataframe, *args, **kwargs)
 
-    def addColor(self):
+    def addColor(self, options):
 
         """
         Function to adjust color properties of the primary unit of geomap.
@@ -173,13 +183,13 @@ class MapChart(Jarvis):
 
         self.html_content += """
             <script type="text/javascript">
-                %s.addColor();
+                %s.addColor(options=%s);
             </script>
-        """ % self._id
+        """ % (self._id, options)
 
         return self;
 
-    def addMarker(self, shape='circle', color="steelblue", scale=1.0):
+    def addMarker(self, options):
 
         """
         Function for adding markers based on "value" column.
@@ -187,14 +197,15 @@ class MapChart(Jarvis):
         :param shape: e.g. circle, rect, ellipse, line, polyline. Only circle supported ATM.
         :param color: color properties.
         :param scale: adjustment of scale.
-
+        :param coordinate: allows for specifying [latitude, longitude] coordinates.
         """
 
+        ##TODO: Add reference column, default as geoUnitColumn
         self.html_content += """
             <script type="text/javascript">
-                %s.addMarker(type='%s', color = '%s', scale=%f);
+                %s.addMarker(options=%s);
             </script>
-        """ % (self._id, shape, color, scale)
+        """ % (self._id, options)
 
         return self;
 
