@@ -1037,7 +1037,7 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
 
     this.svg = this.drawCanvas();
 
-    // Modified from https://github.com/soxofaan/d3-plugin-captain-sankey
+    // Modified from https://bl.ocks.org/austinczarnecki/cc6371af0b726e61b9ab
     var formatNumber = d3.format(",.0f"),
         format = function(d) { return formatNumber(d); },
         color = d3.scale.category20();
@@ -1098,10 +1098,12 @@ SankeyBuilder = function(id, links, nodes, canvasWidth, canvasHeight, width, hei
         .attr("x", 6 + sankey.nodeWidth())
         .attr("text-anchor", "start");
 
+    var self = this;
+
     function dragmove(d) {
       d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) +  ")");
       sankey.relayout();
-      this.link.attr("d", path);
+      self.link.attr("d", path);
     }
 
     return this;
