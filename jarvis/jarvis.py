@@ -3,7 +3,7 @@ from jinja2 import Environment, PackageLoader
 from IPython.display import display, HTML, Javascript
 import os
 import jinja2
-from pkg_resources import resource_string
+from pkg_resources import resource_string, resource_filename
 import pandas as pd
 
 
@@ -159,6 +159,26 @@ class MapChart(Jarvis):
         self.region = region
         self.geoUnitColumn=unit
         self.geoValueColumn=value
+        self.coerce_country=kwargs.get("coerce_country", True)
+
+        dataframe = dataframe.copy()
+
+        if region == "world":
+
+            countries_names = resource_filename(__name__, '/files/maps/countries-names.csv')
+            topology_names = pd.read_csv(countries_names)
+
+            topology_names.set_index('value', inplace=True)
+            dataframe[unit+"_id"] = dataframe[unit].map(topology_names['id'])
+
+            if dataframe[unit+"_id"].isnull().any() and self.coerce_country:
+                display(dataframe[dataframe[unit+"_id"].isnull()])
+                raise Exception("""The countries above can't be a assigned an alpha-3 country id. \
+                Either correct the names or use coerce_country=False to ignore the value. \ """)
+            else:
+                dataframe.dropna(subset=[unit+"_id"],inplace=True)
+
+            dataframe[unit] = dataframe[unit+"_id"]
 
         map_options = {
             "world": {"path": "files/maps/countries.json"},

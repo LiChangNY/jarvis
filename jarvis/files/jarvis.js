@@ -581,11 +581,11 @@ MapBuilder = function(id, data, topology, projectionType, region, canvasWidth, c
                 return d.id;
               })
               .attr('data-name', function(d) {
-                return d.properties.name;
+                return d.id;
               })
               .attr('data-value', function(d) {
                 if (data) {
-                    var match = data.find(function (d2) { return d2[geoUnitColumn] == d.properties.name});
+                    var match = data.find(function (d2) { return d2[geoUnitColumn] == d.id});
 
                     if (match) { return match[geoValueColumn]; }
                 }
