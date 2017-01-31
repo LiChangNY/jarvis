@@ -8,20 +8,20 @@ If you want to visualize basic graphes (e.g., line charts, bar charts, and pie c
 
 ### Force-directed graph
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/force%20graph.png" width="600" height="450">
+<img src="img/force%20graph.png" width="600" height="450">
 
 ### Sankey chart
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/sankey.png" width="600" height="450">
+<img src="img/sankey.png" width="600" height="450">
 
 ### Radial chart
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/radial.png" width="600" height="550">
+<img src="img/radial.png" width="600" height="550">
 
 ### Geo-map
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/map.png" width="600" height="450">
+<img src="img/map.png" width="600" height="450">
 
 ### A map with orthographic projection
 
-<img src="https://github.com/LiChangNY/jarvis/blob/master/img/globe.png" width="480" height="450">
+<img src="img/globe.png" width="480" height="450">
